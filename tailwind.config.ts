@@ -47,6 +47,19 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // Trading colors
+        profit: {
+          DEFAULT: "hsl(var(--profit-green))",
+          foreground: "hsl(var(--profit-green-foreground))",
+        },
+        warning: {
+          DEFAULT: "hsl(var(--warning-yellow))",
+          foreground: "hsl(var(--warning-yellow-foreground))",
+        },
+        loss: {
+          DEFAULT: "hsl(var(--loss-red))",
+          foreground: "hsl(var(--loss-red-foreground))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
@@ -62,6 +75,21 @@ export default {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+      },
+      backgroundImage: {
+        'gradient-primary': 'var(--gradient-primary)',
+        'gradient-profit': 'var(--gradient-profit)',
+        'gradient-loss': 'var(--gradient-loss)',
+        'gradient-hero': 'var(--gradient-hero)',
+      },
+      boxShadow: {
+        'glow': 'var(--shadow-glow)',
+        'profit': 'var(--shadow-profit)',
+        'loss': 'var(--shadow-loss)',
+      },
+      transitionProperty: {
+        'smooth': 'var(--transition-smooth)',
+        'glow': 'var(--transition-glow)',
       },
       keyframes: {
         "accordion-down": {

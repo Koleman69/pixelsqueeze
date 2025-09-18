@@ -3,9 +3,13 @@ import { PortfolioCard } from "@/components/PortfolioCard";
 import { BacktestResults } from "@/components/BacktestResults";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
-import { Bell, Shield, TrendingUp, Zap, BarChart3, Target, LogOut } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Bell, Shield, TrendingUp, Zap, BarChart3, Target, LogOut, User, Sparkles } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import UserProfile from "@/components/UserProfile";
+import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
 import heroImage from "@/assets/crypto-hero.jpg";
 
 const mockSignals = [
@@ -67,9 +71,42 @@ const backtestData = [
 
 const Index = () => {
   const { user, signOut } = useAuth();
+  const { toast } = useToast();
+  const [showProfile, setShowProfile] = useState(false);
+  const [aiInsight, setAiInsight] = useState<string>("");
+  const [loadingInsight, setLoadingInsight] = useState(false);
 
   const handleSignOut = async () => {
     await signOut();
+  };
+
+  const getAIInsight = async () => {
+    setLoadingInsight(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('ai-insights', {
+        body: {
+          prompt: "Analyze the current crypto market conditions and provide 3 specific trading recommendations for maximizing portfolio growth in the next 7 days.",
+          userId: user?.id
+        }
+      });
+
+      if (error) throw error;
+
+      setAiInsight(data.insight);
+      toast({
+        title: "AI Insight Generated",
+        description: "Fresh market analysis ready!"
+      });
+    } catch (error) {
+      console.error('Error getting AI insight:', error);
+      toast({
+        title: "Error",
+        description: "Failed to generate AI insight",
+        variant: "destructive"
+      });
+    } finally {
+      setLoadingInsight(false);
+    }
   };
 
   return (
@@ -85,6 +122,23 @@ const Index = () => {
             <span className="text-sm text-muted-foreground">
               Welcome, {user?.email}
             </span>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => setShowProfile(!showProfile)}
+            >
+              <User className="w-4 h-4 mr-2" />
+              Profile
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={getAIInsight}
+              disabled={loadingInsight}
+            >
+              <Sparkles className="w-4 h-4 mr-2" />
+              AI Insight
+            </Button>
             <Button variant="outline" size="sm" onClick={handleSignOut}>
               <LogOut className="w-4 h-4 mr-2" />
               Sign Out
@@ -92,6 +146,34 @@ const Index = () => {
           </div>
         </div>
       </nav>
+
+      {/* User Profile Section */}
+      {showProfile && (
+        <section className="py-8 px-6 bg-secondary/20">
+          <div className="max-w-4xl mx-auto">
+            <UserProfile />
+          </div>
+        </section>
+      )}
+
+      {/* AI Insights Section */}
+      {aiInsight && (
+        <section className="py-8 px-6 bg-card border-b border-border">
+          <div className="max-w-4xl mx-auto">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-primary" />
+                  AI Market Insights
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground whitespace-pre-wrap">{aiInsight}</p>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+      )}
 
       {/* Hero Section */}
       <section className="relative py-20 px-6 overflow-hidden">

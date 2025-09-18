@@ -4,7 +4,8 @@ import { BacktestResults } from "@/components/BacktestResults";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Bell, Shield, TrendingUp, Zap, BarChart3, Target } from "lucide-react";
+import { Bell, Shield, TrendingUp, Zap, BarChart3, Target, LogOut } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 import heroImage from "@/assets/crypto-hero.jpg";
 
 const mockSignals = [
@@ -65,8 +66,33 @@ const backtestData = [
 ];
 
 const Index = () => {
+  const { user, signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+  };
+
   return (
     <div className="min-h-screen bg-background">
+      {/* Navigation Bar */}
+      <nav className="bg-card border-b border-border px-6 py-4">
+        <div className="max-w-7xl mx-auto flex justify-between items-center">
+          <div className="flex items-center">
+            <TrendingUp className="w-6 h-6 text-primary mr-2" />
+            <h1 className="text-xl font-bold">Pixel Squeeze</h1>
+          </div>
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-muted-foreground">
+              Welcome, {user?.email}
+            </span>
+            <Button variant="outline" size="sm" onClick={handleSignOut}>
+              <LogOut className="w-4 h-4 mr-2" />
+              Sign Out
+            </Button>
+          </div>
+        </div>
+      </nav>
+
       {/* Hero Section */}
       <section className="relative py-20 px-6 overflow-hidden">
         <div 

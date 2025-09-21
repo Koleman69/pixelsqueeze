@@ -4,10 +4,11 @@ import { BacktestResults } from "@/components/BacktestResults";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Bell, Shield, TrendingUp, Zap, BarChart3, Target, LogOut, User, Sparkles } from "lucide-react";
+import { Bell, Shield, TrendingUp, Zap, BarChart3, Target, LogOut, User, Sparkles, Image } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import UserProfile from "@/components/UserProfile";
+import ImageProcessor from "@/components/ImageProcessor";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import heroImage from "@/assets/crypto-hero.jpg";
@@ -73,6 +74,7 @@ const Index = () => {
   const { user, signOut } = useAuth();
   const { toast } = useToast();
   const [showProfile, setShowProfile] = useState(false);
+  const [showImageProcessor, setShowImageProcessor] = useState(false);
   const [aiInsight, setAiInsight] = useState<string>("");
   const [loadingInsight, setLoadingInsight] = useState(false);
 
@@ -133,6 +135,14 @@ const Index = () => {
             <Button 
               variant="outline" 
               size="sm" 
+              onClick={() => setShowImageProcessor(!showImageProcessor)}
+            >
+              <Image className="w-4 h-4 mr-2" />
+              Image Tools
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
               onClick={getAIInsight}
               disabled={loadingInsight}
             >
@@ -152,6 +162,15 @@ const Index = () => {
         <section className="py-8 px-6 bg-secondary/20">
           <div className="max-w-4xl mx-auto">
             <UserProfile />
+          </div>
+        </section>
+      )}
+
+      {/* Image Processor Section */}
+      {showImageProcessor && (
+        <section className="py-8 px-6 bg-secondary/20">
+          <div className="max-w-4xl mx-auto">
+            <ImageProcessor />
           </div>
         </section>
       )}

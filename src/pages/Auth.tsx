@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, TrendingUp } from "lucide-react";
+import { Loader2, Minimize2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const Auth = () => {
@@ -128,11 +128,11 @@ const Auth = () => {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="flex items-center justify-center mb-4">
-            <TrendingUp className="w-8 h-8 text-primary mr-2" />
+            <Minimize2 className="w-8 h-8 text-primary mr-2" />
             <h1 className="text-2xl font-bold">Pixel Squeeze</h1>
           </div>
           <p className="text-muted-foreground">
-            Join the exclusive $100 to $10,000 trading challenge
+            Experience professional-grade image compression
           </p>
         </div>
 

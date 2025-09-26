@@ -2,11 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Crypto Trading Platform Design System */
+/* Photo Compression Platform Design System */
 
 @layer base {
   :root {
-    /* Dark trading theme */
+    /* Dark professional theme */
     --background: 222 15% 8%;
     --foreground: 210 40% 98%;
 
@@ -16,7 +16,7 @@
     --popover: 222 15% 10%;
     --popover-foreground: 210 40% 98%;
 
-    /* Crypto blue primary */
+    /* Compression blue primary */
     --primary: 217 91% 60%;
     --primary-foreground: 222 15% 8%;
 
@@ -29,7 +29,7 @@
     --accent: 217 91% 60%;
     --accent-foreground: 222 15% 8%;
 
-    /* Trading signals */
+    /* Compression status colors */
     --profit-green: 142 76% 36%;
     --profit-green-foreground: 210 40% 98%;
     
@@ -48,13 +48,13 @@
 
     --radius: 0.75rem;
 
-    /* Trading gradients */
+    /* Compression gradients */
     --gradient-primary: linear-gradient(135deg, hsl(217 91% 60%), hsl(217 91% 70%));
     --gradient-profit: linear-gradient(135deg, hsl(142 76% 36%), hsl(142 76% 46%));
     --gradient-loss: linear-gradient(135deg, hsl(0 84% 60%), hsl(0 84% 70%));
     --gradient-hero: linear-gradient(135deg, hsl(222 15% 8%), hsl(222 15% 12%));
     
-    /* Trading shadows */
+    /* Compression shadows */
     --shadow-glow: 0 0 40px hsl(217 91% 60% / 0.3);
     --shadow-profit: 0 8px 32px hsl(142 76% 36% / 0.3);
     --shadow-loss: 0 8px 32px hsl(0 84% 60% / 0.3);

@@ -47,7 +47,7 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        // Trading colors
+        // Compression status colors
         profit: {
           DEFAULT: "hsl(var(--profit-green))",
           foreground: "hsl(var(--profit-green-foreground))",

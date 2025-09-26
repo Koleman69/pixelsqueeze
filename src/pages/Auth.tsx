@@ -92,7 +92,9 @@ const Auth = () => {
     try {
       const redirectUrl = `${window.location.origin}/`;
       
-      const { error } = await supabase.auth.signUp({
+      console.log('Attempting signup with:', { email: formData.email, redirectUrl });
+      
+      const { data, error } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
         options: {
@@ -100,19 +102,32 @@ const Auth = () => {
         }
       });
 
+      console.log('Signup response:', { data, error });
+
       if (error) {
+        console.error('Signup error:', error);
         toast({
           title: "Signup failed",
           description: error.message,
           variant: "destructive"
         });
       } else {
-        toast({
-          title: "Success",
-          description: "Account created! Please check your email for verification."
-        });
+        console.log('Signup successful:', data);
+        if (data.user && !data.user.email_confirmed_at) {
+          toast({
+            title: "Success",
+            description: "Account created! Please check your email for verification."
+          });
+        } else {
+          toast({
+            title: "Success",
+            description: "Account created successfully!"
+          });
+          navigate("/");
+        }
       }
     } catch (error) {
+      console.error('Signup exception:', error);
       toast({
         title: "Error",
         description: "An unexpected error occurred",

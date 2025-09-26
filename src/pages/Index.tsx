@@ -6,6 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Upload, Shield, TrendingDown, Zap, BarChart3, Target, LogOut, Image, FileImage, Minimize2, HardDrive } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
+import { useRef } from "react";
 import heroImage from "@/assets/compression-hero.jpg";
 
 const mockCompressions = [
@@ -46,9 +48,26 @@ const compressionData = [
 
 const Index = () => {
   const { user, signOut } = useAuth();
+  const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSignOut = async () => {
     await signOut();
+  };
+
+  const handleFileUpload = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      const fileNames = Array.from(files).map(file => file.name).join(', ');
+      toast({
+        title: "Files selected",
+        description: `Selected ${files.length} file(s): ${fileNames}. Compression feature coming soon!`,
+      });
+    }
   };
 
   return (
@@ -96,7 +115,7 @@ const Index = () => {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button size="lg" className="bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90 px-8 py-3">
+            <Button size="lg" className="bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90 px-8 py-3" onClick={handleFileUpload}>
               <Upload className="w-5 h-5 mr-2" />
               Start Compressing
             </Button>
@@ -104,6 +123,15 @@ const Index = () => {
               View Analytics
             </Button>
           </div>
+          
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            multiple
+            className="hidden"
+            onChange={handleFileChange}
+          />
         </div>
       </section>
 
@@ -228,7 +256,7 @@ const Index = () => {
             Start compressing your images today and experience the perfect balance of quality and file size reduction.
           </p>
           
-          <Button size="lg" className="bg-gradient-profit text-profit-foreground shadow-profit hover:opacity-90 px-8 py-4 text-lg">
+          <Button size="lg" className="bg-gradient-profit text-profit-foreground shadow-profit hover:opacity-90 px-8 py-4 text-lg" onClick={handleFileUpload}>
             <Upload className="w-6 h-6 mr-2" />
             Upload Your Images
           </Button>

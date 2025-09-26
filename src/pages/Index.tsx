@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Upload, Shield, TrendingDown, Zap, BarChart3, Target, LogOut, Image, FileImage, Minimize2, HardDrive } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { useImageCompression } from "@/hooks/useImageCompression";
 import { useRef } from "react";
 import heroImage from "@/assets/compression-hero.jpg";
 
@@ -49,6 +50,7 @@ const compressionData = [
 const Index = () => {
   const { user, signOut } = useAuth();
   const { toast } = useToast();
+  const { compressions, compressMultipleImages } = useImageCompression();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSignOut = async () => {
@@ -59,14 +61,19 @@ const Index = () => {
     fileInputRef.current?.click();
   };
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files && files.length > 0) {
-      const fileNames = Array.from(files).map(file => file.name).join(', ');
       toast({
-        title: "Files selected",
-        description: `Selected ${files.length} file(s): ${fileNames}. Compression feature coming soon!`,
+        title: "Starting compression",
+        description: `Processing ${files.length} image(s)...`,
       });
+      
+      try {
+        await compressMultipleImages(files, 80);
+      } catch (error) {
+        console.error('Compression failed:', error);
+      }
     }
   };
 
@@ -188,9 +195,15 @@ const Index = () => {
           </div>
           
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {mockCompressions.map((compression, index) => (
-              <CompressionStatus key={index} {...compression} />
-            ))}
+            {compressions.length > 0 ? (
+              compressions.slice(0, 3).map((compression) => (
+                <CompressionStatus key={compression.id} {...compression} />
+              ))
+            ) : (
+              mockCompressions.map((compression, index) => (
+                <CompressionStatus key={index} {...compression} />
+              ))
+            )}
           </div>
         </div>
       </section>

@@ -4,21 +4,25 @@ import { Button } from "@/components/ui/button";
 import { CheckCircle, AlertCircle, XCircle, Download, Eye } from "lucide-react";
 
 interface CompressionStatusProps {
+  id?: string;
   fileName: string;
   originalSize: number;
   compressedSize: number;
   compressionRatio: number;
   quality: number;
   status: "completed" | "processing" | "failed";
+  error?: string;
 }
 
 export const CompressionStatus = ({ 
-  fileName,
-  originalSize,
-  compressedSize,
-  compressionRatio,
-  quality,
-  status
+  id,
+  fileName, 
+  originalSize, 
+  compressedSize, 
+  compressionRatio, 
+  quality, 
+  status,
+  error
 }: CompressionStatusProps) => {
   const getStatusColor = () => {
     switch (status) {
@@ -120,9 +124,8 @@ export const CompressionStatus = ({
 
       {status === 'failed' && (
         <div className="space-y-3">
-          <div className="flex justify-between items-center">
-            <span className="text-sm text-muted-foreground">Error</span>
-            <span className="text-sm font-medium text-loss">Compression failed</span>
+          <div className="text-destructive text-sm">
+            {error || 'Compression failed. Please try again.'}
           </div>
           <Button size="sm" variant="outline" className="w-full">
             Try Again

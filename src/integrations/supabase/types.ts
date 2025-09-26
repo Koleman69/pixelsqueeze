@@ -291,54 +291,7 @@ export type Database = {
       }
     }
     Views: {
-      subscriber_safe_status: {
-        Row: {
-          access_count: number | null
-          created_at: string | null
-          data_classification: string | null
-          email_status: string | null
-          id: string | null
-          last_accessed: string | null
-          security_level: string | null
-          stripe_status: string | null
-          subscribed: boolean | null
-          subscription_end: string | null
-          subscription_tier: string | null
-          updated_at: string | null
-          user_id: string | null
-        }
-        Insert: {
-          access_count?: number | null
-          created_at?: string | null
-          data_classification?: string | null
-          email_status?: never
-          id?: string | null
-          last_accessed?: string | null
-          security_level?: string | null
-          stripe_status?: never
-          subscribed?: boolean | null
-          subscription_end?: string | null
-          subscription_tier?: string | null
-          updated_at?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          access_count?: number | null
-          created_at?: string | null
-          data_classification?: string | null
-          email_status?: never
-          id?: string | null
-          last_accessed?: string | null
-          security_level?: string | null
-          stripe_status?: never
-          subscribed?: boolean | null
-          subscription_end?: string | null
-          subscription_tier?: string | null
-          updated_at?: string | null
-          user_id?: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       count_subscriber_access_last_hour: {
@@ -348,6 +301,24 @@ export type Database = {
       get_my_subscription_status: {
         Args: Record<PropertyKey, never>
         Returns: Json
+      }
+      get_safe_subscriber_status: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          access_count: number
+          created_at: string
+          data_classification: string
+          email_status: string
+          id: string
+          last_accessed: string
+          security_level: string
+          stripe_status: string
+          subscribed: boolean
+          subscription_end: string
+          subscription_tier: string
+          updated_at: string
+          user_id: string
+        }[]
       }
       get_safe_subscription_status: {
         Args: Record<PropertyKey, never>

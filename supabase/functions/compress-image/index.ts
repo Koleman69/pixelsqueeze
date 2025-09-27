@@ -7,21 +7,31 @@ const corsHeaders = {
 }
 
 interface CompressionRequest {
-  file: string; // base64 encoded image
-  fileName: string;
+  files: Array<{
+    file: string; // base64 encoded image
+    fileName: string;
+  }>;
   quality?: number;
   maxWidth?: number;
   maxHeight?: number;
+  dpi?: number;
+  isBulk?: boolean;
 }
 
 interface CompressionResponse {
   success: boolean;
-  originalSize: number;
-  compressedSize: number;
-  compressionRatio: number;
-  quality: number;
-  compressedImage?: string;
+  results: Array<{
+    fileName: string;
+    originalSize: number;
+    compressedSize: number;
+    compressionRatio: number;
+    quality: number;
+    compressedImage?: string;
+    error?: string;
+  }>;
+  bulkDownloadUrl?: string;
   error?: string;
+  requiresSubscription?: boolean;
 }
 
 serve(async (req) => {
@@ -36,39 +46,136 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_ANON_KEY') ?? ''
     )
 
-    const { file, fileName, quality = 80, maxWidth = 1920, maxHeight = 1920 }: CompressionRequest = await req.json()
+    const { files, quality = 80, maxWidth = 1920, maxHeight = 1920, dpi = 72, isBulk = false }: CompressionRequest = await req.json()
     
-    console.log(`Starting compression for ${fileName} with quality ${quality}`)
+    // Check if user is authenticated for premium features
+    let isSubscribed = false;
+    const authHeader = req.headers.get("Authorization");
+    
+    if (authHeader) {
+      try {
+        const token = authHeader.replace("Bearer ", "");
+        const { data: userData } = await supabase.auth.getUser(token);
+        
+        if (userData?.user?.email) {
+          // Check subscription status
+          const checkSubResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/check-subscription`, {
+            method: 'POST',
+            headers: {
+              'Authorization': authHeader,
+              'Content-Type': 'application/json'
+            }
+          });
+          
+          if (checkSubResponse.ok) {
+            const subData = await checkSubResponse.json();
+            isSubscribed = subData.subscribed;
+          }
+        }
+      } catch (error) {
+        console.warn('Failed to check subscription:', error);
+      }
+    }
 
-    // Decode base64 image
-    const imageData = Uint8Array.from(atob(file), c => c.charCodeAt(0))
-    const originalSize = imageData.length
+    // Limit features for non-subscribers
+    if (!isSubscribed) {
+      if (files.length > 3) {
+        return new Response(JSON.stringify({
+          success: false,
+          error: "Free users can only compress up to 3 images at once. Subscribe to Pixel Squeeze Pro for unlimited bulk compression.",
+          requiresSubscription: true,
+          results: []
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200
+        });
+      }
+      
+      if (dpi > 72 || maxWidth > 1920 || maxHeight > 1920) {
+        return new Response(JSON.stringify({
+          success: false,
+          error: "Advanced features like custom DPI and large sizes require Pixel Squeeze Pro subscription.",
+          requiresSubscription: true,
+          results: []
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200
+        });
+      }
+    }
 
-    console.log(`Original file size: ${originalSize} bytes`)
+    console.log(`Starting ${isBulk ? 'bulk ' : ''}compression for ${files.length} files with quality ${quality}, DPI ${dpi}`);
 
-    // Create a simple compression simulation
-    // In a real implementation, you'd use an image processing library
-    const compressionFactor = Math.max(0.1, quality / 100)
-    const simulatedCompressedSize = Math.floor(originalSize * compressionFactor)
-    const compressionRatio = Math.round((1 - compressionFactor) * 100)
+    const results = [];
+    
+    for (const fileData of files) {
+      try {
+        console.log(`Processing ${fileData.fileName}`);
+        
+        // Decode base64 image
+        const imageData = Uint8Array.from(atob(fileData.file), c => c.charCodeAt(0));
+        const originalSize = imageData.length;
 
-    // Simulate processing time
-    await new Promise(resolve => setTimeout(resolve, 2000 + Math.random() * 3000))
+        console.log(`Original file size: ${originalSize} bytes`);
 
-    // For demo purposes, we'll return the original image as "compressed"
-    // In a real implementation, you'd process the image here
-    const compressedImage = file
+        // Enhanced compression simulation with DPI and resizing considerations
+        let compressionFactor = Math.max(0.1, quality / 100);
+        
+        // Adjust compression based on DPI (higher DPI = larger file)
+        if (dpi > 72) {
+          compressionFactor *= (72 / dpi) * 0.8; // Reduce compression efficiency for higher DPI
+        }
+        
+        // Adjust for resizing
+        const resizeFactor = (maxWidth * maxHeight) / (1920 * 1920);
+        if (resizeFactor < 1) {
+          compressionFactor *= resizeFactor; // Smaller dimensions = better compression
+        }
 
-    console.log(`Compression complete: ${originalSize} -> ${simulatedCompressedSize} bytes (${compressionRatio}% reduction)`)
+        const simulatedCompressedSize = Math.floor(originalSize * compressionFactor);
+        const compressionRatio = Math.round((1 - compressionFactor) * 100);
+
+        // Simulate processing time (longer for premium features)
+        const processingTime = isSubscribed ? 
+          1000 + Math.random() * 2000 : // Faster processing for subscribers
+          2000 + Math.random() * 3000;  // Standard processing time
+          
+        await new Promise(resolve => setTimeout(resolve, processingTime));
+
+        results.push({
+          fileName: fileData.fileName,
+          originalSize,
+          compressedSize: simulatedCompressedSize,
+          compressionRatio,
+          quality: Math.min(quality, isSubscribed ? 100 : 85), // Limit quality for free users
+          compressedImage: fileData.file // In real implementation, this would be the processed image
+        });
+
+        console.log(`Compression complete: ${originalSize} -> ${simulatedCompressedSize} bytes (${compressionRatio}% reduction)`);
+      } catch (error) {
+        console.error(`Error processing ${fileData.fileName}:`, error);
+        results.push({
+          fileName: fileData.fileName,
+          originalSize: 0,
+          compressedSize: 0,
+          compressionRatio: 0,
+          quality: 0,
+          error: `Failed to process ${fileData.fileName}: ${error.message}`
+        });
+      }
+    }
+
+    // Generate bulk download URL for subscribers with multiple files
+    let bulkDownloadUrl;
+    if (isBulk && isSubscribed && results.length > 1) {
+      bulkDownloadUrl = `data:application/zip;base64,${btoa('bulk-download-placeholder')}`;
+    }
 
     const response: CompressionResponse = {
       success: true,
-      originalSize,
-      compressedSize: simulatedCompressedSize,
-      compressionRatio,
-      quality,
-      compressedImage
-    }
+      results,
+      bulkDownloadUrl
+    };
 
     return new Response(
       JSON.stringify(response),
@@ -78,21 +185,18 @@ serve(async (req) => {
           'Content-Type': 'application/json'
         } 
       }
-    )
+    );
 
   } catch (error) {
-    console.error('Compression error:', error)
+    console.error('Compression error:', error);
     
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     
     const errorResponse: CompressionResponse = {
       success: false,
-      originalSize: 0,
-      compressedSize: 0,
-      compressionRatio: 0,
-      quality: 0,
+      results: [],
       error: errorMessage
-    }
+    };
 
     return new Response(
       JSON.stringify(errorResponse),
@@ -103,6 +207,6 @@ serve(async (req) => {
           'Content-Type': 'application/json'
         } 
       }
-    )
+    );
   }
 })

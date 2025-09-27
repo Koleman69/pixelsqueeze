@@ -1,14 +1,15 @@
 import { CompressionStatus } from "@/components/CompressionStatus";
 import { StatsCard } from "@/components/StatsCard";
 import { CompressionResults } from "@/components/CompressionResults";
+import { ImageUploader } from "@/components/ImageUploader";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Upload, Shield, TrendingDown, Zap, BarChart3, Target, LogOut, Image, FileImage, Minimize2, HardDrive } from "lucide-react";
+import { Upload, Shield, TrendingDown, Zap, BarChart3, Target, LogOut, Image, FileImage, Minimize2, HardDrive, Crown } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useImageCompression } from "@/hooks/useImageCompression";
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import heroImage from "@/assets/compression-hero.jpg";
 
 const mockCompressions = [
@@ -50,8 +51,14 @@ const compressionData = [
 const Index = () => {
   const { user, signOut } = useAuth();
   const { toast } = useToast();
-  const { compressions, compressMultipleImages } = useImageCompression();
+  const { compressions, subscription, createCheckout, checkSubscription } = useImageCompression();
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (user) {
+      checkSubscription();
+    }
+  }, [user]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -65,15 +72,9 @@ const Index = () => {
     const files = event.target.files;
     if (files && files.length > 0) {
       toast({
-        title: "Starting compression",
+        title: "Processing images",
         description: `Processing ${files.length} image(s)...`,
       });
-      
-      try {
-        await compressMultipleImages(files, 80);
-      } catch (error) {
-        console.error('Compression failed:', error);
-      }
     }
   };
 
@@ -107,10 +108,20 @@ const Index = () => {
         <div className="absolute inset-0 bg-gradient-hero" />
         
         <div className="relative max-w-7xl mx-auto text-center">
-          <Badge variant="outline" className="mb-6 px-4 py-2 border-primary text-primary">
-            <Zap className="w-4 h-4 mr-2" />
-            Up to 80% File Size Reduction
-          </Badge>
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <Badge variant="outline" className="mb-4 px-4 py-2 border-primary text-primary">
+                <Zap className="w-4 h-4 mr-2" />
+                Up to 80% File Size Reduction
+              </Badge>
+            </div>
+            {subscription.subscribed && (
+              <Badge className="bg-gradient-primary">
+                <Crown className="w-4 h-4 mr-2" />
+                Pro Active
+              </Badge>
+            )}
+          </div>
           
           <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-primary via-foreground to-primary bg-clip-text text-transparent">
             Compress Images Without Quality Loss
@@ -126,9 +137,12 @@ const Index = () => {
               <Upload className="w-5 h-5 mr-2" />
               Start Compressing
             </Button>
-            <Button size="lg" variant="outline" className="border-primary text-primary hover:bg-primary/10 px-8 py-3">
-              View Analytics
-            </Button>
+            {!subscription.subscribed && (
+              <Button size="lg" className="bg-gradient-profit text-profit-foreground shadow-profit hover:opacity-90 px-8 py-3" onClick={createCheckout}>
+                <Crown className="w-5 h-5 mr-2" />
+                Upgrade to Pro
+              </Button>
+            )}
           </div>
           
           <input
@@ -142,8 +156,15 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Stats Overview */}
+      {/* Image Upload Studio */}
       <section className="py-16 px-6">
+        <div className="max-w-4xl mx-auto">
+          <ImageUploader />
+        </div>
+      </section>
+
+      {/* Stats Overview */}
+      <section className="py-16 px-6 bg-secondary/20">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-3xl font-bold mb-8 text-center">Your Compression Stats</h2>
           
@@ -269,9 +290,18 @@ const Index = () => {
             Start compressing your images today and experience the perfect balance of quality and file size reduction.
           </p>
           
-          <Button size="lg" className="bg-gradient-profit text-profit-foreground shadow-profit hover:opacity-90 px-8 py-4 text-lg" onClick={handleFileUpload}>
-            <Upload className="w-6 h-6 mr-2" />
-            Upload Your Images
+          <Button size="lg" className="bg-gradient-profit text-profit-foreground shadow-profit hover:opacity-90 px-8 py-4 text-lg" onClick={subscription.subscribed ? handleFileUpload : createCheckout}>
+            {subscription.subscribed ? (
+              <>
+                <Upload className="w-6 h-6 mr-2" />
+                Upload Your Images
+              </>
+            ) : (
+              <>
+                <Crown className="w-6 h-6 mr-2" />
+                Get Pro Access
+              </>
+            )}
           </Button>
           
           <p className="text-sm text-muted-foreground mt-4">

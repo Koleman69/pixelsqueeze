@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -21,6 +21,7 @@ interface ImageEditorProps {
 type EditorMode = 'crop' | 'resize' | 'ai';
 
 export const ImageEditor = ({ onComplete }: ImageEditorProps) => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string>('');
   const [crop, setCrop] = useState<Point>({ x: 0, y: 0 });
@@ -315,17 +316,25 @@ export const ImageEditor = ({ onComplete }: ImageEditorProps) => {
         </div>
 
         {!imageSrc ? (
-          <div className="border-2 border-dashed border-border rounded-lg p-8 text-center">
+          <div 
+            className="border-2 border-dashed border-border rounded-lg p-8 text-center cursor-pointer hover:border-primary transition-colors"
+            onClick={() => fileInputRef.current?.click()}
+          >
             <Upload className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
             <h3 className="text-lg font-semibold mb-2">Upload Image to Edit</h3>
             <p className="text-muted-foreground mb-4">
-              Select an image to start cropping or resizing
+              Click to select an image to start cropping, resizing, or AI editing
             </p>
-            <Input
+            <Button variant="outline" className="mx-auto">
+              <Upload className="w-4 h-4 mr-2" />
+              Choose Image
+            </Button>
+            <input
+              ref={fileInputRef}
               type="file"
               accept="image/*"
               onChange={handleFileSelect}
-              className="max-w-xs mx-auto"
+              className="hidden"
             />
           </div>
         ) : (

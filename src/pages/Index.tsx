@@ -251,8 +251,140 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Features */}
+      {/* Testimonials */}
       <section className="py-16 px-6">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-3xl font-bold mb-4 text-center">What Our Users Say</h2>
+          <p className="text-muted-foreground text-center mb-12 max-w-2xl mx-auto">
+            Join thousands of satisfied users who trust PixelSqueeze for their image compression needs
+          </p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <Card className="p-6">
+              <div className="flex gap-1 mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <span key={i} className="text-yellow-500 text-xl">★</span>
+                ))}
+              </div>
+              <p className="text-foreground mb-4 italic">
+                "PixelSqueeze saved me so much time! I used to spend hours manually compressing images for my e-commerce site. Now it takes seconds, and the quality is amazing. Highly recommend!"
+              </p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-gradient-primary flex items-center justify-center text-primary-foreground font-bold">
+                  SM
+                </div>
+                <div>
+                  <p className="font-semibold">Sarah Mitchell</p>
+                  <p className="text-sm text-muted-foreground">E-commerce Manager</p>
+                </div>
+              </div>
+            </Card>
+            
+            <Card className="p-6">
+              <div className="flex gap-1 mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <span key={i} className="text-yellow-500 text-xl">★</span>
+                ))}
+              </div>
+              <p className="text-foreground mb-4 italic">
+                "As a wedding photographer, file sizes were killing my storage budget. PixelSqueeze reduced my files by 75% without any visible quality loss. It's a game changer!"
+              </p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-gradient-profit flex items-center justify-center text-profit-foreground font-bold">
+                  JR
+                </div>
+                <div>
+                  <p className="font-semibold">James Rodriguez</p>
+                  <p className="text-sm text-muted-foreground">Professional Photographer</p>
+                </div>
+              </div>
+            </Card>
+            
+            <Card className="p-6">
+              <div className="flex gap-1 mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <span key={i} className="text-yellow-500 text-xl">★</span>
+                ))}
+              </div>
+              <p className="text-foreground mb-4 italic">
+                "The AI editing feature is incredible! I can transform backgrounds and apply filters in seconds. Worth every penny of the Pro subscription."
+              </p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-gradient-primary flex items-center justify-center text-primary-foreground font-bold">
+                  EL
+                </div>
+                <div>
+                  <p className="font-semibold">Emily Lin</p>
+                  <p className="text-sm text-muted-foreground">Social Media Manager</p>
+                </div>
+              </div>
+            </Card>
+            
+            <Card className="p-6">
+              <div className="flex gap-1 mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <span key={i} className="text-yellow-500 text-xl">★</span>
+                ))}
+              </div>
+              <p className="text-foreground mb-4 italic">
+                "Our website load time improved by 60% after using PixelSqueeze. Google rankings went up, and our bounce rate dropped significantly. This tool pays for itself!"
+              </p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-gradient-profit flex items-center justify-center text-profit-foreground font-bold">
+                  MK
+                </div>
+                <div>
+                  <p className="font-semibold">Michael Kim</p>
+                  <p className="text-sm text-muted-foreground">Web Developer</p>
+                </div>
+              </div>
+            </Card>
+            
+            <Card className="p-6">
+              <div className="flex gap-1 mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <span key={i} className="text-yellow-500 text-xl">★</span>
+                ))}
+              </div>
+              <p className="text-foreground mb-4 italic">
+                "I've tried many compression tools, but PixelSqueeze is the only one that delivers professional results consistently. The bulk processing saves me hours every week."
+              </p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-gradient-primary flex items-center justify-center text-primary-foreground font-bold">
+                  AP
+                </div>
+                <div>
+                  <p className="font-semibold">Amanda Peterson</p>
+                  <p className="text-sm text-muted-foreground">Graphic Designer</p>
+                </div>
+              </div>
+            </Card>
+            
+            <Card className="p-6">
+              <div className="flex gap-1 mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <span key={i} className="text-yellow-500 text-xl">★</span>
+                ))}
+              </div>
+              <p className="text-foreground mb-4 italic">
+                "Simple, fast, and effective. Exactly what I needed for my blog. The quality retention is outstanding, and my readers are loading pages faster than ever."
+              </p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-gradient-profit flex items-center justify-center text-profit-foreground font-bold">
+                  DT
+                </div>
+                <div>
+                  <p className="font-semibold">David Thompson</p>
+                  <p className="text-sm text-muted-foreground">Content Creator</p>
+                </div>
+              </div>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Features */}
+      <section className="py-16 px-6 bg-secondary/20">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-3xl font-bold mb-12 text-center">Why Choose Pixel Squeeze</h2>
           
@@ -291,7 +423,7 @@ const Index = () => {
       </section>
 
       {/* Analytics Section */}
-      <section className="py-16 px-6 bg-secondary/20">
+      <section className="py-16 px-6">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">Compression Performance</h2>

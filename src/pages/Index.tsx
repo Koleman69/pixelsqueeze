@@ -13,6 +13,11 @@ import { useImageCompression } from "@/hooks/useImageCompression";
 import { useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import heroImage from "@/assets/compression-hero.jpg";
+import weddingBefore from "@/assets/wedding-before.jpg";
+import weddingAfter from "@/assets/wedding-after.jpg";
+import manBefore from "@/assets/man-before.jpg";
+import manAfter from "@/assets/man-after.jpg";
+import { BeforeAfterSlider } from "@/components/BeforeAfterSlider";
 
 const mockCompressions = [
   {
@@ -173,6 +178,52 @@ const Index = () => {
             className="hidden"
             onChange={handleFileChange}
           />
+        </div>
+      </section>
+
+      {/* AI Transformation Showcase */}
+      <section className="py-20 px-6 bg-gradient-to-b from-secondary/20 to-background">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-12">
+            <Badge variant="outline" className="mb-4 px-4 py-2 border-primary text-primary">
+              <Zap className="w-4 h-4 mr-2" />
+              AI-Powered Transformations
+            </Badge>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+              See the Magic in Action
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              Transform blurry, imperfect images into crystal-clear masterpieces with our AI-powered editing tools. 
+              Slide to reveal the stunning difference.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <BeforeAfterSlider
+              beforeImage={weddingBefore}
+              afterImage={weddingAfter}
+              title="Wedding Photo Enhancement"
+              description="Turn blurry wedding moments into crystal-clear memories"
+            />
+            
+            <BeforeAfterSlider
+              beforeImage={manBefore}
+              afterImage={manAfter}
+              title="Portrait Perfection"
+              description="Professional skin retouching and enhancement in seconds"
+            />
+          </div>
+
+          <div className="text-center">
+            <Button 
+              size="lg" 
+              className="bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90 px-8 py-6 text-lg"
+              onClick={handleFileUpload}
+            >
+              <Upload className="w-6 h-6 mr-2" />
+              Try It With Your Photos
+            </Button>
+          </div>
         </div>
       </section>
 

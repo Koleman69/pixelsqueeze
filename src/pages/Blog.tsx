@@ -195,6 +195,9 @@ const Blog = () => {
             <Link to="/company" className="text-foreground/80 hover:text-foreground transition-colors">
               Company
             </Link>
+            <Link to="/account" className="text-foreground/80 hover:text-foreground transition-colors">
+              Account
+            </Link>
           </div>
         </div>
       </nav>

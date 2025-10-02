@@ -10,6 +10,7 @@ import Success from "./pages/Success";
 import Blog from "./pages/Blog";
 import BlogArticle from "./pages/BlogArticle";
 import Company from "./pages/Company";
+import Account from "./pages/Account";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -73,6 +74,11 @@ const App = () => (
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/:articleId" element={<BlogArticle />} />
             <Route path="/company" element={<Company />} />
+            <Route path="/account" element={
+              <ProtectedRoute>
+                <Account />
+              </ProtectedRoute>
+            } />
             <Route path="/auth" element={
               <PublicRoute>
                 <Auth />

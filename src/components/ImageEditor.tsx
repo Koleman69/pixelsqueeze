@@ -5,8 +5,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
-import { Crop, Maximize2, Download, Upload } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
+import { Crop, Maximize2, Download, Upload, Sparkles, Crown } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { useImageCompression } from '@/hooks/useImageCompression';
 import Cropper from 'react-easy-crop';
 import { Point, Area } from 'react-easy-crop';
 
@@ -14,17 +18,26 @@ interface ImageEditorProps {
   onComplete?: (blob: Blob, fileName: string) => void;
 }
 
+type EditorMode = 'crop' | 'resize' | 'ai';
+
 export const ImageEditor = ({ onComplete }: ImageEditorProps) => {
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string>('');
   const [crop, setCrop] = useState<Point>({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
-  const [isCropMode, setIsCropMode] = useState(false);
+  const [editorMode, setEditorMode] = useState<EditorMode>('crop');
   const [customWidth, setCustomWidth] = useState(1920);
   const [customHeight, setCustomHeight] = useState(1080);
   const [maintainAspectRatio, setMaintainAspectRatio] = useState(false);
+  const [aiPrompt, setAiPrompt] = useState('');
+  const [isAiProcessing, setIsAiProcessing] = useState(false);
+  const [aiEditedImage, setAiEditedImage] = useState<string | null>(null);
+  const [aiUsageCount, setAiUsageCount] = useState(0);
   const { toast } = useToast();
+  const { subscription, createCheckout } = useImageCompression();
+
+  const FREE_AI_EDITS = 3;
 
   const onCropComplete = useCallback((croppedArea: Area, croppedAreaPixels: Area) => {
     setCroppedAreaPixels(croppedAreaPixels);
@@ -34,6 +47,7 @@ export const ImageEditor = ({ onComplete }: ImageEditorProps) => {
     const file = event.target.files?.[0];
     if (file) {
       setFileName(file.name);
+      setAiEditedImage(null);
       const reader = new FileReader();
       reader.onload = () => {
         setImageSrc(reader.result as string);
@@ -41,6 +55,99 @@ export const ImageEditor = ({ onComplete }: ImageEditorProps) => {
       reader.readAsDataURL(file);
     }
   };
+
+  const handleAiEdit = async () => {
+    if (!imageSrc || !aiPrompt.trim()) {
+      toast({
+        title: "Missing Information",
+        description: "Please upload an image and enter a prompt",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Check if user has exceeded free tier
+    if (!subscription.subscribed && aiUsageCount >= FREE_AI_EDITS) {
+      toast({
+        title: "Upgrade Required",
+        description: `You've used your ${FREE_AI_EDITS} free AI edits. Upgrade to Pro for unlimited AI editing!`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsAiProcessing(true);
+
+    try {
+      // Get base64 image data (remove data URL prefix)
+      const base64Data = imageSrc.split(',')[1];
+
+      const { data, error } = await supabase.functions.invoke('ai-edit-image', {
+        body: {
+          imageBase64: base64Data,
+          prompt: aiPrompt,
+          editType: 'transform'
+        }
+      });
+
+      if (error) throw error;
+
+      if (!data.success) {
+        throw new Error(data.error || 'AI editing failed');
+      }
+
+      setAiEditedImage(data.editedImage);
+      setAiUsageCount(prev => prev + 1);
+
+      toast({
+        title: "AI Edit Complete",
+        description: data.message || "Your image has been transformed!",
+      });
+
+    } catch (error: any) {
+      console.error('AI edit error:', error);
+      
+      let errorMessage = "Failed to edit image with AI";
+      if (error.message?.includes("Rate limit")) {
+        errorMessage = "Too many requests. Please try again in a moment.";
+      } else if (error.message?.includes("credits")) {
+        errorMessage = "AI credits exhausted. Please add credits to your workspace.";
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
+      toast({
+        title: "AI Edit Failed",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setIsAiProcessing(false);
+    }
+  };
+
+  const handleDownloadAiEdit = () => {
+    if (!aiEditedImage) return;
+
+    const link = document.createElement('a');
+    link.href = aiEditedImage;
+    link.download = `ai_edited_${fileName}`;
+    link.click();
+
+    toast({
+      title: "Download Complete",
+      description: "Your AI-edited image has been downloaded",
+    });
+  };
+
+  const quickPrompts = [
+    "Change the background to a sunny beach",
+    "Make it look like a vintage photograph",
+    "Add a dramatic sunset sky",
+    "Convert to black and white with high contrast",
+    "Make it look like a painting",
+    "Add a bokeh blur effect to the background"
+  ];
 
   const createImage = (url: string): Promise<HTMLImageElement> =>
     new Promise((resolve, reject) => {
@@ -224,27 +331,45 @@ export const ImageEditor = ({ onComplete }: ImageEditorProps) => {
         ) : (
           <div className="space-y-6">
             {/* Mode Selection */}
-            <div className="flex gap-4">
+            <div className="flex flex-wrap gap-4">
               <Button
-                variant={isCropMode ? "default" : "outline"}
-                onClick={() => setIsCropMode(true)}
+                variant={editorMode === 'crop' ? "default" : "outline"}
+                onClick={() => setEditorMode('crop')}
               >
                 <Crop className="w-4 h-4 mr-2" />
-                Crop Mode
+                Crop
               </Button>
               <Button
-                variant={!isCropMode ? "default" : "outline"}
-                onClick={() => setIsCropMode(false)}
+                variant={editorMode === 'resize' ? "default" : "outline"}
+                onClick={() => setEditorMode('resize')}
               >
                 <Maximize2 className="w-4 h-4 mr-2" />
-                Resize Mode
+                Resize
               </Button>
-              <Button variant="outline" onClick={() => setImageSrc(null)}>
+              <Button
+                variant={editorMode === 'ai' ? "default" : "outline"}
+                onClick={() => setEditorMode('ai')}
+              >
+                <Sparkles className="w-4 h-4 mr-2" />
+                AI Transform
+                {!subscription.subscribed && (
+                  <Badge variant="secondary" className="ml-2 text-xs">
+                    {FREE_AI_EDITS - aiUsageCount} free
+                  </Badge>
+                )}
+              </Button>
+              <Button variant="outline" onClick={() => { setImageSrc(null); setAiEditedImage(null); }}>
                 Upload New Image
               </Button>
+              {!subscription.subscribed && editorMode === 'ai' && (
+                <Button onClick={createCheckout} size="sm" className="ml-auto bg-gradient-primary">
+                  <Crown className="w-4 h-4 mr-2" />
+                  Upgrade for Unlimited AI
+                </Button>
+              )}
             </div>
 
-            {isCropMode ? (
+            {editorMode === 'crop' ? (
               <div className="space-y-4">
                 <div className="relative h-96 bg-black rounded-lg overflow-hidden">
                   <Cropper
@@ -274,7 +399,7 @@ export const ImageEditor = ({ onComplete }: ImageEditorProps) => {
                   Download Cropped Image
                 </Button>
               </div>
-            ) : (
+            ) : editorMode === 'resize' ? (
               <div className="space-y-4">
                 <div className="flex items-center justify-center bg-muted rounded-lg p-4">
                   <img
@@ -324,6 +449,80 @@ export const ImageEditor = ({ onComplete }: ImageEditorProps) => {
                   <Download className="w-4 h-4 mr-2" />
                   Download Resized Image ({customWidth}x{customHeight})
                 </Button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="flex items-center justify-center bg-muted rounded-lg p-4">
+                  <img
+                    src={aiEditedImage || imageSrc}
+                    alt="Preview"
+                    className="max-h-96 object-contain"
+                  />
+                </div>
+
+                {aiEditedImage && (
+                  <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                    <p className="text-sm text-green-800 flex items-center gap-2">
+                      <Sparkles className="w-4 h-4" />
+                      AI transformation complete! Download or try another edit.
+                    </p>
+                  </div>
+                )}
+
+                <div className="space-y-2">
+                  <Label>What would you like to do with this image?</Label>
+                  <Textarea
+                    placeholder="E.g., Change the background to a tropical beach, Add a vintage film filter, Make it look like a watercolor painting..."
+                    value={aiPrompt}
+                    onChange={(e) => setAiPrompt(e.target.value)}
+                    rows={3}
+                    disabled={isAiProcessing}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Quick Prompts</Label>
+                  <div className="flex flex-wrap gap-2">
+                    {quickPrompts.map((prompt, index) => (
+                      <Button
+                        key={index}
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setAiPrompt(prompt)}
+                        disabled={isAiProcessing}
+                      >
+                        {prompt}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+
+                {!subscription.subscribed && (
+                  <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <p className="text-sm text-blue-800">
+                      <Crown className="w-4 h-4 inline mr-1" />
+                      Free: {aiUsageCount}/{FREE_AI_EDITS} AI edits used. Upgrade for unlimited transformations!
+                    </p>
+                  </div>
+                )}
+
+                <div className="flex gap-2">
+                  <Button 
+                    onClick={handleAiEdit} 
+                    className="flex-1 bg-gradient-primary"
+                    disabled={isAiProcessing || !aiPrompt.trim() || (!subscription.subscribed && aiUsageCount >= FREE_AI_EDITS)}
+                  >
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    {isAiProcessing ? "Transforming..." : "Transform with AI"}
+                  </Button>
+                  
+                  {aiEditedImage && (
+                    <Button onClick={handleDownloadAiEdit} variant="outline">
+                      <Download className="w-4 h-4 mr-2" />
+                      Download
+                    </Button>
+                  )}
+                </div>
               </div>
             )}
           </div>

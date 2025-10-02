@@ -19,6 +19,7 @@ export interface CompressionResult {
   quality: number;
   status: 'processing' | 'completed' | 'failed';
   compressedImage?: string;
+  originalImage?: string;
   error?: string;
 }
 
@@ -53,20 +54,31 @@ export const useImageCompression = () => {
     const fileArray = Array.from(files);
     const ids: string[] = [];
 
-    // Add initial compression entries
-    const newCompressions: CompressionResult[] = fileArray.map(file => {
-      const id = Date.now().toString() + Math.random().toString(36).substr(2, 9);
-      ids.push(id);
-      return {
-        id,
-        fileName: file.name,
-        originalSize: file.size,
-        compressedSize: 0,
-        compressionRatio: 0,
-        quality: settings.quality,
-        status: 'processing'
-      };
-    });
+    // Add initial compression entries with original image data
+    const newCompressions: CompressionResult[] = await Promise.all(
+      fileArray.map(async (file) => {
+        const id = Date.now().toString() + Math.random().toString(36).substr(2, 9);
+        ids.push(id);
+        
+        // Store original image as data URL
+        const originalDataUrl = await new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result as string);
+          reader.readAsDataURL(file);
+        });
+
+        return {
+          id,
+          fileName: file.name,
+          originalSize: file.size,
+          compressedSize: 0,
+          compressionRatio: 0,
+          quality: settings.quality,
+          status: 'processing' as const,
+          originalImage: originalDataUrl
+        };
+      })
+    );
 
     setCompressions(prev => [...newCompressions, ...prev]);
 

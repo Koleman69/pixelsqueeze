@@ -2,6 +2,8 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, AlertCircle, XCircle, Download, Eye } from "lucide-react";
+import { BeforeAfterSlider } from "@/components/BeforeAfterSlider";
+import { useState } from "react";
 
 interface CompressionStatusProps {
   id?: string;
@@ -12,6 +14,8 @@ interface CompressionStatusProps {
   quality: number;
   status: "completed" | "processing" | "failed";
   error?: string;
+  originalImage?: string;
+  compressedImage?: string;
 }
 
 export const CompressionStatus = ({ 
@@ -22,8 +26,11 @@ export const CompressionStatus = ({
   compressionRatio, 
   quality, 
   status,
-  error
+  error,
+  originalImage,
+  compressedImage
 }: CompressionStatusProps) => {
+  const [showSlider, setShowSlider] = useState(false);
   const getStatusColor = () => {
     switch (status) {
       case 'completed': return 'profit';
@@ -78,6 +85,17 @@ export const CompressionStatus = ({
 
       {status === 'completed' && (
         <>
+          {originalImage && compressedImage && (
+            <div className="mb-4">
+              <BeforeAfterSlider
+                beforeImage={originalImage}
+                afterImage={`data:image/jpeg;base64,${compressedImage}`}
+                title={fileName}
+                description={`${compressionRatio}% size reduction with ${quality}% quality retained`}
+              />
+            </div>
+          )}
+
           <div className="space-y-3 mb-4">
             <div className="flex justify-between items-center">
               <span className="text-sm text-muted-foreground">Original Size</span>

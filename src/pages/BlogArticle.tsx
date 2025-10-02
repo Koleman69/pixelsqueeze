@@ -208,6 +208,26 @@ const BlogArticle = () => {
 
   return (
     <article className="min-h-screen bg-background">
+      {/* Navigation */}
+      <nav className="border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+          <Link to="/" className="text-2xl font-bold text-foreground hover:text-primary transition-colors">
+            PixelSqueeze
+          </Link>
+          <div className="flex gap-6">
+            <Link to="/" className="text-foreground/80 hover:text-foreground transition-colors">
+              Home
+            </Link>
+            <Link to="/blog" className="text-foreground hover:text-foreground transition-colors font-medium">
+              Blog
+            </Link>
+            <Link to="/company" className="text-foreground/80 hover:text-foreground transition-colors">
+              Company
+            </Link>
+          </div>
+        </div>
+      </nav>
+
       {/* Article Header */}
       <header className="bg-card border-b border-border py-12 px-6">
         <div className="max-w-4xl mx-auto">

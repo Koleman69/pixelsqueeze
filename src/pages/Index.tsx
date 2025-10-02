@@ -96,6 +96,11 @@ const Index = () => {
                 Blog
               </Button>
             </Link>
+            <Link to="/company">
+              <Button variant="ghost" size="sm">
+                Company
+              </Button>
+            </Link>
           </div>
           <div className="flex items-center gap-4">
             <span className="text-sm text-muted-foreground hidden sm:inline">

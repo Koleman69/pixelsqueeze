@@ -7,6 +7,8 @@ import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Success from "./pages/Success";
+import Blog from "./pages/Blog";
+import BlogArticle from "./pages/BlogArticle";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -67,6 +69,8 @@ const App = () => (
                 <Success />
               </ProtectedRoute>
             } />
+            <Route path="/blog" element={<Blog />} />
+            <Route path="/blog/:articleId" element={<BlogArticle />} />
             <Route path="/auth" element={
               <PublicRoute>
                 <Auth />

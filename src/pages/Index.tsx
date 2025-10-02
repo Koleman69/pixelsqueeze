@@ -6,11 +6,12 @@ import { ImageEditor } from "@/components/ImageEditor";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Upload, Shield, TrendingDown, Zap, BarChart3, Target, LogOut, Image, FileImage, Minimize2, HardDrive, Crown } from "lucide-react";
+import { Upload, Shield, TrendingDown, Zap, BarChart3, Target, LogOut, Image, FileImage, Minimize2, HardDrive, Crown, BookOpen } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useImageCompression } from "@/hooks/useImageCompression";
 import { useRef, useEffect } from "react";
+import { Link } from "react-router-dom";
 import heroImage from "@/assets/compression-hero.jpg";
 
 const mockCompressions = [
@@ -84,12 +85,20 @@ const Index = () => {
       {/* Navigation Bar */}
       <nav className="bg-card border-b border-border px-6 py-4">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <div className="flex items-center">
-            <Minimize2 className="w-6 h-6 text-primary mr-2" />
-            <h1 className="text-xl font-bold">Pixel Squeeze</h1>
+          <div className="flex items-center gap-6">
+            <div className="flex items-center">
+              <Minimize2 className="w-6 h-6 text-primary mr-2" />
+              <h1 className="text-xl font-bold">Pixel Squeeze</h1>
+            </div>
+            <Link to="/blog">
+              <Button variant="ghost" size="sm">
+                <BookOpen className="w-4 h-4 mr-2" />
+                Blog
+              </Button>
+            </Link>
           </div>
           <div className="flex items-center gap-4">
-            <span className="text-sm text-muted-foreground">
+            <span className="text-sm text-muted-foreground hidden sm:inline">
               Welcome, {user?.email}
             </span>
             <Button variant="outline" size="sm" onClick={handleSignOut}>

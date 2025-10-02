@@ -12,3 +12,14 @@ Allow: /
 
 User-agent: *
 Allow: /
+Sitemap: https://pixelsqueeze.app/sitemap.xml
+
+# Allow all pages
+Allow: /blog
+Allow: /blog/*
+
+# High-value content for SEO
+Allow: /blog/best-image-compression-tools-2025
+Allow: /blog/reduce-photo-size-without-losing-quality
+Allow: /blog/jpeg-vs-png-vs-webp-compression-comparison
+Allow: /blog/optimize-images-page-speed-seo

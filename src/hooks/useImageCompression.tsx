@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import JSZip from 'jszip';
 
 export interface CompressionSettings {
   quality: number;
@@ -202,25 +203,43 @@ export const useImageCompression = () => {
     }
 
     try {
-      // For bulk download, we'll create individual downloads
-      // In a real implementation, you'd create a ZIP file
-      selectedCompressions.forEach((compression, index) => {
-        setTimeout(() => {
-          const link = document.createElement('a');
-          link.href = `data:image/jpeg;base64,${compression.compressedImage}`;
-          link.download = `compressed_${compression.fileName}`;
-          link.click();
-        }, index * 500); // Stagger downloads
+      // Create a ZIP file with all compressed images
+      const zip = new JSZip();
+      
+      selectedCompressions.forEach((compression) => {
+        // Convert base64 to binary data
+        const base64Data = compression.compressedImage!;
+        const binaryData = atob(base64Data);
+        const bytes = new Uint8Array(binaryData.length);
+        for (let i = 0; i < binaryData.length; i++) {
+          bytes[i] = binaryData.charCodeAt(i);
+        }
+        
+        // Add file to ZIP
+        zip.file(`compressed_${compression.fileName}`, bytes);
       });
 
+      // Generate ZIP file
+      const zipBlob = await zip.generateAsync({ type: 'blob' });
+      
+      // Download the ZIP
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(zipBlob);
+      link.download = `compressed-images-${Date.now()}.zip`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(link.href);
+
       toast({
-        title: "Bulk Download Started",
-        description: `Downloading ${selectedCompressions.length} compressed images`,
+        title: "Bulk Download Complete",
+        description: `Downloaded ${selectedCompressions.length} compressed images as ZIP`,
       });
     } catch (error) {
+      console.error('Bulk download error:', error);
       toast({
         title: "Download Failed",
-        description: "Failed to download images",
+        description: "Failed to create ZIP file. Please try downloading images individually.",
         variant: "destructive"
       });
     }

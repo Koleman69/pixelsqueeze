@@ -2,6 +2,7 @@ import { CompressionStatus } from "@/components/CompressionStatus";
 import { StatsCard } from "@/components/StatsCard";
 import { CompressionResults } from "@/components/CompressionResults";
 import { ImageUploader } from "@/components/ImageUploader";
+import { ImageEditor } from "@/components/ImageEditor";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -160,6 +161,13 @@ const Index = () => {
       <section className="py-16 px-6">
         <div className="max-w-4xl mx-auto">
           <ImageUploader />
+        </div>
+      </section>
+
+      {/* Image Editor */}
+      <section className="py-16 px-6 bg-secondary/20">
+        <div className="max-w-4xl mx-auto">
+          <ImageEditor />
         </div>
       </section>
 

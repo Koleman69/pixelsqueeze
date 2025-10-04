@@ -142,11 +142,18 @@ const Auth = () => {
     <div className="min-h-screen bg-background flex items-center justify-center p-6">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="flex items-center justify-center mb-4">
-            <Minimize2 className="w-8 h-8 text-primary mr-2" />
-            <h1 className="text-2xl font-bold">compressngo</h1>
+          <div className="flex items-center justify-center mb-6">
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-primary blur-xl opacity-50"></div>
+              <div className="relative flex items-center bg-background/50 backdrop-blur-sm px-6 py-3 rounded-2xl border-2 border-primary/30">
+                <Minimize2 className="w-12 h-12 text-primary mr-3" strokeWidth={2.5} />
+                <h1 className="text-5xl font-bold font-brand bg-gradient-to-r from-primary via-primary to-primary/70 bg-clip-text text-transparent">
+                  compressngo
+                </h1>
+              </div>
+            </div>
           </div>
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground text-lg">
             Experience professional-grade image compression
           </p>
         </div>

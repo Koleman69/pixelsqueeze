@@ -363,6 +363,46 @@ export const ImageEditor = ({ onComplete }: ImageEditorProps) => {
                 />
               </div>
             )}
+
+            {/* Mode Selection */}
+            <div className="flex flex-wrap gap-4">
+              <Button
+                variant={editorMode === 'crop' ? "default" : "outline"}
+                onClick={() => setEditorMode('crop')}
+              >
+                <Crop className="w-4 h-4 mr-2" />
+                Crop
+              </Button>
+              <Button
+                variant={editorMode === 'resize' ? "default" : "outline"}
+                onClick={() => setEditorMode('resize')}
+              >
+                <Maximize2 className="w-4 h-4 mr-2" />
+                Resize
+              </Button>
+              <Button
+                variant={editorMode === 'ai' ? "default" : "outline"}
+                onClick={() => setEditorMode('ai')}
+              >
+                <Sparkles className="w-4 h-4 mr-2" />
+                AI Transform
+                {!subscription.subscribed && (
+                  <Badge variant="secondary" className="ml-2 text-xs">
+                    {FREE_AI_EDITS - aiUsageCount} free
+                  </Badge>
+                )}
+              </Button>
+              <Button variant="outline" onClick={() => { setImageSrc(null); setAiEditedImage(null); }}>
+                <Upload className="w-4 h-4 mr-2" />
+                Upload New Image
+              </Button>
+              {!subscription.subscribed && editorMode === 'ai' && (
+                <Button onClick={createCheckout} size="sm" className="ml-auto bg-gradient-primary">
+                  <Crown className="w-4 h-4 mr-2" />
+                  Upgrade for Unlimited AI
+                </Button>
+              )}
+            </div>
             {/* Mode Selection */}
             <div className="flex flex-wrap gap-4">
               <Button

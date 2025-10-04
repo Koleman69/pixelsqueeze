@@ -144,7 +144,7 @@ const Auth = () => {
         <div className="text-center mb-8">
           <div className="flex items-center justify-center mb-4">
             <Minimize2 className="w-8 h-8 text-primary mr-2" />
-            <h1 className="text-2xl font-bold">Pixel Squeeze</h1>
+            <h1 className="text-2xl font-bold">compressngo</h1>
           </div>
           <p className="text-muted-foreground">
             Experience professional-grade image compression

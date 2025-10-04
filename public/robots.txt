@@ -12,7 +12,7 @@ Allow: /
 
 User-agent: *
 Allow: /
-Sitemap: https://pixelsqueeze.app/sitemap.xml
+Sitemap: https://compressngo.app/sitemap.xml
 
 # Allow all pages
 Allow: /blog

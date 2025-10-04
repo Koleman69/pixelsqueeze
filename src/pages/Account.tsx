@@ -61,7 +61,7 @@ const Account = () => {
       <nav className="border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <Link to="/" className="text-2xl font-bold text-foreground hover:text-primary transition-colors">
-            PixelSqueeze
+            compressngo
           </Link>
           <div className="flex gap-6 items-center">
             <Link to="/" className="text-foreground/80 hover:text-foreground transition-colors">
@@ -251,7 +251,7 @@ const Account = () => {
 
       <footer className="border-t border-border/40 mt-16">
         <div className="container mx-auto px-4 py-8 text-center text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} PixelSqueeze LLC. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} compressngo LLC. All rights reserved.</p>
         </div>
       </footer>
     </div>

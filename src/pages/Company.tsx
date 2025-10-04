@@ -8,18 +8,18 @@ const Company = () => {
   return (
     <>
       <Helmet>
-        <title>About PixelSqueeze LLC - Professional Image Compression Company</title>
-        <meta name="description" content="Learn about PixelSqueeze LLC, founded in 2025 and based in San Antonio, TX. Contact us for inquiries about professional image compression services." />
-        <meta property="og:title" content="About PixelSqueeze LLC - Professional Image Compression Company" />
-        <meta property="og:description" content="Learn about PixelSqueeze LLC, founded in 2025 and based in San Antonio, TX. Contact us for inquiries about professional image compression services." />
-        <link rel="canonical" href="https://pixelsqueeze.app/company" />
+        <title>About compressngo LLC - Professional Image Compression Company</title>
+        <meta name="description" content="Learn about compressngo LLC, founded in 2025 and based in San Antonio, TX. Contact us for inquiries about professional image compression services." />
+        <meta property="og:title" content="About compressngo LLC - Professional Image Compression Company" />
+        <meta property="og:description" content="Learn about compressngo LLC, founded in 2025 and based in San Antonio, TX. Contact us for inquiries about professional image compression services." />
+        <link rel="canonical" href="https://compressngo.app/company" />
       </Helmet>
 
       <div className="min-h-screen bg-background">
         <header className="border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
           <nav className="container mx-auto px-4 py-4 flex justify-between items-center">
             <Link to="/" className="text-2xl font-bold text-foreground hover:text-primary transition-colors">
-              PixelSqueeze
+              compressngo
             </Link>
             <div className="flex gap-6">
               <Link to="/" className="text-foreground/80 hover:text-foreground transition-colors">
@@ -38,7 +38,7 @@ const Company = () => {
         <main className="container mx-auto px-4 py-16">
           <article className="max-w-4xl mx-auto">
             <h1 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
-              About PixelSqueeze LLC
+              About compressngo LLC
             </h1>
             
             <p className="text-lg text-muted-foreground mb-12">
@@ -57,10 +57,10 @@ const Company = () => {
                 <CardContent>
                   <p className="text-foreground">All inquiries can be sent to:</p>
                   <a 
-                    href="mailto:inquiry@pixelsqueeze.app" 
+                    href="mailto:inquiry@compressngo.app" 
                     className="text-primary hover:underline font-medium text-lg"
                   >
-                    inquiry@pixelsqueeze.app
+                    inquiry@compressngo.app
                   </a>
                 </CardContent>
               </Card>
@@ -75,7 +75,7 @@ const Company = () => {
                 </CardHeader>
                 <CardContent>
                   <address className="not-italic text-foreground">
-                    <strong className="block mb-2">PixelSqueeze LLC</strong>
+                    <strong className="block mb-2">compressngo LLC</strong>
                     12803 West Ave<br />
                     San Antonio, TX 78216<br />
                     United States
@@ -113,7 +113,7 @@ const Company = () => {
             </div>
 
             <section className="bg-muted/50 rounded-lg p-8 mb-12">
-              <h2 className="text-2xl font-bold mb-4 text-foreground">Why Choose PixelSqueeze?</h2>
+              <h2 className="text-2xl font-bold mb-4 text-foreground">Why Choose compressngo?</h2>
               <ul className="space-y-3 text-foreground">
                 <li className="flex items-start gap-2">
                   <span className="text-primary font-bold">•</span>
@@ -141,7 +141,7 @@ const Company = () => {
             <div className="text-center">
               <Link to="/">
                 <Button size="lg" className="text-lg px-8">
-                  Try PixelSqueeze Now
+                  Try compressngo Now
                 </Button>
               </Link>
             </div>
@@ -150,7 +150,7 @@ const Company = () => {
 
         <footer className="border-t border-border/40 mt-16">
           <div className="container mx-auto px-4 py-8 text-center text-muted-foreground">
-            <p>&copy; {new Date().getFullYear()} PixelSqueeze LLC. All rights reserved.</p>
+            <p>&copy; {new Date().getFullYear()} compressngo LLC. All rights reserved.</p>
             <p className="mt-2">San Antonio, TX</p>
           </div>
         </footer>

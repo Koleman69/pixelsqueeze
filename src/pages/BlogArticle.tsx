@@ -176,7 +176,7 @@ const BlogArticle = () => {
   useEffect(() => {
     if (article) {
       // Set page title and meta description for SEO
-      document.title = `${article.title} | PixelSqueeze Blog`;
+      document.title = `${article.title} | compressngo Blog`;
       
       const metaDescription = document.querySelector('meta[name="description"]');
       if (metaDescription) {
@@ -212,7 +212,7 @@ const BlogArticle = () => {
       <nav className="border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <Link to="/" className="text-2xl font-bold text-foreground hover:text-primary transition-colors">
-            PixelSqueeze
+            compressngo
           </Link>
           <div className="flex gap-6">
             <Link to="/" className="text-foreground/80 hover:text-foreground transition-colors">

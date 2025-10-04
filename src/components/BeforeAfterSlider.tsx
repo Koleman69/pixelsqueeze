@@ -24,12 +24,16 @@ export const BeforeAfterSlider = ({ beforeImage, afterImage, title, description 
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!isDragging) return;
+    e.preventDefault();
+    e.stopPropagation();
     const rect = e.currentTarget.getBoundingClientRect();
     handleMove(e.clientX, rect);
   };
 
   const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
     if (!isDragging) return;
+    e.preventDefault();
+    e.stopPropagation();
     const rect = e.currentTarget.getBoundingClientRect();
     handleMove(e.touches[0].clientX, rect);
   };
@@ -42,7 +46,7 @@ export const BeforeAfterSlider = ({ beforeImage, afterImage, title, description 
       </div>
       
       <div 
-        className="relative w-full aspect-video cursor-col-resize select-none"
+        className="relative w-full aspect-video cursor-col-resize select-none touch-none overflow-hidden"
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
         onMouseMove={handleMouseMove}

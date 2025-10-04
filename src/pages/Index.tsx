@@ -214,15 +214,8 @@ const Index = () => {
             />
           </div>
 
-          <div className="text-center">
-            <Button 
-              size="lg" 
-              className="bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90 px-8 py-6 text-lg"
-              onClick={handleFileUpload}
-            >
-              <Upload className="w-6 h-6 mr-2" />
-              Try It With Your Photos
-            </Button>
+          <div className="text-center mt-12 mb-8">
+            <p className="text-lg font-semibold mb-4">Try it with your own photos below!</p>
           </div>
         </div>
       </section>

@@ -7,12 +7,13 @@ import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { Crop, Maximize2, Download, Upload, Sparkles, Crown } from 'lucide-react';
+import { Crop, Maximize2, Download, Upload, Sparkles, Crown, ImageIcon } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useImageCompression } from '@/hooks/useImageCompression';
 import Cropper from 'react-easy-crop';
 import { Point, Area } from 'react-easy-crop';
+import { BeforeAfterSlider } from './BeforeAfterSlider';
 
 interface ImageEditorProps {
   onComplete?: (blob: Blob, fileName: string) => void;
@@ -309,9 +310,9 @@ export const ImageEditor = ({ onComplete }: ImageEditorProps) => {
     <Card className="p-6">
       <div className="space-y-6">
         <div>
-          <h2 className="text-2xl font-bold mb-2">Image Editor</h2>
+          <h2 className="text-2xl font-bold mb-2">Photo Perfection Studio</h2>
           <p className="text-muted-foreground">
-            Crop and resize your images to exact dimensions
+            Upload your photo to see before/after transformations with the slider
           </p>
         </div>
 
@@ -321,9 +322,9 @@ export const ImageEditor = ({ onComplete }: ImageEditorProps) => {
             onClick={() => fileInputRef.current?.click()}
           >
             <Upload className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-            <h3 className="text-lg font-semibold mb-2">Upload Image to Edit</h3>
+            <h3 className="text-lg font-semibold mb-2">Upload Your Photo</h3>
             <p className="text-muted-foreground mb-4">
-              Click to select an image to start cropping, resizing, or AI editing
+              Click to select an image and see instant before/after transformations
             </p>
             <Button variant="outline" className="mx-auto">
               <Upload className="w-4 h-4 mr-2" />
@@ -339,6 +340,29 @@ export const ImageEditor = ({ onComplete }: ImageEditorProps) => {
           </div>
         ) : (
           <div className="space-y-6">
+            {/* Show Before/After Slider when image is uploaded */}
+            {imageSrc && editorMode === 'ai' && aiEditedImage && (
+              <div className="mb-6">
+                <BeforeAfterSlider
+                  beforeImage={imageSrc}
+                  afterImage={aiEditedImage}
+                  title="Your Photo Transformation"
+                  description="Slide to see the AI-powered enhancement"
+                />
+              </div>
+            )}
+
+            {/* Show original image in slider format even before AI edit */}
+            {imageSrc && !aiEditedImage && (
+              <div className="mb-6">
+                <BeforeAfterSlider
+                  beforeImage={imageSrc}
+                  afterImage={imageSrc}
+                  title="Your Uploaded Photo"
+                  description="Use AI Transform below to create stunning effects"
+                />
+              </div>
+            )}
             {/* Mode Selection */}
             <div className="flex flex-wrap gap-4">
               <Button

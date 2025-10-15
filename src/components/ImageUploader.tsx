@@ -25,6 +25,7 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
   });
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   
   const { 
     compressImages, 
@@ -50,16 +51,25 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
     const files = event.target.files;
     if (files && files.length > 0) {
       setSelectedFiles(files);
+      setIsUploading(true);
       
       if (onUpload) {
         onUpload(files);
       }
+
+      // Show upload toast
+      toast({
+        title: "Uploading Images",
+        description: `Processing ${files.length} image(s)...`,
+      });
 
       // Start compression immediately
       try {
         await compressImages(files, settings, files.length > 1);
       } catch (error) {
         console.error('Compression failed:', error);
+      } finally {
+        setIsUploading(false);
       }
     }
   };
@@ -225,17 +235,24 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
           className="border-2 border-dashed border-border rounded-lg p-8 text-center cursor-pointer hover:border-primary transition-colors"
           onClick={handleFileSelect}
         >
-          <Upload className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-          <h3 className="text-lg font-semibold mb-2">Upload Images</h3>
+          <Upload className={`w-12 h-12 mx-auto mb-4 text-muted-foreground ${isUploading ? 'animate-bounce' : ''}`} />
+          <h3 className="text-lg font-semibold mb-2">
+            {isUploading ? 'Processing Images...' : 'Upload Images'}
+          </h3>
           <p className="text-muted-foreground mb-4">
-            Click to browse or drag and drop your images here
-          </p>
-          <p className="text-sm text-muted-foreground">
-            {subscription.subscribed 
-              ? "Unlimited files • All formats • Up to 50MB each" 
-              : "Up to 3 files • JPEG, PNG, WebP • Up to 10MB each"
+            {isUploading 
+              ? `Compressing ${selectedFiles?.length || 0} image(s)...` 
+              : 'Click to browse or drag and drop your images here'
             }
           </p>
+          {!isUploading && (
+            <p className="text-sm text-muted-foreground">
+              {subscription.subscribed 
+                ? "Unlimited files • All formats • Up to 50MB each" 
+                : "Up to 3 files • JPEG, PNG, WebP • Up to 10MB each"
+              }
+            </p>
+          )}
           
           <input
             ref={fileInputRef}
@@ -244,6 +261,7 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
             multiple
             className="hidden"
             onChange={handleFileChange}
+            disabled={isUploading}
           />
         </div>
 

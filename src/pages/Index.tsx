@@ -6,11 +6,11 @@ import { ImageEditor } from "@/components/ImageEditor";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Upload, Shield, TrendingDown, Zap, BarChart3, Target, LogOut, Image, FileImage, Minimize2, HardDrive, Crown, BookOpen } from "lucide-react";
+import { Upload, Shield, TrendingDown, Zap, BarChart3, Target, LogOut, Image, FileImage, Minimize2, HardDrive, Crown, BookOpen, Loader2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useImageCompression } from "@/hooks/useImageCompression";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import heroImage from "@/assets/compression-hero.jpg";
 import weddingBefore from "@/assets/wedding-before.jpg";
@@ -58,8 +58,9 @@ const compressionData = [
 const Index = () => {
   const { user, signOut } = useAuth();
   const { toast } = useToast();
-  const { compressions, subscription, createCheckout, checkSubscription } = useImageCompression();
+  const { compressions, subscription, createCheckout, checkSubscription, compressImages } = useImageCompression();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -78,10 +79,16 @@ const Index = () => {
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files && files.length > 0) {
+      setIsUploading(true);
       toast({
         title: "Processing images",
         description: `Processing ${files.length} image(s)...`,
       });
+      try {
+        await compressImages(files);
+      } finally {
+        setIsUploading(false);
+      }
     }
   };
 
@@ -158,9 +165,18 @@ const Index = () => {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button size="lg" className="bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90 px-8 py-3" onClick={handleFileUpload}>
-              <Upload className="w-5 h-5 mr-2" />
-              Start Compressing
+            <Button size="lg" className="bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90 px-8 py-3" onClick={handleFileUpload} disabled={isUploading}>
+              {isUploading ? (
+                <>
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                  Processing...
+                </>
+              ) : (
+                <>
+                  <Upload className="w-5 h-5 mr-2" />
+                  Start Compressing
+                </>
+              )}
             </Button>
             {!subscription.subscribed && (
               <Button size="lg" className="bg-gradient-profit text-profit-foreground shadow-profit hover:opacity-90 px-8 py-3" onClick={createCheckout}>
@@ -171,13 +187,14 @@ const Index = () => {
           </div>
           
           <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            multiple
-            className="hidden"
-            onChange={handleFileChange}
-          />
+             ref={fileInputRef}
+             type="file"
+             accept="image/*"
+             multiple
+             className="hidden"
+             onChange={handleFileChange}
+             disabled={isUploading}
+           />
         </div>
       </section>
 
@@ -215,7 +232,7 @@ const Index = () => {
           </div>
 
           <div className="text-center mt-12 mb-8">
-            <p className="text-lg font-semibold mb-4">Try it with your own photos below!</p>
+            <p className="text-lg font-semibold mb-4">{isUploading ? 'Processing your images...' : 'Try it with your own photos below!'}</p>
           </div>
         </div>
       </section>

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { CheckCircle, AlertCircle, XCircle, Download, Eye } from "lucide-react";
 import { BeforeAfterSlider } from "@/components/BeforeAfterSlider";
 import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 interface CompressionStatusProps {
   id?: string;
@@ -31,6 +32,8 @@ export const CompressionStatus = ({
   compressedImage
 }: CompressionStatusProps) => {
   const [showSlider, setShowSlider] = useState(false);
+  const { toast } = useToast();
+  
   const getStatusColor = () => {
     switch (status) {
       case 'completed': return 'profit';
@@ -53,6 +56,20 @@ export const CompressionStatus = ({
     if (bytes === 0) return '0 Bytes';
     const i = Math.floor(Math.log(bytes) / Math.log(1024));
     return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i];
+  };
+
+  const handleDownload = () => {
+    if (compressedImage) {
+      const link = document.createElement('a');
+      link.href = `data:image/jpeg;base64,${compressedImage}`;
+      link.download = `compressed_${fileName}`;
+      link.click();
+      
+      toast({
+        title: "Download Started",
+        description: `Downloading ${fileName}`,
+      });
+    }
   };
 
   return (
@@ -116,13 +133,10 @@ export const CompressionStatus = ({
               size="sm" 
               variant={status === 'completed' ? 'default' : 'outline'}
               className={status === 'completed' ? 'bg-gradient-profit hover:opacity-90' : ''}
+              onClick={handleDownload}
             >
               <Download className="w-4 h-4 mr-2" />
               Download
-            </Button>
-            <Button size="sm" variant="outline">
-              <Eye className="w-4 h-4 mr-2" />
-              Preview
             </Button>
           </div>
         </>

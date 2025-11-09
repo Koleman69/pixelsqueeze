@@ -50,6 +50,8 @@ serve(async (req) => {
     
     // Check if user is authenticated for premium features
     let isSubscribed = false;
+    let userId: string | null = null;
+    let freeCompressionsUsed = 0;
     const authHeader = req.headers.get("Authorization");
     
     if (authHeader) {
@@ -58,6 +60,8 @@ serve(async (req) => {
         const { data: userData } = await supabase.auth.getUser(token);
         
         if (userData?.user?.email) {
+          userId = userData.user.id;
+          
           // Check subscription status
           const checkSubResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/check-subscription`, {
             method: 'POST',
@@ -71,14 +75,38 @@ serve(async (req) => {
             const subData = await checkSubResponse.json();
             isSubscribed = subData.subscribed;
           }
+          
+          // Get current free compressions count
+          const { data: subscriberData } = await supabase
+            .from('subscribers')
+            .select('free_compressions_used, subscribed')
+            .eq('user_id', userId)
+            .single();
+          
+          if (subscriberData) {
+            freeCompressionsUsed = subscriberData.free_compressions_used || 0;
+            isSubscribed = subscriberData.subscribed;
+          }
         }
       } catch (error) {
         console.warn('Failed to check subscription:', error);
       }
     }
 
-    // Limit features for non-subscribers
+    // Check free compression limit for non-subscribers
     if (!isSubscribed) {
+      if (freeCompressionsUsed >= 3) {
+        return new Response(JSON.stringify({
+          success: false,
+          error: "You've used all 3 free compressions. Subscribe to Pixel Squeeze Pro for unlimited compression.",
+          requiresSubscription: true,
+          results: []
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200
+        });
+      }
+      
       if (files.length > 3) {
         return new Response(JSON.stringify({
           success: false,
@@ -162,6 +190,23 @@ serve(async (req) => {
           quality: 0,
           error: `Failed to process ${fileData.fileName}: ${error.message}`
         });
+      }
+    }
+
+    // Update free compressions counter for non-subscribers
+    if (!isSubscribed && userId && results.some(r => !r.error)) {
+      try {
+        const successfulCompressions = results.filter(r => !r.error).length;
+        await supabase
+          .from('subscribers')
+          .update({ 
+            free_compressions_used: freeCompressionsUsed + successfulCompressions 
+          })
+          .eq('user_id', userId);
+        
+        console.log(`Updated free compressions: ${freeCompressionsUsed} -> ${freeCompressionsUsed + successfulCompressions}`);
+      } catch (error) {
+        console.error('Failed to update compression counter:', error);
       }
     }
 

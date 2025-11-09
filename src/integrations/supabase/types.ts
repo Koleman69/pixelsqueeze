@@ -202,7 +202,7 @@ export type Database = {
           action: string
           details: Json | null
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           risk_level: string | null
           session_id: string | null
           table_name: string
@@ -214,7 +214,7 @@ export type Database = {
           action: string
           details?: Json | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           risk_level?: string | null
           session_id?: string | null
           table_name?: string
@@ -226,7 +226,7 @@ export type Database = {
           action?: string
           details?: Json | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           risk_level?: string | null
           session_id?: string | null
           table_name?: string
@@ -241,6 +241,7 @@ export type Database = {
           created_at: string
           data_classification: string | null
           email: string
+          free_compressions_used: number
           id: string
           last_accessed: string | null
           obfuscated_email: string | null
@@ -258,6 +259,7 @@ export type Database = {
           created_at?: string
           data_classification?: string | null
           email: string
+          free_compressions_used?: number
           id?: string
           last_accessed?: string | null
           obfuscated_email?: string | null
@@ -275,6 +277,7 @@ export type Database = {
           created_at?: string
           data_classification?: string | null
           email?: string
+          free_compressions_used?: number
           id?: string
           last_accessed?: string | null
           obfuscated_email?: string | null
@@ -298,12 +301,9 @@ export type Database = {
         Args: { target_user_id?: string }
         Returns: number
       }
-      get_my_subscription_status: {
-        Args: Record<PropertyKey, never>
-        Returns: Json
-      }
+      get_my_subscription_status: { Args: never; Returns: Json }
       get_safe_subscriber_status: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           access_count: number
           created_at: string
@@ -321,7 +321,7 @@ export type Database = {
         }[]
       }
       get_safe_subscription_status: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           access_count: number
           created_at: string
@@ -342,10 +342,7 @@ export type Database = {
         Args: { user_uuid: string }
         Returns: Json
       }
-      get_subscriber_encryption_status: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
+      get_subscriber_encryption_status: { Args: never; Returns: string }
       log_service_access: {
         Args: { operation: string; table_name: string; target_user_id?: string }
         Returns: boolean

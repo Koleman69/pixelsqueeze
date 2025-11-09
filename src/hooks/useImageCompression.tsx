@@ -27,6 +27,7 @@ export interface SubscriptionStatus {
   subscribed: boolean;
   product_id?: string;
   subscription_end?: string;
+  free_compressions_used?: number;
 }
 
 export const useImageCompression = () => {
@@ -36,10 +37,46 @@ export const useImageCompression = () => {
 
   const checkSubscription = async () => {
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        setSubscription({ subscribed: false });
+        return { subscribed: false };
+      }
+
       const { data, error } = await supabase.functions.invoke('check-subscription');
       if (error) throw error;
-      setSubscription(data);
-      return data;
+
+      // Get or create subscriber record with free compressions count
+      let subscriberData = await supabase
+        .from('subscribers')
+        .select('free_compressions_used, subscribed')
+        .eq('user_id', session.user.id)
+        .single();
+
+      // Create subscriber record if it doesn't exist
+      if (!subscriberData.data) {
+        const { data: newSubscriber } = await supabase
+          .from('subscribers')
+          .insert({
+            user_id: session.user.id,
+            email: session.user.email!,
+            subscribed: false,
+            free_compressions_used: 0
+          })
+          .select('free_compressions_used, subscribed')
+          .single();
+        
+        subscriberData.data = newSubscriber;
+      }
+
+      const subscriptionData = {
+        ...data,
+        free_compressions_used: subscriberData.data?.free_compressions_used || 0
+      };
+
+      setSubscription(subscriptionData);
+      return subscriptionData;
     } catch (error) {
       console.error('Subscription check failed:', error);
       return { subscribed: false };

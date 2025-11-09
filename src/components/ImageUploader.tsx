@@ -66,6 +66,8 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
       // Start compression immediately
       try {
         await compressImages(files, settings, files.length > 1);
+        // Refresh subscription status to update compression counter
+        await checkSubscription();
       } catch (error) {
         console.error('Compression failed:', error);
       } finally {
@@ -127,10 +129,15 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
               </Button>
             </div>
           ) : (
-            <Button onClick={createCheckout} className="bg-gradient-primary">
-              <Crown className="w-4 h-4 mr-2" />
-              Upgrade to Pro - $6.95/month
-            </Button>
+            <div className="flex flex-col items-end gap-2">
+              <Badge variant="outline" className="text-xs">
+                {subscription.free_compressions_used || 0}/3 Free Compressions Used
+              </Badge>
+              <Button onClick={createCheckout} className="bg-gradient-primary">
+                <Crown className="w-4 h-4 mr-2" />
+                Upgrade to Pro - $6.95/month
+              </Button>
+            </div>
           )}
         </div>
 

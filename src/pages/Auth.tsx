@@ -170,8 +170,6 @@ const Auth = () => {
     try {
       const redirectUrl = `${window.location.origin}/`;
       
-      console.log('Attempting signup with:', { email: formData.email, redirectUrl });
-      
       const { data, error } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
@@ -180,17 +178,13 @@ const Auth = () => {
         }
       });
 
-      console.log('Signup response:', { data, error });
-
       if (error) {
-        console.error('Signup error:', error);
         toast({
           title: "Signup failed",
           description: error.message,
           variant: "destructive"
         });
       } else {
-        console.log('Signup successful:', data);
         if (data.user && !data.user.email_confirmed_at) {
           toast({
             title: "Success",

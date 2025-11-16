@@ -38,8 +38,42 @@ serve(async (req) => {
 
     const { imageBase64, prompt, editType } = await req.json();
     
-    if (!imageBase64 || !prompt) {
-      throw new Error("Missing required fields: imageBase64 and prompt");
+    // Input validation constants
+    const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10MB
+    const MAX_PROMPT_LENGTH = 5000;
+    
+    // Validate required fields
+    if (!imageBase64 || typeof imageBase64 !== 'string') {
+      throw new Error("Missing or invalid imageBase64 field");
+    }
+    
+    if (!prompt || typeof prompt !== 'string') {
+      throw new Error("Missing or invalid prompt field");
+    }
+    
+    // Validate prompt length
+    if (prompt.length === 0) {
+      throw new Error("Prompt cannot be empty");
+    }
+    
+    if (prompt.length > MAX_PROMPT_LENGTH) {
+      throw new Error(`Prompt exceeds maximum length of ${MAX_PROMPT_LENGTH} characters`);
+    }
+    
+    // Validate base64 format
+    if (!/^[A-Za-z0-9+/=]+$/.test(imageBase64)) {
+      throw new Error("Invalid base64 image data format");
+    }
+    
+    // Estimate base64 decoded size
+    const estimatedSize = (imageBase64.length * 3) / 4;
+    if (estimatedSize > MAX_IMAGE_SIZE) {
+      throw new Error(`Image exceeds maximum size of 10MB`);
+    }
+    
+    // Validate editType if provided
+    if (editType !== undefined && typeof editType !== 'string') {
+      throw new Error("Invalid editType field");
     }
 
     logStep("Request received", { editType, promptLength: prompt.length });

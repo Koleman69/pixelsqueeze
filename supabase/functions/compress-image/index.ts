@@ -48,6 +48,166 @@ serve(async (req) => {
 
     const { files, quality = 80, maxWidth = 1920, maxHeight = 1920, dpi = 72, isBulk = false }: CompressionRequest = await req.json()
     
+    // Input validation constants
+    const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+    const MAX_FILES = 50;
+    const MAX_FILENAME_LENGTH = 255;
+    
+    // Validate quality parameter
+    if (typeof quality !== 'number' || quality < 1 || quality > 100) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: 'Quality must be a number between 1 and 100',
+        results: []
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 400
+      });
+    }
+    
+    // Validate dimensions
+    if (typeof maxWidth !== 'number' || maxWidth < 1 || maxWidth > 10000) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: 'maxWidth must be a number between 1 and 10000',
+        results: []
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 400
+      });
+    }
+    
+    if (typeof maxHeight !== 'number' || maxHeight < 1 || maxHeight > 10000) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: 'maxHeight must be a number between 1 and 10000',
+        results: []
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 400
+      });
+    }
+    
+    // Validate DPI
+    if (typeof dpi !== 'number' || dpi < 72 || dpi > 600) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: 'DPI must be a number between 72 and 600',
+        results: []
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 400
+      });
+    }
+    
+    // Validate files array
+    if (!Array.isArray(files)) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: 'Files must be an array',
+        results: []
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 400
+      });
+    }
+    
+    if (files.length === 0) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: 'At least one file is required',
+        results: []
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 400
+      });
+    }
+    
+    if (files.length > MAX_FILES) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: `Maximum ${MAX_FILES} files allowed per request`,
+        results: []
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 400
+      });
+    }
+    
+    // Validate each file
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      
+      if (!file || typeof file !== 'object') {
+        return new Response(JSON.stringify({
+          success: false,
+          error: `File at index ${i} is invalid`,
+          results: []
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 400
+        });
+      }
+      
+      if (!file.file || typeof file.file !== 'string') {
+        return new Response(JSON.stringify({
+          success: false,
+          error: `File at index ${i} is missing valid base64 data`,
+          results: []
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 400
+        });
+      }
+      
+      if (!file.fileName || typeof file.fileName !== 'string') {
+        return new Response(JSON.stringify({
+          success: false,
+          error: `File at index ${i} is missing valid fileName`,
+          results: []
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 400
+        });
+      }
+      
+      if (file.fileName.length > MAX_FILENAME_LENGTH) {
+        return new Response(JSON.stringify({
+          success: false,
+          error: `Filename at index ${i} exceeds ${MAX_FILENAME_LENGTH} characters`,
+          results: []
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 400
+        });
+      }
+      
+      // Estimate base64 decoded size
+      const estimatedSize = (file.file.length * 3) / 4;
+      if (estimatedSize > MAX_FILE_SIZE) {
+        return new Response(JSON.stringify({
+          success: false,
+          error: `File at index ${i} exceeds maximum size of 10MB`,
+          results: []
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 400
+        });
+      }
+      
+      // Validate base64 format (basic check)
+      if (!/^[A-Za-z0-9+/=]+$/.test(file.file)) {
+        return new Response(JSON.stringify({
+          success: false,
+          error: `File at index ${i} contains invalid base64 data`,
+          results: []
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 400
+        });
+      }
+    }
+    
     // Check if user is authenticated for premium features
     let isSubscribed = false;
     let userId: string | null = null;

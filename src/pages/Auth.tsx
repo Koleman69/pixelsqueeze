@@ -9,6 +9,30 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2, Minimize2, ArrowLeft, Apple } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Separator } from "@/components/ui/separator";
+import { z } from "zod";
+
+const emailSchema = z.string().trim().email("Please enter a valid email address").max(255);
+
+const passwordSchema = z.string()
+  .min(8, "Password must be at least 8 characters")
+  .max(100, "Password must be less than 100 characters")
+  .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+  .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+  .regex(/[0-9]/, "Password must contain at least one number");
+
+const loginSchema = z.object({
+  email: emailSchema,
+  password: z.string().min(1, "Password is required")
+});
+
+const signupSchema = z.object({
+  email: emailSchema,
+  password: passwordSchema,
+  confirmPassword: z.string()
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords do not match",
+  path: ["confirmPassword"]
+});
 
 const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -31,6 +55,21 @@ const Auth = () => {
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate email
+    try {
+      emailSchema.parse(resetEmail);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        toast({
+          title: "Invalid email",
+          description: error.errors[0].message,
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+    
     setIsLoading(true);
 
     const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
@@ -57,13 +96,22 @@ const Auth = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.email || !formData.password) {
-      toast({
-        title: "Error",
-        description: "Please fill in all fields",
-        variant: "destructive"
+    
+    // Validate login form
+    try {
+      loginSchema.parse({
+        email: formData.email,
+        password: formData.password
       });
-      return;
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        toast({
+          title: "Validation Error",
+          description: error.errors[0].message,
+          variant: "destructive"
+        });
+        return;
+      }
     }
 
     setIsLoading(true);
@@ -99,22 +147,23 @@ const Auth = () => {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.email || !formData.password || !formData.confirmPassword) {
-      toast({
-        title: "Error",
-        description: "Please fill in all fields",
-        variant: "destructive"
+    
+    // Validate signup form
+    try {
+      signupSchema.parse({
+        email: formData.email,
+        password: formData.password,
+        confirmPassword: formData.confirmPassword
       });
-      return;
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      toast({
-        title: "Error",
-        description: "Passwords do not match",
-        variant: "destructive"
-      });
-      return;
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        toast({
+          title: "Validation Error",
+          description: error.errors[0].message,
+          variant: "destructive"
+        });
+        return;
+      }
     }
 
     setIsLoading(true);

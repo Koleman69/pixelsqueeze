@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <!-- Homepage -->
   <url>
-    <loc>https://pixelsqueeze.app/</loc>
+    <loc>https://compressngo.app/</loc>
     <lastmod>2025-01-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
@@ -10,7 +10,7 @@
   
   <!-- Company Page -->
   <url>
-    <loc>https://pixelsqueeze.app/company</loc>
+    <loc>https://compressngo.app/company</loc>
     <lastmod>2025-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
@@ -18,7 +18,7 @@
   
   <!-- Account Page -->
   <url>
-    <loc>https://pixelsqueeze.app/account</loc>
+    <loc>https://compressngo.app/account</loc>
     <lastmod>2025-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -26,7 +26,7 @@
   
   <!-- Blog Homepage -->
   <url>
-    <loc>https://pixelsqueeze.app/blog</loc>
+    <loc>https://compressngo.app/blog</loc>
     <lastmod>2025-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
@@ -34,28 +34,28 @@
   
   <!-- Blog Articles -->
   <url>
-    <loc>https://pixelsqueeze.app/blog/best-image-compression-tools-2025</loc>
+    <loc>https://compressngo.app/blog/best-image-compression-tools-2025</loc>
     <lastmod>2025-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   
   <url>
-    <loc>https://pixelsqueeze.app/blog/reduce-photo-size-without-losing-quality</loc>
+    <loc>https://compressngo.app/blog/reduce-photo-size-without-losing-quality</loc>
     <lastmod>2025-01-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   
   <url>
-    <loc>https://pixelsqueeze.app/blog/jpeg-vs-png-vs-webp-compression-comparison</loc>
+    <loc>https://compressngo.app/blog/jpeg-vs-png-vs-webp-compression-comparison</loc>
     <lastmod>2025-01-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   
   <url>
-    <loc>https://pixelsqueeze.app/blog/optimize-images-page-speed-seo</loc>
+    <loc>https://compressngo.app/blog/optimize-images-page-speed-seo</loc>
     <lastmod>2024-12-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>

@@ -100,7 +100,7 @@ const Index = () => {
           <div className="flex items-center gap-6">
             <div className="flex items-center">
               <Minimize2 className="w-6 h-6 text-primary mr-2" />
-              <h1 className="text-xl font-bold">compressngo</h1>
+              <h1 className="text-xl font-bold">PixelSqueeze</h1>
             </div>
             <Link to="/blog">
               <Button variant="ghost" size="sm">
@@ -322,7 +322,7 @@ const Index = () => {
         <div className="max-w-7xl mx-auto">
           <h2 className="text-3xl font-bold mb-4 text-center">What Our Users Say</h2>
           <p className="text-muted-foreground text-center mb-12 max-w-2xl mx-auto">
-            Join thousands of satisfied users who trust compressngo for their image compression needs
+            Join thousands of satisfied users who trust PixelSqueeze for their image compression needs
           </p>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -333,7 +333,7 @@ const Index = () => {
                 ))}
               </div>
               <p className="text-foreground mb-4 italic">
-                "compressngo saved me so much time! I used to spend hours manually compressing images for my e-commerce site. Now it takes seconds, and the quality is amazing. Highly recommend!"
+                "PixelSqueeze saved me so much time! I used to spend hours manually compressing images for my e-commerce site. Now it takes seconds, and the quality is amazing. Highly recommend!"
               </p>
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-gradient-primary flex items-center justify-center text-primary-foreground font-bold">
@@ -353,7 +353,7 @@ const Index = () => {
                 ))}
               </div>
               <p className="text-foreground mb-4 italic">
-                "As a wedding photographer, file sizes were killing my storage budget. compressngo reduced my files by 75% without any visible quality loss. It's a game changer!"
+                "As a wedding photographer, file sizes were killing my storage budget. PixelSqueeze reduced my files by 75% without any visible quality loss. It's a game changer!"
               </p>
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-gradient-profit flex items-center justify-center text-profit-foreground font-bold">
@@ -393,7 +393,7 @@ const Index = () => {
                 ))}
               </div>
               <p className="text-foreground mb-4 italic">
-                "Our website load time improved by 60% after using compressngo. Google rankings went up, and our bounce rate dropped significantly. This tool pays for itself!"
+                "Our website load time improved by 60% after using PixelSqueeze. Google rankings went up, and our bounce rate dropped significantly. This tool pays for itself!"
               </p>
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-gradient-profit flex items-center justify-center text-profit-foreground font-bold">
@@ -413,7 +413,7 @@ const Index = () => {
                 ))}
               </div>
               <p className="text-foreground mb-4 italic">
-                "I've tried many compression tools, but compressngo is the only one that delivers professional results consistently. The bulk processing saves me hours every week."
+                "I've tried many compression tools, but PixelSqueeze is the only one that delivers professional results consistently. The bulk processing saves me hours every week."
               </p>
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-gradient-primary flex items-center justify-center text-primary-foreground font-bold">

@@ -2,120 +2,140 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Photo Compression Platform Design System */
+/* Pixelsqueeze Mobile-First Design System - Optimized for Median/iOS */
 
 @layer base {
   :root {
-    /* Dark professional theme */
-    --background: 222 15% 8%;
+    /* iOS-friendly clean color palette */
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    /* iOS blue primary - system color */
+    --primary: 211 100% 50%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 47% 11%;
+
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
+
+    --accent: 211 100% 50%;
+    --accent-foreground: 0 0% 100%;
+
+    /* Status colors - iOS semantic colors */
+    --profit-green: 142 71% 45%;
+    --profit-green-foreground: 0 0% 100%;
+    
+    --warning-yellow: 38 92% 50%;
+    --warning-yellow-foreground: 0 0% 100%;
+    
+    --loss-red: 0 84% 60%;
+    --loss-red-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 211 100% 50%;
+
+    --radius: 0.875rem;
+
+    /* Mobile-optimized gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(211 100% 50%), hsl(211 100% 60%));
+    --gradient-profit: linear-gradient(135deg, hsl(142 71% 45%), hsl(142 71% 55%));
+    --gradient-loss: linear-gradient(135deg, hsl(0 84% 60%), hsl(0 84% 70%));
+    --gradient-hero: linear-gradient(180deg, hsl(210 40% 98%), hsl(0 0% 100%));
+    
+    /* Subtle iOS shadows */
+    --shadow-glow: 0 4px 20px hsl(211 100% 50% / 0.15);
+    --shadow-profit: 0 4px 16px hsl(142 71% 45% / 0.2);
+    --shadow-loss: 0 4px 16px hsl(0 84% 60% / 0.2);
+    --shadow-card: 0 2px 8px hsl(0 0% 0% / 0.06);
+    
+    /* Smooth iOS animations */
+    --transition-smooth: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-glow: all 0.3s ease-in-out;
+
+    /* Safe area insets for notched devices */
+    --safe-area-top: env(safe-area-inset-top, 0px);
+    --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-area-left: env(safe-area-inset-left, 0px);
+    --safe-area-right: env(safe-area-inset-right, 0px);
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 211 100% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 210 40% 96%;
+    --sidebar-accent-foreground: 222 47% 11%;
+    --sidebar-border: 214 32% 91%;
+    --sidebar-ring: 211 100% 50%;
+  }
+
+  .dark {
+    --background: 222 47% 6%;
     --foreground: 210 40% 98%;
 
-    --card: 222 15% 10%;
+    --card: 222 47% 8%;
     --card-foreground: 210 40% 98%;
 
-    --popover: 222 15% 10%;
+    --popover: 222 47% 8%;
     --popover-foreground: 210 40% 98%;
 
-    /* Compression blue primary */
-    --primary: 217 91% 60%;
-    --primary-foreground: 222 15% 8%;
+    --primary: 211 100% 60%;
+    --primary-foreground: 222 47% 6%;
 
-    --secondary: 222 15% 15%;
+    --secondary: 217 33% 17%;
     --secondary-foreground: 210 40% 98%;
 
-    --muted: 222 15% 15%;
+    --muted: 217 33% 17%;
     --muted-foreground: 215 20% 65%;
 
-    --accent: 217 91% 60%;
-    --accent-foreground: 222 15% 8%;
+    --accent: 211 100% 60%;
+    --accent-foreground: 222 47% 6%;
 
-    /* Compression status colors */
-    --profit-green: 142 76% 36%;
+    --profit-green: 142 71% 45%;
     --profit-green-foreground: 210 40% 98%;
     
-    --warning-yellow: 48 96% 53%;
-    --warning-yellow-foreground: 222 15% 8%;
+    --warning-yellow: 38 92% 50%;
+    --warning-yellow-foreground: 222 47% 6%;
     
     --loss-red: 0 84% 60%;
     --loss-red-foreground: 210 40% 98%;
 
-    --destructive: 0 84% 60%;
+    --destructive: 0 63% 31%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 222 15% 20%;
-    --input: 222 15% 15%;
-    --ring: 217 91% 60%;
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --ring: 211 100% 60%;
 
-    --radius: 0.75rem;
-
-    /* Compression gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(217 91% 60%), hsl(217 91% 70%));
-    --gradient-profit: linear-gradient(135deg, hsl(142 76% 36%), hsl(142 76% 46%));
+    --gradient-primary: linear-gradient(135deg, hsl(211 100% 60%), hsl(211 100% 70%));
+    --gradient-profit: linear-gradient(135deg, hsl(142 71% 45%), hsl(142 71% 55%));
     --gradient-loss: linear-gradient(135deg, hsl(0 84% 60%), hsl(0 84% 70%));
-    --gradient-hero: linear-gradient(135deg, hsl(222 15% 8%), hsl(222 15% 12%));
-    
-    /* Compression shadows */
-    --shadow-glow: 0 0 40px hsl(217 91% 60% / 0.3);
-    --shadow-profit: 0 8px 32px hsl(142 76% 36% / 0.3);
-    --shadow-loss: 0 8px 32px hsl(0 84% 60% / 0.3);
-    
-    /* Animations */
-    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-glow: all 0.5s ease-in-out;
+    --gradient-hero: linear-gradient(180deg, hsl(222 47% 6%), hsl(222 47% 10%));
 
-    --sidebar-background: 0 0% 98%;
+    --shadow-glow: 0 4px 24px hsl(211 100% 60% / 0.25);
+    --shadow-profit: 0 4px 20px hsl(142 71% 45% / 0.25);
+    --shadow-loss: 0 4px 20px hsl(0 84% 60% / 0.25);
+    --shadow-card: 0 2px 12px hsl(0 0% 0% / 0.3);
 
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-background: 222 47% 8%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 211 100% 60%;
+    --sidebar-primary-foreground: 222 47% 6%;
+    --sidebar-accent: 217 33% 17%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 217 33% 17%;
+    --sidebar-ring: 211 100% 60%;
   }
 }
 
@@ -124,7 +144,62 @@
     @apply border-border;
   }
 
+  html {
+    /* Prevent iOS rubber-banding on body */
+    overscroll-behavior: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+    /* Safe area padding for iOS notch */
+    padding-top: var(--safe-area-top);
+    padding-bottom: var(--safe-area-bottom);
+    padding-left: var(--safe-area-left);
+    padding-right: var(--safe-area-right);
+    /* Smooth scrolling */
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Mobile touch targets - minimum 44px for iOS */
+  button, 
+  a, 
+  [role="button"] {
+    min-height: 44px;
+    @apply touch-manipulation;
+  }
+
+  /* Prevent text selection on interactive elements */
+  button,
+  [role="button"] {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+}
+
+@layer utilities {
+  /* Safe area utilities */
+  .safe-top {
+    padding-top: max(1rem, var(--safe-area-top));
+  }
+  
+  .safe-bottom {
+    padding-bottom: max(1rem, var(--safe-area-bottom));
+  }
+  
+  .safe-x {
+    padding-left: max(1rem, var(--safe-area-left));
+    padding-right: max(1rem, var(--safe-area-right));
+  }
+
+  /* Mobile card styling */
+  .mobile-card {
+    @apply bg-card rounded-xl shadow-sm border border-border/50;
+    box-shadow: var(--shadow-card);
+  }
+
+  /* iOS-style navigation bar */
+  .nav-blur {
+    @apply backdrop-blur-xl bg-background/80;
   }
 }

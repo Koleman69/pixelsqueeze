@@ -100,7 +100,7 @@ const Index = () => {
           <div className="flex items-center gap-6">
             <div className="flex items-center">
               <Minimize2 className="w-6 h-6 text-primary mr-2" />
-              <h1 className="text-xl font-bold">PixelSqueeze</h1>
+              <h1 className="text-xl font-bold">Pixelsqueeze</h1>
             </div>
             <Link to="/blog">
               <Button variant="ghost" size="sm">

@@ -245,7 +245,7 @@ const Auth = () => {
               <div className="relative flex items-center bg-background/50 backdrop-blur-sm px-6 py-3 rounded-2xl border-2 border-primary/30">
                 <Minimize2 className="w-12 h-12 text-primary mr-3" strokeWidth={2.5} />
                 <h1 className="text-5xl font-bold font-brand bg-gradient-to-r from-primary via-primary to-primary/70 bg-clip-text text-transparent">
-                  compressngo
+                  Pixelsqueeze
                 </h1>
               </div>
             </div>

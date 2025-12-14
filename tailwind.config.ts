@@ -7,14 +7,25 @@ export default {
   theme: {
     container: {
       center: true,
-      padding: "2rem",
+      padding: "1rem",
       screens: {
+        sm: "100%",
+        md: "100%",
+        lg: "1024px",
+        xl: "1280px",
         "2xl": "1400px",
       },
     },
     extend: {
       fontFamily: {
-        'brand': ['Space Grotesk', 'sans-serif'],
+        'brand': ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'Segoe UI', 'Roboto', 'sans-serif'],
+        'body': ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Text', 'Segoe UI', 'Roboto', 'sans-serif'],
+      },
+      spacing: {
+        'safe-top': 'var(--safe-area-top)',
+        'safe-bottom': 'var(--safe-area-bottom)',
+        'safe-left': 'var(--safe-area-left)',
+        'safe-right': 'var(--safe-area-right)',
       },
       colors: {
         border: "hsl(var(--border))",
@@ -50,7 +61,6 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        // Compression status colors
         profit: {
           DEFAULT: "hsl(var(--profit-green))",
           foreground: "hsl(var(--profit-green-foreground))",
@@ -78,6 +88,8 @@ export default {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        xl: "1rem",
+        "2xl": "1.25rem",
       },
       backgroundImage: {
         'gradient-primary': 'var(--gradient-primary)',
@@ -89,27 +101,17 @@ export default {
         'glow': 'var(--shadow-glow)',
         'profit': 'var(--shadow-profit)',
         'loss': 'var(--shadow-loss)',
-      },
-      transitionProperty: {
-        'smooth': 'var(--transition-smooth)',
-        'glow': 'var(--transition-glow)',
+        'card': 'var(--shadow-card)',
+        'ios': '0 2px 10px rgba(0, 0, 0, 0.08)',
       },
       keyframes: {
         "accordion-down": {
-          from: {
-            height: "0",
-          },
-          to: {
-            height: "var(--radix-accordion-content-height)",
-          },
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
         },
         "accordion-up": {
-          from: {
-            height: "var(--radix-accordion-content-height)",
-          },
-          to: {
-            height: "0",
-          },
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
         },
       },
       animation: {

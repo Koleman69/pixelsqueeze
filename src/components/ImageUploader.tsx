@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -6,10 +6,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { Input } from '@/components/ui/input';
-import { Settings, Upload, Crown, Download, Zap } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Settings, Upload, Crown, Download, Zap, Image, Video } from 'lucide-react';
 import { CompressionSettings, useImageCompression } from '@/hooks/useImageCompression';
+import { useVideoCompression, VideoCompressionSettings } from '@/hooks/useVideoCompression';
+import { VideoCompressionResults } from '@/components/VideoCompressionResults';
 import { useToast } from '@/hooks/use-toast';
-import { useRef, useEffect } from 'react';
 
 interface ImageUploaderProps {
   onUpload?: (files: FileList) => void;
@@ -17,11 +20,19 @@ interface ImageUploaderProps {
 
 export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const videoInputRef = useRef<HTMLInputElement>(null);
+  const [activeTab, setActiveTab] = useState<'image' | 'video'>('image');
   const [settings, setSettings] = useState<CompressionSettings>({
     quality: 80,
     maxWidth: 1920,
     maxHeight: 1920,
     dpi: 72
+  });
+  const [videoSettings, setVideoSettings] = useState<VideoCompressionSettings>({
+    quality: 'medium',
+    maxWidth: 1280,
+    maxHeight: 720,
+    videoBitrate: 1000
   });
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
@@ -36,6 +47,13 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
     downloadBulk,
     compressions 
   } = useImageCompression();
+
+  const {
+    videoCompressions,
+    compressVideo,
+    downloadCompressedVideo,
+    clearVideoCompressions
+  } = useVideoCompression();
   
   const { toast } = useToast();
 
@@ -44,7 +62,11 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
   }, []);
 
   const handleFileSelect = () => {
-    fileInputRef.current?.click();
+    if (activeTab === 'video') {
+      videoInputRef.current?.click();
+    } else {
+      fileInputRef.current?.click();
+    }
   };
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -70,6 +92,26 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
         await checkSubscription();
       } catch (error) {
         console.error('Compression failed:', error);
+      } finally {
+        setIsUploading(false);
+      }
+    }
+  };
+
+  const handleVideoChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      setIsUploading(true);
+      
+      toast({
+        title: "Processing Video",
+        description: `Compressing ${files[0].name}...`,
+      });
+
+      try {
+        await compressVideo(files[0], videoSettings);
+      } catch (error) {
+        console.error('Video compression failed:', error);
       } finally {
         setIsUploading(false);
       }
@@ -112,9 +154,9 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold">Image Compression Studio</h2>
+            <h2 className="text-2xl font-bold">Media Compression Studio</h2>
             <p className="text-muted-foreground">
-              Upload and compress your images with advanced settings
+              Compress your images and videos with advanced settings
             </p>
           </div>
           
@@ -141,146 +183,249 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
           )}
         </div>
 
-        {/* Settings */}
-        <div className="flex items-center gap-4">
-          <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
-            <DialogTrigger asChild>
-              <Button variant="outline">
-                <Settings className="w-4 h-4 mr-2" />
-                Compression Settings
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-md">
-              <DialogHeader>
-                <DialogTitle>Compression Settings</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-6">
-                <div className="space-y-2">
-                  <Label>Quality: {settings.quality}%</Label>
-                  <Slider
-                    value={[settings.quality]}
-                    onValueChange={([value]) => setSettings(prev => ({ ...prev, quality: value }))}
-                    max={subscription.subscribed ? 100 : 85}
-                    min={10}
-                    step={5}
-                  />
-                  {!subscription.subscribed && (
-                    <p className="text-xs text-muted-foreground">
-                      Pro users can use up to 100% quality
-                    </p>
-                  )}
-                </div>
+        {/* Media Type Tabs */}
+        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'image' | 'video')}>
+          <TabsList className="grid w-full grid-cols-2 max-w-xs">
+            <TabsTrigger value="image" className="flex items-center gap-2">
+              <Image className="w-4 h-4" />
+              Images
+            </TabsTrigger>
+            <TabsTrigger value="video" className="flex items-center gap-2">
+              <Video className="w-4 h-4" />
+              Videos
+            </TabsTrigger>
+          </TabsList>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>Max Width</Label>
-                    <Input
-                      type="number"
-                      value={settings.maxWidth}
-                      onChange={(e) => setSettings(prev => ({ ...prev, maxWidth: parseInt(e.target.value) || 1920 }))}
-                      max={subscription.subscribed ? 4096 : 1920}
-                      min={100}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Max Height</Label>
-                    <Input
-                      type="number"
-                      value={settings.maxHeight}
-                      onChange={(e) => setSettings(prev => ({ ...prev, maxHeight: parseInt(e.target.value) || 1920 }))}
-                      max={subscription.subscribed ? 4096 : 1920}
-                      min={100}
-                    />
-                  </div>
-                </div>
+          <TabsContent value="image" className="space-y-6 mt-6">
+            {/* Image Settings */}
+            <div className="flex items-center gap-4">
+              <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="outline">
+                    <Settings className="w-4 h-4 mr-2" />
+                    Image Settings
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Image Compression Settings</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-6">
+                    <div className="space-y-2">
+                      <Label>Quality: {settings.quality}%</Label>
+                      <Slider
+                        value={[settings.quality]}
+                        onValueChange={([value]) => setSettings(prev => ({ ...prev, quality: value }))}
+                        max={subscription.subscribed ? 100 : 85}
+                        min={10}
+                        step={5}
+                      />
+                      {!subscription.subscribed && (
+                        <p className="text-xs text-muted-foreground">
+                          Pro users can use up to 100% quality
+                        </p>
+                      )}
+                    </div>
 
-                <div className="space-y-2">
-                  <Label>DPI: {settings.dpi}</Label>
-                  <Slider
-                    value={[settings.dpi]}
-                    onValueChange={([value]) => setSettings(prev => ({ ...prev, dpi: value }))}
-                    max={subscription.subscribed ? 300 : 72}
-                    min={72}
-                    step={1}
-                  />
-                  {!subscription.subscribed && (
-                    <p className="text-xs text-muted-foreground">
-                      Pro users can set custom DPI up to 300
-                    </p>
-                  )}
-                </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label>Max Width</Label>
+                        <Input
+                          type="number"
+                          value={settings.maxWidth}
+                          onChange={(e) => setSettings(prev => ({ ...prev, maxWidth: parseInt(e.target.value) || 1920 }))}
+                          max={subscription.subscribed ? 4096 : 1920}
+                          min={100}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Max Height</Label>
+                        <Input
+                          type="number"
+                          value={settings.maxHeight}
+                          onChange={(e) => setSettings(prev => ({ ...prev, maxHeight: parseInt(e.target.value) || 1920 }))}
+                          max={subscription.subscribed ? 4096 : 1920}
+                          min={100}
+                        />
+                      </div>
+                    </div>
 
-                {requiresSubscription && (
-                  <div className="p-3 bg-orange-50 border border-orange-200 rounded-lg">
-                    <p className="text-sm text-orange-800">
-                      <Crown className="w-4 h-4 inline mr-1" />
-                      Advanced settings require Pro subscription
-                    </p>
+                    <div className="space-y-2">
+                      <Label>DPI: {settings.dpi}</Label>
+                      <Slider
+                        value={[settings.dpi]}
+                        onValueChange={([value]) => setSettings(prev => ({ ...prev, dpi: value }))}
+                        max={subscription.subscribed ? 300 : 72}
+                        min={72}
+                        step={1}
+                      />
+                      {!subscription.subscribed && (
+                        <p className="text-xs text-muted-foreground">
+                          Pro users can set custom DPI up to 300
+                        </p>
+                      )}
+                    </div>
+
+                    {requiresSubscription && (
+                      <div className="p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                        <p className="text-sm text-orange-800">
+                          <Crown className="w-4 h-4 inline mr-1" />
+                          Advanced settings require Pro subscription
+                        </p>
+                      </div>
+                    )}
                   </div>
-                )}
+                </DialogContent>
+              </Dialog>
+
+              {subscription.subscribed && selectedFiles && selectedFiles.length > 1 && (
+                <Button onClick={handleBulkCompress} variant="outline">
+                  <Zap className="w-4 h-4 mr-2" />
+                  Bulk Compress ({selectedFiles.length} files)
+                </Button>
+              )}
+
+              {compressions.some(c => c.status === 'completed') && (
+                <Button onClick={handleBulkDownload} variant="outline">
+                  <Download className="w-4 h-4 mr-2" />
+                  Download All
+                </Button>
+              )}
+            </div>
+
+            {/* Image Upload Area */}
+            <div 
+              className="border-2 border-dashed border-border rounded-lg p-8 text-center cursor-pointer hover:border-primary transition-colors"
+              onClick={handleFileSelect}
+            >
+              <Upload className={`w-12 h-12 mx-auto mb-4 text-muted-foreground ${isUploading ? 'animate-bounce' : ''}`} />
+              <h3 className="text-lg font-semibold mb-2">
+                {isUploading ? 'Processing Images...' : 'Upload Images'}
+              </h3>
+              <p className="text-muted-foreground mb-4">
+                {isUploading 
+                  ? `Compressing ${selectedFiles?.length || 0} image(s)...` 
+                  : 'Click to browse or drag and drop your images here'
+                }
+              </p>
+              {!isUploading && (
+                <p className="text-sm text-muted-foreground">
+                  {subscription.subscribed 
+                    ? "Unlimited files • All formats • Up to 50MB each" 
+                    : "Up to 3 files • JPEG, PNG, WebP • Up to 10MB each"
+                  }
+                </p>
+              )}
+              
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                multiple
+                className="hidden"
+                onChange={handleFileChange}
+                disabled={isUploading}
+              />
+            </div>
+
+            {/* Image Settings Display */}
+            <div className="flex flex-wrap gap-2">
+              <Badge variant="outline">Quality: {settings.quality}%</Badge>
+              <Badge variant="outline">Size: {settings.maxWidth}×{settings.maxHeight}</Badge>
+              <Badge variant="outline">DPI: {settings.dpi}</Badge>
+              {requiresSubscription && (
+                <Badge variant="destructive">Pro Required</Badge>
+              )}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="video" className="space-y-6 mt-6">
+            {/* Video Settings */}
+            <div className="flex items-center gap-4 flex-wrap">
+              <div className="flex items-center gap-2">
+                <Label>Quality:</Label>
+                <Select 
+                  value={videoSettings.quality} 
+                  onValueChange={(v) => setVideoSettings(prev => ({ ...prev, quality: v as 'low' | 'medium' | 'high' }))}
+                >
+                  <SelectTrigger className="w-32">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="low">Low (500kbps)</SelectItem>
+                    <SelectItem value="medium">Medium (1Mbps)</SelectItem>
+                    <SelectItem value="high">High (2.5Mbps)</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-            </DialogContent>
-          </Dialog>
 
-          {subscription.subscribed && selectedFiles && selectedFiles.length > 1 && (
-            <Button onClick={handleBulkCompress} variant="outline">
-              <Zap className="w-4 h-4 mr-2" />
-              Bulk Compress ({selectedFiles.length} files)
-            </Button>
-          )}
+              <div className="flex items-center gap-2">
+                <Label>Resolution:</Label>
+                <Select 
+                  value={`${videoSettings.maxWidth}x${videoSettings.maxHeight}`}
+                  onValueChange={(v) => {
+                    const [w, h] = v.split('x').map(Number);
+                    setVideoSettings(prev => ({ ...prev, maxWidth: w, maxHeight: h }));
+                  }}
+                >
+                  <SelectTrigger className="w-32">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="640x360">360p</SelectItem>
+                    <SelectItem value="854x480">480p</SelectItem>
+                    <SelectItem value="1280x720">720p</SelectItem>
+                    <SelectItem value="1920x1080">1080p</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
 
-          {compressions.some(c => c.status === 'completed') && (
-            <Button onClick={handleBulkDownload} variant="outline">
-              <Download className="w-4 h-4 mr-2" />
-              Download All
-            </Button>
-          )}
-        </div>
+            {/* Video Upload Area */}
+            <div 
+              className="border-2 border-dashed border-border rounded-lg p-8 text-center cursor-pointer hover:border-primary transition-colors"
+              onClick={handleFileSelect}
+            >
+              <Video className={`w-12 h-12 mx-auto mb-4 text-muted-foreground ${isUploading ? 'animate-pulse' : ''}`} />
+              <h3 className="text-lg font-semibold mb-2">
+                {isUploading ? 'Processing Video...' : 'Upload Video'}
+              </h3>
+              <p className="text-muted-foreground mb-4">
+                {isUploading 
+                  ? 'Compressing video in your browser...' 
+                  : 'Click to browse or drag and drop your video here'
+                }
+              </p>
+              {!isUploading && (
+                <p className="text-sm text-muted-foreground">
+                  MP4, WebM, MOV • Processed locally in your browser
+                </p>
+              )}
+              
+              <input
+                ref={videoInputRef}
+                type="file"
+                accept="video/*"
+                className="hidden"
+                onChange={handleVideoChange}
+                disabled={isUploading}
+              />
+            </div>
 
-        {/* Upload Area */}
-        <div 
-          className="border-2 border-dashed border-border rounded-lg p-8 text-center cursor-pointer hover:border-primary transition-colors"
-          onClick={handleFileSelect}
-        >
-          <Upload className={`w-12 h-12 mx-auto mb-4 text-muted-foreground ${isUploading ? 'animate-bounce' : ''}`} />
-          <h3 className="text-lg font-semibold mb-2">
-            {isUploading ? 'Processing Images...' : 'Upload Images'}
-          </h3>
-          <p className="text-muted-foreground mb-4">
-            {isUploading 
-              ? `Compressing ${selectedFiles?.length || 0} image(s)...` 
-              : 'Click to browse or drag and drop your images here'
-            }
-          </p>
-          {!isUploading && (
-            <p className="text-sm text-muted-foreground">
-              {subscription.subscribed 
-                ? "Unlimited files • All formats • Up to 50MB each" 
-                : "Up to 3 files • JPEG, PNG, WebP • Up to 10MB each"
-              }
-            </p>
-          )}
-          
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            multiple
-            className="hidden"
-            onChange={handleFileChange}
-            disabled={isUploading}
-          />
-        </div>
+            {/* Video Settings Display */}
+            <div className="flex flex-wrap gap-2">
+              <Badge variant="outline">Quality: {videoSettings.quality}</Badge>
+              <Badge variant="outline">Resolution: {videoSettings.maxWidth}×{videoSettings.maxHeight}</Badge>
+              <Badge variant="secondary">Browser Processing</Badge>
+            </div>
 
-        {/* Current Settings Display */}
-        <div className="flex flex-wrap gap-2">
-          <Badge variant="outline">Quality: {settings.quality}%</Badge>
-          <Badge variant="outline">Size: {settings.maxWidth}×{settings.maxHeight}</Badge>
-          <Badge variant="outline">DPI: {settings.dpi}</Badge>
-          {requiresSubscription && (
-            <Badge variant="destructive">Pro Required</Badge>
-          )}
-        </div>
+            {/* Video Compression Results */}
+            <VideoCompressionResults 
+              compressions={videoCompressions}
+              onDownload={downloadCompressedVideo}
+            />
+          </TabsContent>
+        </Tabs>
       </div>
     </Card>
   );

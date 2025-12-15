@@ -6,7 +6,7 @@ import { ImageEditor } from "@/components/ImageEditor";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Upload, Shield, TrendingDown, Zap, BarChart3, Target, LogOut, Image, FileImage, Minimize2, HardDrive, Crown, BookOpen, Loader2 } from "lucide-react";
+import { Upload, Shield, TrendingDown, Zap, BarChart3, Target, LogOut, Image, FileImage, Minimize2, HardDrive, Crown, BookOpen, Loader2, Download } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useImageCompression } from "@/hooks/useImageCompression";
@@ -58,7 +58,7 @@ const compressionData = [
 const Index = () => {
   const { user, signOut } = useAuth();
   const { toast } = useToast();
-  const { compressions, subscription, createCheckout, checkSubscription, compressImages } = useImageCompression();
+  const { compressions, subscription, createCheckout, checkSubscription, compressImages, downloadBulk } = useImageCompression();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -178,6 +178,20 @@ const Index = () => {
                 </>
               )}
             </Button>
+            {compressions.some(c => c.status === 'completed') && (
+              <Button 
+                size="lg" 
+                variant="outline" 
+                className="border-primary text-primary hover:bg-primary hover:text-primary-foreground px-8 py-3"
+                onClick={() => {
+                  const completedIds = compressions.filter(c => c.status === 'completed').map(c => c.id);
+                  downloadBulk(completedIds);
+                }}
+              >
+                <Download className="w-5 h-5 mr-2" />
+                Download All ({compressions.filter(c => c.status === 'completed').length})
+              </Button>
+            )}
             {!subscription.subscribed && (
               <Button size="lg" className="bg-gradient-profit text-profit-foreground shadow-profit hover:opacity-90 px-8 py-3" onClick={createCheckout}>
                 <Crown className="w-5 h-5 mr-2" />

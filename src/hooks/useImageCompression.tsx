@@ -230,10 +230,32 @@ export const useImageCompression = () => {
   const downloadCompressed = (compressionId: string) => {
     const compression = compressions.find(c => c.id === compressionId);
     if (compression?.compressedImage) {
+      // Convert base64 to blob for better mobile compatibility
+      const base64Data = compression.compressedImage;
+      const binaryData = atob(base64Data);
+      const bytes = new Uint8Array(binaryData.length);
+      for (let i = 0; i < binaryData.length; i++) {
+        bytes[i] = binaryData.charCodeAt(i);
+      }
+      
+      // Determine MIME type from filename
+      const extension = compression.fileName.toLowerCase().split('.').pop();
+      let mimeType = 'image/jpeg';
+      if (extension === 'png') mimeType = 'image/png';
+      else if (extension === 'webp') mimeType = 'image/webp';
+      else if (extension === 'gif') mimeType = 'image/gif';
+      
+      const blob = new Blob([bytes], { type: mimeType });
+      const url = URL.createObjectURL(blob);
+      
       const link = document.createElement('a');
-      link.href = `data:image/jpeg;base64,${compression.compressedImage}`;
+      link.href = url;
       link.download = `compressed_${compression.fileName}`;
+      link.style.display = 'none';
+      document.body.appendChild(link);
       link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
     }
   };
 

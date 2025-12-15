@@ -15,6 +15,7 @@ import {
   Star
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet";
 import { BeforeAfterSlider } from "@/components/BeforeAfterSlider";
 import weddingBefore from "@/assets/wedding-before.jpg";
 import weddingAfter from "@/assets/wedding-after.jpg";
@@ -23,8 +24,70 @@ import manAfter from "@/assets/man-after.jpg";
 import heroImage from "@/assets/compression-hero.jpg";
 
 const Landing = () => {
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Pixelsqueeze",
+    "applicationCategory": "MultimediaApplication",
+    "operatingSystem": "Web",
+    "description": "AI-powered image compression tool that reduces file sizes by up to 80% while maintaining stunning visual quality.",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD",
+      "description": "Free tier with 3 compressions"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.9",
+      "ratingCount": "2847",
+      "bestRating": "5"
+    }
+  };
+
+  const organizationData = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Pixelsqueeze",
+    "url": "https://pixelsqueeze.com",
+    "logo": "https://pixelsqueeze.com/logo.png",
+    "description": "Professional image compression and optimization platform"
+  };
+
   return (
     <div className="min-h-screen bg-background">
+      <Helmet>
+        <title>Pixelsqueeze - AI Image Compression | Reduce File Size by 80%</title>
+        <meta name="description" content="Compress images without losing quality. AI-powered image compression reduces file sizes by up to 80%. Perfect for web optimization, faster loading times, and storage savings. Start free today." />
+        <meta name="keywords" content="image compression, compress images, reduce image size, image optimizer, photo compressor, web optimization, AI compression, bulk image compression" />
+        
+        {/* Open Graph / Facebook */}
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="Pixelsqueeze - AI Image Compression" />
+        <meta property="og:description" content="Reduce image file sizes by up to 80% without losing quality. AI-powered compression for professionals." />
+        <meta property="og:image" content="https://pixelsqueeze.com/og-image.jpg" />
+        <meta property="og:url" content="https://pixelsqueeze.com" />
+        <meta property="og:site_name" content="Pixelsqueeze" />
+        
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Pixelsqueeze - AI Image Compression" />
+        <meta name="twitter:description" content="Reduce image file sizes by up to 80% without losing quality. Start compressing for free." />
+        <meta name="twitter:image" content="https://pixelsqueeze.com/twitter-image.jpg" />
+        
+        {/* Additional SEO */}
+        <meta name="robots" content="index, follow" />
+        <meta name="author" content="Pixelsqueeze" />
+        <link rel="canonical" href="https://pixelsqueeze.com" />
+        
+        {/* Structured Data */}
+        <script type="application/ld+json">
+          {JSON.stringify(structuredData)}
+        </script>
+        <script type="application/ld+json">
+          {JSON.stringify(organizationData)}
+        </script>
+      </Helmet>
       {/* Navigation */}
       <nav className="bg-background/80 backdrop-blur-sm border-b border-border px-6 py-4 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto flex justify-between items-center">

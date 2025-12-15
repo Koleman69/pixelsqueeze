@@ -1,6 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { 
   Minimize2, 
   Zap, 
@@ -12,7 +18,8 @@ import {
   Image,
   Sparkles,
   ArrowRight,
-  Star
+  Star,
+  HelpCircle
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
@@ -54,6 +61,53 @@ const Landing = () => {
     "description": "Professional image compression and optimization platform"
   };
 
+  const faqData = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How does Pixelsqueeze compress images without losing quality?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Pixelsqueeze uses advanced AI algorithms to analyze each image and identify areas where file size can be reduced without visible quality loss. Our technology removes unnecessary metadata, optimizes color profiles, and applies smart compression that preserves important visual details."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What image formats are supported?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "We support all major image formats including JPEG, PNG, WebP, GIF, and TIFF. You can also convert between formats during compression."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Are my images stored on your servers?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Your privacy is our priority. Images are processed in real-time and automatically deleted from our servers within 1 hour. All transfers are encrypted with 256-bit SSL."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I compress multiple images at once?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes! Pro subscribers can upload and compress up to 50 images at once with our bulk processing feature and download all compressed images as a single ZIP file."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I cancel my subscription anytime?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Absolutely! You can cancel your Pro subscription at any time from your account settings. Your access will continue until the end of your current billing period."
+        }
+      }
+    ]
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
@@ -86,6 +140,9 @@ const Landing = () => {
         </script>
         <script type="application/ld+json">
           {JSON.stringify(organizationData)}
+        </script>
+        <script type="application/ld+json">
+          {JSON.stringify(faqData)}
         </script>
       </Helmet>
       {/* Navigation */}
@@ -450,7 +507,98 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* CTA Section */}
+      {/* FAQ Section */}
+      <section className="py-20 px-6 bg-secondary/20">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-12">
+            <Badge variant="outline" className="mb-4 px-4 py-2 border-primary text-primary">
+              <HelpCircle className="w-4 h-4 mr-2" />
+              Got Questions?
+            </Badge>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+              Frequently Asked Questions
+            </h2>
+            <p className="text-xl text-muted-foreground">
+              Everything you need to know about Pixelsqueeze
+            </p>
+          </div>
+
+          <Accordion type="single" collapsible className="w-full space-y-4">
+            <AccordionItem value="item-1" className="bg-card rounded-lg border px-6">
+              <AccordionTrigger className="text-left text-lg font-medium hover:no-underline">
+                How does Pixelsqueeze compress images without losing quality?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground pb-4">
+                Pixelsqueeze uses advanced AI algorithms to analyze each image and identify areas where file size can be reduced without visible quality loss. Our technology removes unnecessary metadata, optimizes color profiles, and applies smart compression that preserves important visual details while eliminating redundant data.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-2" className="bg-card rounded-lg border px-6">
+              <AccordionTrigger className="text-left text-lg font-medium hover:no-underline">
+                What image formats are supported?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground pb-4">
+                We support all major image formats including JPEG, PNG, WebP, GIF, and TIFF. You can also convert between formats during compression. For example, you can upload a PNG and download an optimized WebP for even better compression.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-3" className="bg-card rounded-lg border px-6">
+              <AccordionTrigger className="text-left text-lg font-medium hover:no-underline">
+                Is there a file size limit?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground pb-4">
+                Free users can upload images up to 10MB each. Pro subscribers can upload images up to 50MB each. There is no limit on the number of images you can process with a Pro subscription.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-4" className="bg-card rounded-lg border px-6">
+              <AccordionTrigger className="text-left text-lg font-medium hover:no-underline">
+                Are my images stored on your servers?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground pb-4">
+                Your privacy is our priority. Images are processed in real-time and automatically deleted from our servers within 1 hour. We never store, share, or use your images for any purpose other than compression. All transfers are encrypted with 256-bit SSL.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-5" className="bg-card rounded-lg border px-6">
+              <AccordionTrigger className="text-left text-lg font-medium hover:no-underline">
+                Can I compress multiple images at once?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground pb-4">
+                Yes! Pro subscribers can upload and compress up to 50 images at once with our bulk processing feature. You can also download all compressed images as a single ZIP file for convenience.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-6" className="bg-card rounded-lg border px-6">
+              <AccordionTrigger className="text-left text-lg font-medium hover:no-underline">
+                What is the difference between Free and Pro?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground pb-4">
+                Free users get 3 compressions with standard quality (85%) and 72 DPI output. Pro subscribers get unlimited compressions, premium quality up to 100%, custom DPI settings up to 300, larger image dimensions up to 4096px, bulk processing, ZIP downloads, and AI-powered image editing features.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-7" className="bg-card rounded-lg border px-6">
+              <AccordionTrigger className="text-left text-lg font-medium hover:no-underline">
+                Can I cancel my subscription anytime?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground pb-4">
+                Absolutely! You can cancel your Pro subscription at any time from your account settings. Your access will continue until the end of your current billing period. No questions asked, no hidden fees.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-8" className="bg-card rounded-lg border px-6">
+              <AccordionTrigger className="text-left text-lg font-medium hover:no-underline">
+                Do you offer refunds?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground pb-4">
+                Yes, we offer a 7-day money-back guarantee. If you are not satisfied with Pixelsqueeze Pro for any reason, contact our support team within 7 days of your purchase for a full refund.
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </div>
+      </section>
+
       <section className="py-20 px-6 bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">

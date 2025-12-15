@@ -30,11 +30,14 @@ export interface VideoCompressionResult {
   pausedTime?: number; // Track time spent paused
 }
 
+export type QueuePriority = 'high' | 'normal' | 'low';
+
 export interface QueuedVideo {
   id: string;
   file: File;
   fileName: string;
   fileSize: number;
+  priority: QueuePriority;
 }
 
 interface VideoCompressionRef {
@@ -314,12 +317,13 @@ export const useVideoCompression = () => {
   };
 
   // Queue management functions
-  const addToQueue = useCallback((files: File[]) => {
+  const addToQueue = useCallback((files: File[], priority: QueuePriority = 'normal') => {
     const newQueueItems: QueuedVideo[] = files.map(file => ({
       id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
       file,
       fileName: file.name,
-      fileSize: file.size
+      fileSize: file.size,
+      priority
     }));
     setVideoQueue(prev => [...prev, ...newQueueItems]);
     
@@ -328,6 +332,12 @@ export const useVideoCompression = () => {
       description: `${files.length} video(s) added to compression queue`,
     });
   }, [toast]);
+
+  const updatePriority = useCallback((id: string, priority: QueuePriority) => {
+    setVideoQueue(prev => prev.map(item =>
+      item.id === id ? { ...item, priority } : item
+    ));
+  }, []);
 
   const removeFromQueue = useCallback((id: string) => {
     setVideoQueue(prev => prev.filter(item => item.id !== id));
@@ -361,10 +371,16 @@ export const useVideoCompression = () => {
     if (videoQueue.length === 0 || isQueueProcessing) return;
     
     setIsQueueProcessing(true);
-    const queueCopy = [...videoQueue];
+    
+    // Sort queue by priority before processing (high first, then normal, then low)
+    const priorityOrder: Record<QueuePriority, number> = { high: 0, normal: 1, low: 2 };
+    const sortedQueue = [...videoQueue].sort((a, b) => 
+      priorityOrder[a.priority] - priorityOrder[b.priority]
+    );
+    
     setVideoQueue([]); // Clear queue as we start processing
     
-    for (const item of queueCopy) {
+    for (const item of sortedQueue) {
       try {
         await compressVideo(item.file, settings);
       } catch (error) {
@@ -376,7 +392,7 @@ export const useVideoCompression = () => {
     
     toast({
       title: "Queue Complete",
-      description: `Finished processing ${queueCopy.length} video(s)`,
+      description: `Finished processing ${sortedQueue.length} video(s)`,
     });
   }, [videoQueue, isQueueProcessing, compressVideo, toast]);
 
@@ -521,6 +537,7 @@ export const useVideoCompression = () => {
     moveQueueItemUp,
     moveQueueItemDown,
     clearQueue,
-    processQueue
+    processQueue,
+    updatePriority
   };
 };

@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { Settings, Upload, Crown, Download, Zap, Image, Video, Volume2, VolumeX } from 'lucide-react';
+import { Settings, Upload, Crown, Download, Zap, Image, Video, Volume2, VolumeX, Smartphone, Globe, Archive, SlidersHorizontal } from 'lucide-react';
 import { CompressionSettings, useImageCompression } from '@/hooks/useImageCompression';
 import { useVideoCompression, VideoCompressionSettings, VideoOutputFormat } from '@/hooks/useVideoCompression';
 import { VideoCompressionResults } from '@/components/VideoCompressionResults';
@@ -38,10 +38,79 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
     outputFormat: 'webm',
     preserveAudio: true
   });
+  const [selectedPreset, setSelectedPreset] = useState<string>('custom');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
+
+  // Video compression presets
+  const videoPresets: Record<string, { label: string; description: string; icon: typeof Globe; settings: VideoCompressionSettings }> = {
+    web: {
+      label: 'Web Optimized',
+      description: 'Small file size, fast loading',
+      icon: Globe,
+      settings: {
+        quality: 'medium',
+        maxWidth: 1280,
+        maxHeight: 720,
+        videoBitrate: 1000,
+        outputFormat: 'webm',
+        preserveAudio: true
+      }
+    },
+    mobile: {
+      label: 'Mobile',
+      description: 'Optimized for phones',
+      icon: Smartphone,
+      settings: {
+        quality: 'low',
+        maxWidth: 854,
+        maxHeight: 480,
+        videoBitrate: 500,
+        outputFormat: 'mp4',
+        preserveAudio: true
+      }
+    },
+    archive: {
+      label: 'Archive Quality',
+      description: 'High quality preservation',
+      icon: Archive,
+      settings: {
+        quality: 'high',
+        maxWidth: 1920,
+        maxHeight: 1080,
+        videoBitrate: 2500,
+        outputFormat: 'webm',
+        preserveAudio: true
+      }
+    },
+    social: {
+      label: 'Social Media',
+      description: 'Balanced for sharing',
+      icon: Zap,
+      settings: {
+        quality: 'medium',
+        maxWidth: 1080,
+        maxHeight: 1080,
+        videoBitrate: 1500,
+        outputFormat: 'mp4',
+        preserveAudio: true
+      }
+    }
+  };
+
+  const applyPreset = (presetKey: string) => {
+    if (presetKey === 'custom') {
+      setSelectedPreset('custom');
+      return;
+    }
+    const preset = videoPresets[presetKey];
+    if (preset) {
+      setVideoSettings(preset.settings);
+      setSelectedPreset(presetKey);
+    }
+  };
   
   const { 
     compressImages, 
@@ -429,13 +498,54 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
           </TabsContent>
 
           <TabsContent value="video" className="space-y-6 mt-6">
+            {/* Video Presets */}
+            <div className="space-y-3">
+              <Label className="text-sm font-medium">Quick Presets</Label>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                {Object.entries(videoPresets).map(([key, preset]) => {
+                  const PresetIcon = preset.icon;
+                  const isActive = selectedPreset === key;
+                  return (
+                    <button
+                      key={key}
+                      onClick={() => applyPreset(key)}
+                      className={`p-3 rounded-lg border-2 text-left transition-all hover:border-primary/50 ${
+                        isActive 
+                          ? 'border-primary bg-primary/5' 
+                          : 'border-border bg-background hover:bg-muted/50'
+                      }`}
+                    >
+                      <PresetIcon className={`w-5 h-5 mb-1 ${isActive ? 'text-primary' : 'text-muted-foreground'}`} />
+                      <p className={`text-sm font-medium ${isActive ? 'text-primary' : ''}`}>{preset.label}</p>
+                      <p className="text-xs text-muted-foreground">{preset.description}</p>
+                    </button>
+                  );
+                })}
+                <button
+                  onClick={() => setSelectedPreset('custom')}
+                  className={`p-3 rounded-lg border-2 text-left transition-all hover:border-primary/50 ${
+                    selectedPreset === 'custom' 
+                      ? 'border-primary bg-primary/5' 
+                      : 'border-border bg-background hover:bg-muted/50'
+                  }`}
+                >
+                  <SlidersHorizontal className={`w-5 h-5 mb-1 ${selectedPreset === 'custom' ? 'text-primary' : 'text-muted-foreground'}`} />
+                  <p className={`text-sm font-medium ${selectedPreset === 'custom' ? 'text-primary' : ''}`}>Custom</p>
+                  <p className="text-xs text-muted-foreground">Manual settings</p>
+                </button>
+              </div>
+            </div>
+
             {/* Video Settings */}
             <div className="flex items-center gap-4 flex-wrap">
               <div className="flex items-center gap-2">
                 <Label>Quality:</Label>
                 <Select 
                   value={videoSettings.quality} 
-                  onValueChange={(v) => setVideoSettings(prev => ({ ...prev, quality: v as 'low' | 'medium' | 'high' }))}
+                  onValueChange={(v) => {
+                    setVideoSettings(prev => ({ ...prev, quality: v as 'low' | 'medium' | 'high' }));
+                    setSelectedPreset('custom');
+                  }}
                 >
                   <SelectTrigger className="w-32">
                     <SelectValue />
@@ -455,6 +565,7 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
                   onValueChange={(v) => {
                     const [w, h] = v.split('x').map(Number);
                     setVideoSettings(prev => ({ ...prev, maxWidth: w, maxHeight: h }));
+                    setSelectedPreset('custom');
                   }}
                 >
                   <SelectTrigger className="w-32">
@@ -473,7 +584,10 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
                 <Label>Format:</Label>
                 <Select 
                   value={videoSettings.outputFormat}
-                  onValueChange={(v) => setVideoSettings(prev => ({ ...prev, outputFormat: v as VideoOutputFormat }))}
+                  onValueChange={(v) => {
+                    setVideoSettings(prev => ({ ...prev, outputFormat: v as VideoOutputFormat }));
+                    setSelectedPreset('custom');
+                  }}
                 >
                   <SelectTrigger className="w-32">
                     <SelectValue />
@@ -496,7 +610,10 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
                 </Label>
                 <Switch
                   checked={videoSettings.preserveAudio}
-                  onCheckedChange={(checked) => setVideoSettings(prev => ({ ...prev, preserveAudio: checked }))}
+                  onCheckedChange={(checked) => {
+                    setVideoSettings(prev => ({ ...prev, preserveAudio: checked }));
+                    setSelectedPreset('custom');
+                  }}
                 />
                 <span className="text-sm text-muted-foreground">
                   {videoSettings.preserveAudio ? 'Keep' : 'Remove'}

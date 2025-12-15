@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { Settings, Upload, Crown, Download, Zap, Image, Video, Volume2, VolumeX, Smartphone, Globe, Archive, SlidersHorizontal } from 'lucide-react';
+import { Settings, Upload, Crown, Download, Zap, Image, Video, Volume2, VolumeX, Smartphone, Globe, Archive, SlidersHorizontal, Save, Star, Trash2, Plus } from 'lucide-react';
 import { CompressionSettings, useImageCompression } from '@/hooks/useImageCompression';
 import { useVideoCompression, VideoCompressionSettings, VideoOutputFormat } from '@/hooks/useVideoCompression';
 import { VideoCompressionResults } from '@/components/VideoCompressionResults';
@@ -43,9 +43,63 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
+  const [savedPresets, setSavedPresets] = useState<Record<string, { label: string; settings: VideoCompressionSettings }>>({});
+  const [newPresetName, setNewPresetName] = useState('');
+  const [showSavePreset, setShowSavePreset] = useState(false);
 
-  // Video compression presets
-  const videoPresets: Record<string, { label: string; description: string; icon: typeof Globe; settings: VideoCompressionSettings }> = {
+  // Load saved presets from localStorage on mount
+  useEffect(() => {
+    const stored = localStorage.getItem('videoCompressionPresets');
+    if (stored) {
+      try {
+        setSavedPresets(JSON.parse(stored));
+      } catch (e) {
+        console.error('Failed to load saved presets:', e);
+      }
+    }
+  }, []);
+
+  // Save presets to localStorage when they change
+  const savePresetsToStorage = (presets: Record<string, { label: string; settings: VideoCompressionSettings }>) => {
+    localStorage.setItem('videoCompressionPresets', JSON.stringify(presets));
+    setSavedPresets(presets);
+  };
+
+  const saveCurrentAsPreset = () => {
+    if (!newPresetName.trim()) return;
+    const key = `saved_${Date.now()}`;
+    const newPresets = {
+      ...savedPresets,
+      [key]: {
+        label: newPresetName.trim(),
+        settings: { ...videoSettings }
+      }
+    };
+    savePresetsToStorage(newPresets);
+    setSelectedPreset(key);
+    setNewPresetName('');
+    setShowSavePreset(false);
+    toast({
+      title: "Preset Saved",
+      description: `"${newPresetName.trim()}" has been saved for future use`,
+    });
+  };
+
+  const deleteSavedPreset = (key: string) => {
+    const newPresets = { ...savedPresets };
+    delete newPresets[key];
+    savePresetsToStorage(newPresets);
+    if (selectedPreset === key) {
+      setSelectedPreset('custom');
+    }
+    toast({
+      title: "Preset Deleted",
+      description: "Custom preset has been removed",
+    });
+  };
+
+  // Built-in video compression presets
+  const builtInPresets: Record<string, { label: string; description: string; icon: typeof Globe; settings: VideoCompressionSettings }> = {
     web: {
       label: 'Web Optimized',
       description: 'Small file size, fast loading',
@@ -105,9 +159,17 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
       setSelectedPreset('custom');
       return;
     }
-    const preset = videoPresets[presetKey];
-    if (preset) {
-      setVideoSettings(preset.settings);
+    // Check built-in presets first
+    const builtIn = builtInPresets[presetKey];
+    if (builtIn) {
+      setVideoSettings(builtIn.settings);
+      setSelectedPreset(presetKey);
+      return;
+    }
+    // Check saved presets
+    const saved = savedPresets[presetKey];
+    if (saved) {
+      setVideoSettings(saved.settings);
       setSelectedPreset(presetKey);
     }
   };
@@ -500,9 +562,60 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
           <TabsContent value="video" className="space-y-6 mt-6">
             {/* Video Presets */}
             <div className="space-y-3">
-              <Label className="text-sm font-medium">Quick Presets</Label>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                {Object.entries(videoPresets).map(([key, preset]) => {
+              <div className="flex items-center justify-between">
+                <Label className="text-sm font-medium">Quick Presets</Label>
+                {!showSavePreset ? (
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => setShowSavePreset(true)}
+                    className="h-7"
+                  >
+                    <Save className="w-3 h-3 mr-1" />
+                    Save Current
+                  </Button>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <Input
+                      placeholder="Preset name..."
+                      value={newPresetName}
+                      onChange={(e) => setNewPresetName(e.target.value)}
+                      className="h-7 w-32 text-sm"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') saveCurrentAsPreset();
+                        if (e.key === 'Escape') {
+                          setShowSavePreset(false);
+                          setNewPresetName('');
+                        }
+                      }}
+                      autoFocus
+                    />
+                    <Button 
+                      size="sm" 
+                      onClick={saveCurrentAsPreset}
+                      disabled={!newPresetName.trim()}
+                      className="h-7"
+                    >
+                      <Plus className="w-3 h-3" />
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => {
+                        setShowSavePreset(false);
+                        setNewPresetName('');
+                      }}
+                      className="h-7"
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                )}
+              </div>
+
+              {/* Built-in presets */}
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                {Object.entries(builtInPresets).map(([key, preset]) => {
                   const PresetIcon = preset.icon;
                   const isActive = selectedPreset === key;
                   return (
@@ -534,6 +647,47 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
                   <p className="text-xs text-muted-foreground">Manual settings</p>
                 </button>
               </div>
+
+              {/* Saved custom presets */}
+              {Object.keys(savedPresets).length > 0 && (
+                <div className="space-y-2">
+                  <Label className="text-xs text-muted-foreground">Your Saved Presets</Label>
+                  <div className="flex flex-wrap gap-2">
+                    {Object.entries(savedPresets).map(([key, preset]) => {
+                      const isActive = selectedPreset === key;
+                      return (
+                        <div
+                          key={key}
+                          className={`group flex items-center gap-1 px-3 py-1.5 rounded-full border-2 transition-all ${
+                            isActive 
+                              ? 'border-primary bg-primary/5' 
+                              : 'border-border hover:border-primary/50'
+                          }`}
+                        >
+                          <button
+                            onClick={() => applyPreset(key)}
+                            className="flex items-center gap-1"
+                          >
+                            <Star className={`w-3 h-3 ${isActive ? 'text-primary fill-primary' : 'text-muted-foreground'}`} />
+                            <span className={`text-sm ${isActive ? 'text-primary font-medium' : ''}`}>
+                              {preset.label}
+                            </span>
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              deleteSavedPreset(key);
+                            }}
+                            className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Video Settings */}

@@ -18,7 +18,7 @@ export interface VideoCompressionResult {
   originalSize: number;
   compressedSize: number;
   compressionRatio: number;
-  status: 'processing' | 'completed' | 'failed' | 'paused';
+  status: 'processing' | 'completed' | 'failed' | 'paused' | 'cancelled';
   compressedVideo?: Blob;
   compressedUrl?: string;
   originalUrl?: string;
@@ -394,6 +394,30 @@ export const useVideoCompression = () => {
     }
   };
 
+  const cancelCompression = (compressionId: string) => {
+    const ref = compressionRefs.current.get(compressionId);
+    if (ref) {
+      // Stop the video and media recorder
+      ref.video.pause();
+      ref.video.src = '';
+      if (ref.mediaRecorder.state !== 'inactive') {
+        ref.mediaRecorder.stop();
+      }
+      compressionRefs.current.delete(compressionId);
+      
+      setVideoCompressions(prev => prev.map(comp =>
+        comp.id === compressionId 
+          ? { ...comp, status: 'cancelled' as const, progress: 0 } 
+          : comp
+      ));
+
+      toast({
+        title: "Compression Cancelled",
+        description: "Video compression has been aborted",
+      });
+    }
+  };
+
   const clearVideoCompressions = () => {
     // Revoke object URLs to free memory
     videoCompressions.forEach(comp => {
@@ -412,6 +436,7 @@ export const useVideoCompression = () => {
     downloadAllVideos,
     clearVideoCompressions,
     pauseCompression,
-    resumeCompression
+    resumeCompression,
+    cancelCompression
   };
 };

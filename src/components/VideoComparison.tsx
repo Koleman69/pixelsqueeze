@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Play, Pause, Volume2, VolumeX, Maximize2, RotateCcw } from 'lucide-react';
+import { Play, Pause, Volume2, VolumeX, RotateCcw, SkipBack, SkipForward, ChevronLeft, ChevronRight } from 'lucide-react';
 import { VideoCompressionResult } from '@/hooks/useVideoCompression';
 
 interface VideoComparisonProps {
@@ -85,6 +85,37 @@ export const VideoComparison = ({ compression, isOpen, onClose }: VideoCompariso
       originalVideoRef.current.currentTime = 0;
       compressedVideoRef.current.currentTime = 0;
       setCurrentTime(0);
+    }
+  };
+
+  // Frame stepping - assuming ~30fps, each frame is ~0.033s
+  const FRAME_DURATION = 1 / 30;
+
+  const stepFrame = (direction: 'forward' | 'backward') => {
+    if (originalVideoRef.current && compressedVideoRef.current) {
+      // Pause videos when stepping
+      if (isPlaying) {
+        originalVideoRef.current.pause();
+        compressedVideoRef.current.pause();
+        setIsPlaying(false);
+      }
+      
+      const newTime = direction === 'forward' 
+        ? Math.min(currentTime + FRAME_DURATION, duration)
+        : Math.max(currentTime - FRAME_DURATION, 0);
+      
+      originalVideoRef.current.currentTime = newTime;
+      compressedVideoRef.current.currentTime = newTime;
+      setCurrentTime(newTime);
+    }
+  };
+
+  const skipSeconds = (seconds: number) => {
+    if (originalVideoRef.current && compressedVideoRef.current) {
+      const newTime = Math.max(0, Math.min(currentTime + seconds, duration));
+      originalVideoRef.current.currentTime = newTime;
+      compressedVideoRef.current.currentTime = newTime;
+      setCurrentTime(newTime);
     }
   };
 
@@ -260,29 +291,59 @@ export const VideoComparison = ({ compression, isOpen, onClose }: VideoCompariso
           </Tabs>
 
           {/* Playback Controls */}
-          <div className="flex items-center gap-4">
-            <Button variant="outline" size="icon" onClick={togglePlay}>
-              {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-            </Button>
-            <Button variant="outline" size="icon" onClick={restart}>
-              <RotateCcw className="w-4 h-4" />
-            </Button>
-            <Button variant="outline" size="icon" onClick={toggleMute}>
-              {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-            </Button>
+          <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex items-center gap-1">
+              <Button variant="outline" size="icon" onClick={togglePlay} title={isPlaying ? 'Pause' : 'Play'}>
+                {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+              </Button>
+              <Button variant="outline" size="icon" onClick={restart} title="Restart">
+                <RotateCcw className="w-4 h-4" />
+              </Button>
+              <Button variant="outline" size="icon" onClick={toggleMute} title={isMuted ? 'Unmute' : 'Mute'}>
+                {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+              </Button>
+            </div>
+
+            <div className="h-6 w-px bg-border" />
+
+            {/* Frame Stepping Controls */}
+            <div className="flex items-center gap-1">
+              <Button variant="outline" size="icon" onClick={() => skipSeconds(-5)} title="Back 5s">
+                <SkipBack className="w-4 h-4" />
+              </Button>
+              <Button variant="outline" size="icon" onClick={() => stepFrame('backward')} title="Previous frame">
+                <ChevronLeft className="w-4 h-4" />
+              </Button>
+              <Button variant="outline" size="icon" onClick={() => stepFrame('forward')} title="Next frame">
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+              <Button variant="outline" size="icon" onClick={() => skipSeconds(5)} title="Forward 5s">
+                <SkipForward className="w-4 h-4" />
+              </Button>
+            </div>
+
+            <div className="h-6 w-px bg-border" />
             
-            <div className="flex-1 flex items-center gap-2">
-              <span className="text-xs text-muted-foreground w-10">{formatTime(currentTime)}</span>
+            <div className="flex-1 flex items-center gap-2 min-w-0">
+              <span className="text-xs text-muted-foreground w-12 text-right font-mono">{formatTime(currentTime)}</span>
               <input
                 type="range"
                 min={0}
                 max={duration || 100}
+                step={FRAME_DURATION}
                 value={currentTime}
                 onChange={handleSeek}
                 className="flex-1 h-2 bg-muted rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary"
               />
-              <span className="text-xs text-muted-foreground w-10">{formatTime(duration)}</span>
+              <span className="text-xs text-muted-foreground w-12 font-mono">{formatTime(duration)}</span>
             </div>
+          </div>
+          
+          {/* Frame Info */}
+          <div className="flex justify-center">
+            <Badge variant="secondary" className="text-xs font-mono">
+              Frame: {Math.round(currentTime * 30)} / {Math.round(duration * 30)} (~30fps)
+            </Badge>
           </div>
 
           <p className="text-xs text-muted-foreground text-center">

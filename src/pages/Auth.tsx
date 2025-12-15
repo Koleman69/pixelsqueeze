@@ -132,7 +132,7 @@ const Auth = () => {
           title: "Success",
           description: "Logged in successfully!"
         });
-        navigate("/");
+        navigate("/dashboard");
       }
     } catch (error) {
       toast({
@@ -195,7 +195,7 @@ const Auth = () => {
             title: "Success",
             description: "Account created successfully!"
           });
-          navigate("/");
+          navigate("/dashboard");
         }
       }
     } catch (error) {
@@ -215,7 +215,7 @@ const Auth = () => {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'apple',
         options: {
-          redirectTo: `${window.location.origin}/`
+          redirectTo: `${window.location.origin}/dashboard`
         }
       });
 

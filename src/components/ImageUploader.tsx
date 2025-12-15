@@ -13,6 +13,7 @@ import { Settings, Upload, Crown, Download, Zap, Image, Video, Volume2, VolumeX 
 import { CompressionSettings, useImageCompression } from '@/hooks/useImageCompression';
 import { useVideoCompression, VideoCompressionSettings, VideoOutputFormat } from '@/hooks/useVideoCompression';
 import { VideoCompressionResults } from '@/components/VideoCompressionResults';
+import { VideoQueue } from '@/components/VideoQueue';
 import { useToast } from '@/hooks/use-toast';
 
 interface ImageUploaderProps {
@@ -54,6 +55,8 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
 
   const {
     videoCompressions,
+    videoQueue,
+    isQueueProcessing,
     compressVideo,
     compressVideoBatch,
     downloadCompressedVideo,
@@ -61,7 +64,13 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
     clearVideoCompressions,
     pauseCompression,
     resumeCompression,
-    cancelCompression
+    cancelCompression,
+    addToQueue,
+    removeFromQueue,
+    moveQueueItemUp,
+    moveQueueItemDown,
+    clearQueue,
+    processQueue
   } = useVideoCompression();
   
   const { toast } = useToast();
@@ -110,25 +119,9 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
   const handleVideoChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files && files.length > 0) {
-      setIsUploading(true);
       const fileArray = Array.from(files);
-      
-      toast({
-        title: "Processing Videos",
-        description: `Compressing ${fileArray.length} video(s)...`,
-      });
-
-      try {
-        if (fileArray.length === 1) {
-          await compressVideo(fileArray[0], videoSettings);
-        } else {
-          await compressVideoBatch(fileArray, videoSettings);
-        }
-      } catch (error) {
-        console.error('Video compression failed:', error);
-      } finally {
-        setIsUploading(false);
-      }
+      // Add videos to queue instead of processing immediately
+      addToQueue(fileArray);
     }
   };
 
@@ -201,24 +194,8 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
         return;
       }
 
-      setIsUploading(true);
-
-      toast({
-        title: "Processing Videos",
-        description: `Compressing ${videoFiles.length} video(s)...`,
-      });
-
-      try {
-        if (videoFiles.length === 1) {
-          await compressVideo(videoFiles[0], videoSettings);
-        } else {
-          await compressVideoBatch(videoFiles, videoSettings);
-        }
-      } catch (error) {
-        console.error('Video compression failed:', error);
-      } finally {
-        setIsUploading(false);
-      }
+      // Add videos to queue instead of processing immediately
+      addToQueue(videoFiles);
     }
   };
 
@@ -578,6 +555,17 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
               <Badge variant="outline">Resolution: {videoSettings.maxWidth}×{videoSettings.maxHeight}</Badge>
               <Badge variant="secondary">Browser Processing</Badge>
             </div>
+
+            {/* Video Queue */}
+            <VideoQueue
+              queue={videoQueue}
+              isProcessing={isQueueProcessing}
+              onMoveUp={moveQueueItemUp}
+              onMoveDown={moveQueueItemDown}
+              onRemove={removeFromQueue}
+              onStartProcessing={() => processQueue(videoSettings)}
+              onClearQueue={clearQueue}
+            />
 
             {/* Video Compression Results */}
             <VideoCompressionResults 

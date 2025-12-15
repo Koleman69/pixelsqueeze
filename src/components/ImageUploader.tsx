@@ -312,9 +312,12 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
   }, []);
 
   const handleFileSelect = () => {
+    console.log('[FileSelect] activeTab:', activeTab, 'isUploading:', isUploading);
     if (activeTab === 'video') {
+      console.log('[FileSelect] Triggering video input click');
       videoInputRef.current?.click();
     } else {
+      console.log('[FileSelect] Triggering image input click');
       fileInputRef.current?.click();
     }
   };
@@ -349,12 +352,17 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
   };
 
   const handleVideoChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('[VideoUpload] handleVideoChange triggered');
     const files = event.target.files;
+    console.log('[VideoUpload] Files selected:', files?.length);
     if (files && files.length > 0) {
       const fileArray = Array.from(files);
+      console.log('[VideoUpload] Adding to queue:', fileArray.map(f => ({ name: f.name, size: f.size, type: f.type })));
       // Add videos to queue instead of processing immediately
       addToQueue(fileArray);
     }
+    // Reset input value so same file can be selected again
+    event.target.value = '';
   };
 
   const handleDragOver = (e: React.DragEvent) => {

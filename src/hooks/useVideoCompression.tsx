@@ -305,14 +305,61 @@ export const useVideoCompression = () => {
     }
   };
 
-  const downloadCompressedVideo = (compressionId: string) => {
+  const downloadCompressedVideo = (compressionId: string, customFileName?: string) => {
     const compression = videoCompressions.find(c => c.id === compressionId);
     if (compression?.compressedUrl) {
       const link = document.createElement('a');
       link.href = compression.compressedUrl;
       const extension = compression.outputFormat || (compression.compressedVideo?.type.includes('webm') ? 'webm' : 'mp4');
-      link.download = `compressed_${compression.fileName.replace(/\.[^/.]+$/, '')}.${extension}`;
+      const fileName = customFileName 
+        ? `${customFileName}.${extension}`
+        : `compressed_${compression.fileName.replace(/\.[^/.]+$/, '')}.${extension}`;
+      link.download = fileName;
       link.click();
+    }
+  };
+
+  const downloadWithCustomNames = async (files: { compression: VideoCompressionResult; newName: string }[]) => {
+    if (files.length === 0) return;
+
+    if (files.length === 1) {
+      // Single file - direct download
+      downloadCompressedVideo(files[0].compression.id, files[0].newName);
+      return;
+    }
+
+    // Multiple files - create ZIP
+    const JSZip = (await import('jszip')).default;
+    const zip = new JSZip();
+
+    files.forEach(({ compression, newName }) => {
+      if (compression.compressedVideo) {
+        const extension = compression.outputFormat || 'webm';
+        zip.file(`${newName}.${extension}`, compression.compressedVideo);
+      }
+    });
+
+    try {
+      const zipBlob = await zip.generateAsync({ type: 'blob' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(zipBlob);
+      link.download = `compressed-videos-${Date.now()}.zip`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(link.href);
+
+      toast({
+        title: "Download Complete",
+        description: `Downloaded ${files.length} videos with custom names`,
+      });
+    } catch (error) {
+      console.error('Bulk download error:', error);
+      toast({
+        title: "Download Failed",
+        description: "Failed to create ZIP file",
+        variant: "destructive"
+      });
     }
   };
 
@@ -520,6 +567,7 @@ export const useVideoCompression = () => {
     compressVideo,
     compressVideoBatch,
     downloadCompressedVideo,
+    downloadWithCustomNames,
     downloadAllVideos,
     clearVideoCompressions,
     pauseCompression,

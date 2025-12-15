@@ -3,7 +3,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Download, Video, CheckCircle, XCircle, Loader2, Pause, Play, X, Ban, Eye } from 'lucide-react';
+import { Download, Video, CheckCircle, XCircle, Loader2, Pause, Play, X, Ban, Eye, FileText } from 'lucide-react';
 import { VideoCompressionResult } from '@/hooks/useVideoCompression';
 import { VideoComparison } from './VideoComparison';
 
@@ -13,6 +13,7 @@ interface VideoCompressionResultsProps {
   onPause?: (id: string) => void;
   onResume?: (id: string) => void;
   onCancel?: (id: string) => void;
+  onBatchRename?: () => void;
 }
 
 const formatFileSize = (bytes: number): string => {
@@ -31,18 +32,28 @@ const formatTimeRemaining = (seconds: number | undefined): string => {
   return `~${minutes}m ${secs}s remaining`;
 };
 
-export const VideoCompressionResults = ({ compressions, onDownload, onPause, onResume, onCancel }: VideoCompressionResultsProps) => {
+export const VideoCompressionResults = ({ compressions, onDownload, onPause, onResume, onCancel, onBatchRename }: VideoCompressionResultsProps) => {
   const [comparisonVideo, setComparisonVideo] = useState<VideoCompressionResult | null>(null);
+
+  const completedCount = compressions.filter(c => c.status === 'completed').length;
 
   if (compressions.length === 0) return null;
 
   return (
     <>
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold flex items-center gap-2">
-          <Video className="w-5 h-5" />
-          Video Compression Results
-        </h3>
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-semibold flex items-center gap-2">
+            <Video className="w-5 h-5" />
+            Video Compression Results
+          </h3>
+          {completedCount > 1 && onBatchRename && (
+            <Button variant="outline" size="sm" onClick={onBatchRename}>
+              <FileText className="w-4 h-4 mr-2" />
+              Batch Rename & Download
+            </Button>
+          )}
+        </div>
         
         <div className="grid gap-4">
           {compressions.map((compression) => (

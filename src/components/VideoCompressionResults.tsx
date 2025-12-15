@@ -2,7 +2,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Download, Video, CheckCircle, XCircle, Loader2, Pause, Play } from 'lucide-react';
+import { Download, Video, CheckCircle, XCircle, Loader2, Pause, Play, X, Ban } from 'lucide-react';
 import { VideoCompressionResult } from '@/hooks/useVideoCompression';
 
 interface VideoCompressionResultsProps {
@@ -10,6 +10,7 @@ interface VideoCompressionResultsProps {
   onDownload: (id: string) => void;
   onPause?: (id: string) => void;
   onResume?: (id: string) => void;
+  onCancel?: (id: string) => void;
 }
 
 const formatFileSize = (bytes: number): string => {
@@ -28,7 +29,7 @@ const formatTimeRemaining = (seconds: number | undefined): string => {
   return `~${minutes}m ${secs}s remaining`;
 };
 
-export const VideoCompressionResults = ({ compressions, onDownload, onPause, onResume }: VideoCompressionResultsProps) => {
+export const VideoCompressionResults = ({ compressions, onDownload, onPause, onResume, onCancel }: VideoCompressionResultsProps) => {
   if (compressions.length === 0) return null;
 
   return (
@@ -80,6 +81,12 @@ export const VideoCompressionResults = ({ compressions, onDownload, onPause, onR
                     <Badge variant="destructive" className="flex items-center gap-1">
                       <XCircle className="w-3 h-3" />
                       Failed
+                    </Badge>
+                  )}
+                  {compression.status === 'cancelled' && (
+                    <Badge variant="secondary" className="flex items-center gap-1">
+                      <Ban className="w-3 h-3" />
+                      Cancelled
                     </Badge>
                   )}
                 </div>
@@ -138,6 +145,15 @@ export const VideoCompressionResults = ({ compressions, onDownload, onPause, onR
                     onClick={() => onResume(compression.id)}
                   >
                     <Play className="w-4 h-4" />
+                  </Button>
+                )}
+                {(compression.status === 'processing' || compression.status === 'paused') && onCancel && (
+                  <Button 
+                    size="sm" 
+                    variant="destructive"
+                    onClick={() => onCancel(compression.id)}
+                  >
+                    <X className="w-4 h-4" />
                   </Button>
                 )}
                 {compression.status === 'completed' && (

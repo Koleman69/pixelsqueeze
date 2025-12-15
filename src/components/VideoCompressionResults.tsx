@@ -2,12 +2,14 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Download, Video, CheckCircle, XCircle, Loader2 } from 'lucide-react';
+import { Download, Video, CheckCircle, XCircle, Loader2, Pause, Play } from 'lucide-react';
 import { VideoCompressionResult } from '@/hooks/useVideoCompression';
 
 interface VideoCompressionResultsProps {
   compressions: VideoCompressionResult[];
   onDownload: (id: string) => void;
+  onPause?: (id: string) => void;
+  onResume?: (id: string) => void;
 }
 
 const formatFileSize = (bytes: number): string => {
@@ -26,7 +28,7 @@ const formatTimeRemaining = (seconds: number | undefined): string => {
   return `~${minutes}m ${secs}s remaining`;
 };
 
-export const VideoCompressionResults = ({ compressions, onDownload }: VideoCompressionResultsProps) => {
+export const VideoCompressionResults = ({ compressions, onDownload, onPause, onResume }: VideoCompressionResultsProps) => {
   if (compressions.length === 0) return null;
 
   return (
@@ -62,6 +64,12 @@ export const VideoCompressionResults = ({ compressions, onDownload }: VideoCompr
                       Processing
                     </Badge>
                   )}
+                  {compression.status === 'paused' && (
+                    <Badge variant="secondary" className="flex items-center gap-1">
+                      <Pause className="w-3 h-3" />
+                      Paused
+                    </Badge>
+                  )}
                   {compression.status === 'completed' && (
                     <Badge variant="default" className="flex items-center gap-1 bg-green-600">
                       <CheckCircle className="w-3 h-3" />
@@ -76,13 +84,16 @@ export const VideoCompressionResults = ({ compressions, onDownload }: VideoCompr
                   )}
                 </div>
 
-                {compression.status === 'processing' && (
+                {(compression.status === 'processing' || compression.status === 'paused') && (
                   <div className="space-y-1">
                     <Progress value={compression.progress} className="h-2" />
                     <div className="flex items-center justify-between text-xs text-muted-foreground">
                       <span>{compression.progress.toFixed(0)}% complete</span>
-                      {compression.estimatedTimeRemaining !== undefined && compression.estimatedTimeRemaining > 0 && (
+                      {compression.status === 'processing' && compression.estimatedTimeRemaining !== undefined && compression.estimatedTimeRemaining > 0 && (
                         <span className="text-primary">{formatTimeRemaining(compression.estimatedTimeRemaining)}</span>
+                      )}
+                      {compression.status === 'paused' && (
+                        <span className="text-muted-foreground">Paused</span>
                       )}
                     </div>
                   </div>
@@ -109,17 +120,36 @@ export const VideoCompressionResults = ({ compressions, onDownload }: VideoCompr
                 )}
               </div>
 
-              {/* Download Button */}
-              {compression.status === 'completed' && (
-                <Button 
-                  size="sm" 
-                  onClick={() => onDownload(compression.id)}
-                  className="flex-shrink-0"
-                >
-                  <Download className="w-4 h-4 mr-2" />
-                  Download
-                </Button>
-              )}
+              {/* Action Buttons */}
+              <div className="flex-shrink-0 flex gap-2">
+                {compression.status === 'processing' && onPause && (
+                  <Button 
+                    size="sm" 
+                    variant="outline"
+                    onClick={() => onPause(compression.id)}
+                  >
+                    <Pause className="w-4 h-4" />
+                  </Button>
+                )}
+                {compression.status === 'paused' && onResume && (
+                  <Button 
+                    size="sm" 
+                    variant="outline"
+                    onClick={() => onResume(compression.id)}
+                  >
+                    <Play className="w-4 h-4" />
+                  </Button>
+                )}
+                {compression.status === 'completed' && (
+                  <Button 
+                    size="sm" 
+                    onClick={() => onDownload(compression.id)}
+                  >
+                    <Download className="w-4 h-4 mr-2" />
+                    Download
+                  </Button>
+                )}
+              </div>
             </div>
           </Card>
         ))}

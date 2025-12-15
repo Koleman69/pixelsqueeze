@@ -9,6 +9,7 @@ export interface VideoCompressionSettings {
   maxHeight: number;
   videoBitrate: number; // kbps
   outputFormat: VideoOutputFormat;
+  preserveAudio: boolean;
 }
 
 export interface VideoCompressionResult {
@@ -37,7 +38,8 @@ export const useVideoCompression = () => {
       maxWidth: 1280, 
       maxHeight: 720, 
       videoBitrate: 1000,
-      outputFormat: 'webm'
+      outputFormat: 'webm',
+      preserveAudio: true
     }
   ): Promise<string> => {
     const id = Date.now().toString() + Math.random().toString(36).substr(2, 9);
@@ -120,6 +122,26 @@ export const useVideoCompression = () => {
 
       // Create stream from canvas
       const stream = canvas.captureStream(30);
+      
+      // Add audio track if preserveAudio is enabled
+      if (settings.preserveAudio) {
+        try {
+          // Create an audio context to capture audio from the video
+          const audioContext = new AudioContext();
+          const source = audioContext.createMediaElementSource(video);
+          const destination = audioContext.createMediaStreamDestination();
+          source.connect(destination);
+          source.connect(audioContext.destination); // Also connect to speakers for playback
+          
+          // Add audio tracks to the stream
+          destination.stream.getAudioTracks().forEach(track => {
+            stream.addTrack(track);
+          });
+        } catch (audioError) {
+          console.warn('Could not capture audio track:', audioError);
+        }
+      }
+
       const mediaRecorder = new MediaRecorder(stream, {
         mimeType,
         videoBitsPerSecond: bitrate

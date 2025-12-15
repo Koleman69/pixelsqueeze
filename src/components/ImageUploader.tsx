@@ -8,7 +8,8 @@ import { Slider } from '@/components/ui/slider';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Settings, Upload, Crown, Download, Zap, Image, Video } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
+import { Settings, Upload, Crown, Download, Zap, Image, Video, Volume2, VolumeX } from 'lucide-react';
 import { CompressionSettings, useImageCompression } from '@/hooks/useImageCompression';
 import { useVideoCompression, VideoCompressionSettings, VideoOutputFormat } from '@/hooks/useVideoCompression';
 import { VideoCompressionResults } from '@/components/VideoCompressionResults';
@@ -33,7 +34,8 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
     maxWidth: 1280,
     maxHeight: 720,
     videoBitrate: 1000,
-    outputFormat: 'webm'
+    outputFormat: 'webm',
+    preserveAudio: true
   });
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
@@ -489,6 +491,24 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
                     <SelectItem value="mp4">MP4 (H.264)</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Label className="flex items-center gap-2 cursor-pointer">
+                  {videoSettings.preserveAudio ? (
+                    <Volume2 className="w-4 h-4 text-primary" />
+                  ) : (
+                    <VolumeX className="w-4 h-4 text-muted-foreground" />
+                  )}
+                  Audio:
+                </Label>
+                <Switch
+                  checked={videoSettings.preserveAudio}
+                  onCheckedChange={(checked) => setVideoSettings(prev => ({ ...prev, preserveAudio: checked }))}
+                />
+                <span className="text-sm text-muted-foreground">
+                  {videoSettings.preserveAudio ? 'Keep' : 'Remove'}
+                </span>
               </div>
             </div>
 

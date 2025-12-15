@@ -19,6 +19,7 @@ import {
   Sparkles,
   ArrowRight,
   Star,
+  Quote,
   HelpCircle
 } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -336,6 +337,112 @@ const Landing = () => {
                 Not just compression - enhance, upscale, and transform your images with AI.
               </p>
             </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="py-20 px-6 bg-secondary/20">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <Badge variant="outline" className="mb-4 px-4 py-2 border-primary text-primary">
+              <Star className="w-4 h-4 mr-2 fill-primary" />
+              Trusted by Professionals
+            </Badge>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+              Loved by 50,000+ Users
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              See what our customers are saying about Pixelsqueeze
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {/* Testimonial 1 */}
+            <Card className="p-6 relative">
+              <Quote className="absolute top-4 right-4 w-8 h-8 text-primary/20" />
+              <div className="flex items-center gap-1 mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-4 h-4 fill-primary text-primary" />
+                ))}
+              </div>
+              <p className="text-muted-foreground mb-6">
+                "Pixelsqueeze cut our page load times in half. The quality is indistinguishable from the originals but files are 70% smaller. Essential for any web developer."
+              </p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-primary-foreground font-semibold">
+                  SM
+                </div>
+                <div>
+                  <p className="font-semibold">Sarah Mitchell</p>
+                  <p className="text-sm text-muted-foreground">Lead Developer, TechFlow</p>
+                </div>
+              </div>
+            </Card>
+
+            {/* Testimonial 2 */}
+            <Card className="p-6 relative">
+              <Quote className="absolute top-4 right-4 w-8 h-8 text-primary/20" />
+              <div className="flex items-center gap-1 mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-4 h-4 fill-primary text-primary" />
+                ))}
+              </div>
+              <p className="text-muted-foreground mb-6">
+                "As a photographer, I was skeptical about compression. But Pixelsqueeze maintains the detail I need while making sharing so much easier. Game changer!"
+              </p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-primary-foreground font-semibold">
+                  JC
+                </div>
+                <div>
+                  <p className="font-semibold">James Chen</p>
+                  <p className="text-sm text-muted-foreground">Professional Photographer</p>
+                </div>
+              </div>
+            </Card>
+
+            {/* Testimonial 3 */}
+            <Card className="p-6 relative">
+              <Quote className="absolute top-4 right-4 w-8 h-8 text-primary/20" />
+              <div className="flex items-center gap-1 mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-4 h-4 fill-primary text-primary" />
+                ))}
+              </div>
+              <p className="text-muted-foreground mb-6">
+                "We process thousands of product images daily. The bulk feature saves us hours every week. The ROI paid for itself in the first month."
+              </p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-primary-foreground font-semibold">
+                  EW
+                </div>
+                <div>
+                  <p className="font-semibold">Emily Watson</p>
+                  <p className="text-sm text-muted-foreground">E-commerce Manager, StyleHub</p>
+                </div>
+              </div>
+            </Card>
+          </div>
+
+          {/* Social Proof Stats */}
+          <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            <div>
+              <p className="text-4xl font-bold text-primary">50K+</p>
+              <p className="text-muted-foreground">Active Users</p>
+            </div>
+            <div>
+              <p className="text-4xl font-bold text-primary">10M+</p>
+              <p className="text-muted-foreground">Images Compressed</p>
+            </div>
+            <div>
+              <p className="text-4xl font-bold text-primary">4.9/5</p>
+              <p className="text-muted-foreground">Average Rating</p>
+            </div>
+            <div>
+              <p className="text-4xl font-bold text-primary">99.9%</p>
+              <p className="text-muted-foreground">Uptime</p>
+            </div>
           </div>
         </div>
       </section>

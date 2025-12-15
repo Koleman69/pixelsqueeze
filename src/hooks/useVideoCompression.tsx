@@ -25,6 +25,8 @@ export interface VideoCompressionResult {
   error?: string;
   progress: number;
   outputFormat?: string;
+  startTime?: number;
+  estimatedTimeRemaining?: number; // in seconds
 }
 
 export const useVideoCompression = () => {
@@ -46,6 +48,7 @@ export const useVideoCompression = () => {
     const originalUrl = URL.createObjectURL(file);
 
     // Add initial entry
+    const startTime = Date.now();
     const newCompression: VideoCompressionResult = {
       id,
       fileName: file.name,
@@ -54,7 +57,8 @@ export const useVideoCompression = () => {
       compressionRatio: 0,
       status: 'processing',
       originalUrl,
-      progress: 0
+      progress: 0,
+      startTime
     };
 
     setVideoCompressions(prev => [newCompression, ...prev]);
@@ -178,10 +182,18 @@ export const useVideoCompression = () => {
           
           ctx.drawImage(video, 0, 0, targetWidth, targetHeight);
           
-          // Update progress
+          // Update progress and estimate time remaining
           const progress = Math.min((video.currentTime / duration) * 100, 99);
+          const elapsedTime = (Date.now() - startTime) / 1000; // in seconds
+          let estimatedTimeRemaining: number | undefined;
+          
+          if (progress > 5) { // Only estimate after some progress
+            const totalEstimatedTime = (elapsedTime / progress) * 100;
+            estimatedTimeRemaining = Math.max(0, totalEstimatedTime - elapsedTime);
+          }
+          
           setVideoCompressions(prev => prev.map(comp => 
-            comp.id === id ? { ...comp, progress } : comp
+            comp.id === id ? { ...comp, progress, estimatedTimeRemaining } : comp
           ));
           
           requestAnimationFrame(drawFrame);

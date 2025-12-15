@@ -18,6 +18,14 @@ const formatFileSize = (bytes: number): string => {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 };
 
+const formatTimeRemaining = (seconds: number | undefined): string => {
+  if (seconds === undefined || seconds <= 0) return '';
+  if (seconds < 60) return `~${Math.ceil(seconds)}s remaining`;
+  const minutes = Math.floor(seconds / 60);
+  const secs = Math.ceil(seconds % 60);
+  return `~${minutes}m ${secs}s remaining`;
+};
+
 export const VideoCompressionResults = ({ compressions, onDownload }: VideoCompressionResultsProps) => {
   if (compressions.length === 0) return null;
 
@@ -71,9 +79,12 @@ export const VideoCompressionResults = ({ compressions, onDownload }: VideoCompr
                 {compression.status === 'processing' && (
                   <div className="space-y-1">
                     <Progress value={compression.progress} className="h-2" />
-                    <p className="text-xs text-muted-foreground">
-                      {compression.progress.toFixed(0)}% complete
-                    </p>
+                    <div className="flex items-center justify-between text-xs text-muted-foreground">
+                      <span>{compression.progress.toFixed(0)}% complete</span>
+                      {compression.estimatedTimeRemaining !== undefined && compression.estimatedTimeRemaining > 0 && (
+                        <span className="text-primary">{formatTimeRemaining(compression.estimatedTimeRemaining)}</span>
+                      )}
+                    </div>
                   </div>
                 )}
 

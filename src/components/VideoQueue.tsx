@@ -15,6 +15,7 @@ interface VideoQueueProps {
   onStartProcessing: () => void;
   onClearQueue: () => void;
   onUpdatePriority: (id: string, priority: QueuePriority) => void;
+  onSetAllPriority: (priority: QueuePriority) => void;
 }
 
 const formatFileSize = (bytes: number): string => {
@@ -38,7 +39,8 @@ export const VideoQueue = ({
   onRemove, 
   onStartProcessing,
   onClearQueue,
-  onUpdatePriority
+  onUpdatePriority,
+  onSetAllPriority
 }: VideoQueueProps) => {
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
@@ -191,7 +193,41 @@ export const VideoQueue = ({
             </Badge>
           )}
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
+          {/* Batch Priority Controls */}
+          <div className="flex items-center gap-1 border rounded-md px-1">
+            <span className="text-xs text-muted-foreground px-1">Set all:</span>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 px-2 text-red-500 hover:text-red-600 hover:bg-red-50"
+              onClick={() => onSetAllPriority('high')}
+              disabled={isProcessing}
+            >
+              <Flame className="w-3 h-3 mr-1" />
+              High
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 px-2 hover:bg-muted"
+              onClick={() => onSetAllPriority('normal')}
+              disabled={isProcessing}
+            >
+              <Minus className="w-3 h-3 mr-1" />
+              Normal
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 px-2 text-blue-500 hover:text-blue-600 hover:bg-blue-50"
+              onClick={() => onSetAllPriority('low')}
+              disabled={isProcessing}
+            >
+              <ArrowDown className="w-3 h-3 mr-1" />
+              Low
+            </Button>
+          </div>
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>

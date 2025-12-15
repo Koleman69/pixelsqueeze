@@ -339,6 +339,10 @@ export const useVideoCompression = () => {
     ));
   }, []);
 
+  const setAllPriority = useCallback((priority: QueuePriority) => {
+    setVideoQueue(prev => prev.map(item => ({ ...item, priority })));
+  }, []);
+
   const removeFromQueue = useCallback((id: string) => {
     setVideoQueue(prev => prev.filter(item => item.id !== id));
   }, []);
@@ -526,6 +530,7 @@ export const useVideoCompression = () => {
     reorderQueue,
     clearQueue,
     processQueue,
-    updatePriority
+    updatePriority,
+    setAllPriority
   };
 };

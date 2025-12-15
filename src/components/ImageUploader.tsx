@@ -970,7 +970,7 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
               </p>
               {!isUploading && (
                 <p className="text-sm text-muted-foreground">
-                  MP4, WebM, MOV • Multiple files supported • Processed locally
+                  MP4, WebM, MOV • Up to 30 minutes • Multiple files • Processed locally
                 </p>
               )}
               

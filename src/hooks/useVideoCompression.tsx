@@ -87,11 +87,26 @@ export const useVideoCompression = () => {
       const video = document.createElement('video');
       video.src = originalUrl;
       video.muted = true;
+      video.preload = 'metadata';
       
       await new Promise<void>((resolve, reject) => {
         video.onloadedmetadata = () => resolve();
         video.onerror = () => reject(new Error('Failed to load video'));
       });
+
+      // Check video duration (max 30 minutes = 1800 seconds)
+      const MAX_DURATION_SECONDS = 30 * 60; // 30 minutes
+      if (video.duration > MAX_DURATION_SECONDS) {
+        throw new Error(`Video is too long (${Math.round(video.duration / 60)} minutes). Maximum allowed duration is 30 minutes.`);
+      }
+
+      // Warn if video is very long (might take a while)
+      if (video.duration > 10 * 60) { // 10 minutes
+        toast({
+          title: "Long Video Detected",
+          description: `This ${Math.round(video.duration / 60)} minute video may take a while to compress. Please keep the tab open.`,
+        });
+      }
 
       // Calculate target dimensions
       let targetWidth = video.videoWidth;
@@ -307,15 +322,27 @@ export const useVideoCompression = () => {
 
   const downloadCompressedVideo = (compressionId: string, customFileName?: string) => {
     const compression = videoCompressions.find(c => c.id === compressionId);
-    if (compression?.compressedUrl) {
-      const link = document.createElement('a');
-      link.href = compression.compressedUrl;
+    if (compression?.compressedVideo) {
       const extension = compression.outputFormat || (compression.compressedVideo?.type.includes('webm') ? 'webm' : 'mp4');
       const fileName = customFileName 
         ? `${customFileName}.${extension}`
         : `compressed_${compression.fileName.replace(/\.[^/.]+$/, '')}.${extension}`;
+      
+      // Create blob URL for better mobile compatibility
+      const url = URL.createObjectURL(compression.compressedVideo);
+      const link = document.createElement('a');
+      link.href = url;
       link.download = fileName;
+      link.style.display = 'none';
+      document.body.appendChild(link);
       link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      
+      toast({
+        title: "Download Started",
+        description: `Downloading ${fileName}`,
+      });
     }
   };
 

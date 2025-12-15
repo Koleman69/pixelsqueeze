@@ -12,7 +12,7 @@ export const Success = () => {
           <CheckCircle className="w-8 h-8 text-green-600" />
         </div>
         
-        <h1 className="text-2xl font-bold mb-4">Welcome to Pixel Squeeze Pro!</h1>
+        <h1 className="text-2xl font-bold mb-4">Welcome to Pixelsqueeze Pro!</h1>
         
         <p className="text-muted-foreground mb-6">
           Your subscription has been activated successfully. You now have access to:

@@ -60,18 +60,48 @@ export const CompressionStatus = ({
 
   const handleDownload = () => {
     if (compressedImage) {
-      const link = document.createElement('a');
-      link.href = `data:image/jpeg;base64,${compressedImage}`;
-      link.download = `compressed_${fileName}`;
-      link.click();
-      
-      toast({
-        title: "Download Started",
-        description: `Downloading ${fileName}`,
-      });
+      try {
+        // Convert base64 to binary data for better browser compatibility
+        const base64Data = compressedImage;
+        const binaryData = atob(base64Data);
+        const bytes = new Uint8Array(binaryData.length);
+        for (let i = 0; i < binaryData.length; i++) {
+          bytes[i] = binaryData.charCodeAt(i);
+        }
+
+        // Infer MIME type from file extension
+        const extension = fileName.toLowerCase().split('.').pop();
+        let mimeType = 'image/jpeg';
+        if (extension === 'png') mimeType = 'image/png';
+        else if (extension === 'webp') mimeType = 'image/webp';
+        else if (extension === 'gif') mimeType = 'image/gif';
+
+        const blob = new Blob([bytes], { type: mimeType });
+        const url = URL.createObjectURL(blob);
+
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `compressed_${fileName}`;
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+
+        toast({
+          title: "Download Started",
+          description: `Downloading ${fileName}`,
+        });
+      } catch (error) {
+        console.error('Download error:', error);
+        toast({
+          title: "Download Failed",
+          description: "We couldn't start the download. Please try again.",
+          variant: "destructive",
+        });
+      }
     }
   };
-
   return (
     <Card className="p-6 bg-card/50 backdrop-blur-sm border-border/50 hover:border-primary/30 transition-all duration-300 group">
       <div className="flex items-start justify-between mb-4">

@@ -1,15 +1,15 @@
+import { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Video, Trash2, ChevronUp, ChevronDown, Play, X, Flame, Minus, ArrowDown } from 'lucide-react';
+import { Video, Trash2, Play, X, Flame, Minus, ArrowDown, GripVertical } from 'lucide-react';
 import { QueuedVideo, QueuePriority } from '@/hooks/useVideoCompression';
 
 interface VideoQueueProps {
   queue: QueuedVideo[];
   isProcessing: boolean;
-  onMoveUp: (id: string) => void;
-  onMoveDown: (id: string) => void;
+  onReorder: (fromIndex: number, toIndex: number) => void;
   onRemove: (id: string) => void;
   onStartProcessing: () => void;
   onClearQueue: () => void;
@@ -33,13 +33,15 @@ const priorityConfig: Record<QueuePriority, { label: string; icon: typeof Flame;
 export const VideoQueue = ({ 
   queue, 
   isProcessing,
-  onMoveUp, 
-  onMoveDown, 
+  onReorder,
   onRemove, 
   onStartProcessing,
   onClearQueue,
   onUpdatePriority
 }: VideoQueueProps) => {
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+
   if (queue.length === 0) return null;
 
   // Count by priority for summary
@@ -47,6 +49,41 @@ export const VideoQueue = ({
     high: queue.filter(q => q.priority === 'high').length,
     normal: queue.filter(q => q.priority === 'normal').length,
     low: queue.filter(q => q.priority === 'low').length
+  };
+
+  const handleDragStart = (e: React.DragEvent, index: number) => {
+    if (isProcessing) return;
+    setDraggedIndex(index);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', index.toString());
+  };
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    if (isProcessing || draggedIndex === null) return;
+    e.dataTransfer.dropEffect = 'move';
+    setDragOverIndex(index);
+  };
+
+  const handleDragLeave = () => {
+    setDragOverIndex(null);
+  };
+
+  const handleDrop = (e: React.DragEvent, toIndex: number) => {
+    e.preventDefault();
+    if (isProcessing || draggedIndex === null) return;
+    
+    if (draggedIndex !== toIndex) {
+      onReorder(draggedIndex, toIndex);
+    }
+    
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
+    setDragOverIndex(null);
   };
 
   return (
@@ -87,19 +124,41 @@ export const VideoQueue = ({
       </div>
 
       <p className="text-xs text-muted-foreground">
-        High priority videos will be processed first when starting compression.
+        Drag to reorder. High priority videos will be processed first.
       </p>
 
       <div className="space-y-2">
         {queue.map((item, index) => {
           const config = priorityConfig[item.priority];
           const PriorityIcon = config.icon;
+          const isDragging = draggedIndex === index;
+          const isDragOver = dragOverIndex === index && draggedIndex !== index;
           
           return (
-            <Card key={item.id} className="p-3">
+            <Card 
+              key={item.id} 
+              className={`p-3 transition-all duration-200 ${
+                isDragging ? 'opacity-50 scale-[0.98]' : ''
+              } ${
+                isDragOver ? 'border-primary border-2 bg-primary/5' : ''
+              } ${
+                !isProcessing ? 'cursor-grab active:cursor-grabbing' : ''
+              }`}
+              draggable={!isProcessing}
+              onDragStart={(e) => handleDragStart(e, index)}
+              onDragOver={(e) => handleDragOver(e, index)}
+              onDragLeave={handleDragLeave}
+              onDrop={(e) => handleDrop(e, index)}
+              onDragEnd={handleDragEnd}
+            >
               <div className="flex items-center gap-3">
+                {/* Drag handle */}
+                <div className={`flex-shrink-0 ${isProcessing ? 'opacity-30' : 'opacity-60 hover:opacity-100'}`}>
+                  <GripVertical className="w-5 h-5 text-muted-foreground" />
+                </div>
+
                 {/* Position indicator with priority color */}
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium flex-shrink-0 ${
                   item.priority === 'high' ? 'bg-red-100 text-red-600' :
                   item.priority === 'low' ? 'bg-blue-100 text-blue-600' :
                   'bg-muted'
@@ -119,7 +178,7 @@ export const VideoQueue = ({
                   onValueChange={(value: QueuePriority) => onUpdatePriority(item.id, value)}
                   disabled={isProcessing}
                 >
-                  <SelectTrigger className="w-28 h-8">
+                  <SelectTrigger className="w-28 h-8" onClick={(e) => e.stopPropagation()}>
                     <div className="flex items-center gap-1">
                       <PriorityIcon className={`w-3 h-3 ${config.className}`} />
                       <SelectValue />
@@ -147,34 +206,15 @@ export const VideoQueue = ({
                   </SelectContent>
                 </Select>
 
-                {/* Reorder buttons */}
-                <div className="flex flex-col gap-0.5">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-6 w-6"
-                    onClick={() => onMoveUp(item.id)}
-                    disabled={index === 0 || isProcessing}
-                  >
-                    <ChevronUp className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-6 w-6"
-                    onClick={() => onMoveDown(item.id)}
-                    disabled={index === queue.length - 1 || isProcessing}
-                  >
-                    <ChevronDown className="w-4 h-4" />
-                  </Button>
-                </div>
-
                 {/* Remove button */}
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="text-destructive hover:text-destructive"
-                  onClick={() => onRemove(item.id)}
+                  className="text-destructive hover:text-destructive flex-shrink-0"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onRemove(item.id);
+                  }}
                   disabled={isProcessing}
                 >
                   <Trash2 className="w-4 h-4" />

@@ -343,22 +343,11 @@ export const useVideoCompression = () => {
     setVideoQueue(prev => prev.filter(item => item.id !== id));
   }, []);
 
-  const moveQueueItemUp = useCallback((id: string) => {
+  const reorderQueue = useCallback((fromIndex: number, toIndex: number) => {
     setVideoQueue(prev => {
-      const index = prev.findIndex(item => item.id === id);
-      if (index <= 0) return prev;
       const newQueue = [...prev];
-      [newQueue[index - 1], newQueue[index]] = [newQueue[index], newQueue[index - 1]];
-      return newQueue;
-    });
-  }, []);
-
-  const moveQueueItemDown = useCallback((id: string) => {
-    setVideoQueue(prev => {
-      const index = prev.findIndex(item => item.id === id);
-      if (index === -1 || index >= prev.length - 1) return prev;
-      const newQueue = [...prev];
-      [newQueue[index], newQueue[index + 1]] = [newQueue[index + 1], newQueue[index]];
+      const [movedItem] = newQueue.splice(fromIndex, 1);
+      newQueue.splice(toIndex, 0, movedItem);
       return newQueue;
     });
   }, []);
@@ -534,8 +523,7 @@ export const useVideoCompression = () => {
     cancelCompression,
     addToQueue,
     removeFromQueue,
-    moveQueueItemUp,
-    moveQueueItemDown,
+    reorderQueue,
     clearQueue,
     processQueue,
     updatePriority

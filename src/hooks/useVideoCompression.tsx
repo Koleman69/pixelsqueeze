@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
 export type VideoOutputFormat = 'webm' | 'mp4';
@@ -30,6 +30,13 @@ export interface VideoCompressionResult {
   pausedTime?: number; // Track time spent paused
 }
 
+export interface QueuedVideo {
+  id: string;
+  file: File;
+  fileName: string;
+  fileSize: number;
+}
+
 interface VideoCompressionRef {
   video: HTMLVideoElement;
   mediaRecorder: MediaRecorder;
@@ -37,6 +44,8 @@ interface VideoCompressionRef {
 
 export const useVideoCompression = () => {
   const [videoCompressions, setVideoCompressions] = useState<VideoCompressionResult[]>([]);
+  const [videoQueue, setVideoQueue] = useState<QueuedVideo[]>([]);
+  const [isQueueProcessing, setIsQueueProcessing] = useState(false);
   const compressionRefs = useRef<Map<string, VideoCompressionRef>>(new Map());
   const { toast } = useToast();
 
@@ -304,6 +313,73 @@ export const useVideoCompression = () => {
     }
   };
 
+  // Queue management functions
+  const addToQueue = useCallback((files: File[]) => {
+    const newQueueItems: QueuedVideo[] = files.map(file => ({
+      id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+      file,
+      fileName: file.name,
+      fileSize: file.size
+    }));
+    setVideoQueue(prev => [...prev, ...newQueueItems]);
+    
+    toast({
+      title: "Added to Queue",
+      description: `${files.length} video(s) added to compression queue`,
+    });
+  }, [toast]);
+
+  const removeFromQueue = useCallback((id: string) => {
+    setVideoQueue(prev => prev.filter(item => item.id !== id));
+  }, []);
+
+  const moveQueueItemUp = useCallback((id: string) => {
+    setVideoQueue(prev => {
+      const index = prev.findIndex(item => item.id === id);
+      if (index <= 0) return prev;
+      const newQueue = [...prev];
+      [newQueue[index - 1], newQueue[index]] = [newQueue[index], newQueue[index - 1]];
+      return newQueue;
+    });
+  }, []);
+
+  const moveQueueItemDown = useCallback((id: string) => {
+    setVideoQueue(prev => {
+      const index = prev.findIndex(item => item.id === id);
+      if (index === -1 || index >= prev.length - 1) return prev;
+      const newQueue = [...prev];
+      [newQueue[index], newQueue[index + 1]] = [newQueue[index + 1], newQueue[index]];
+      return newQueue;
+    });
+  }, []);
+
+  const clearQueue = useCallback(() => {
+    setVideoQueue([]);
+  }, []);
+
+  const processQueue = useCallback(async (settings: VideoCompressionSettings) => {
+    if (videoQueue.length === 0 || isQueueProcessing) return;
+    
+    setIsQueueProcessing(true);
+    const queueCopy = [...videoQueue];
+    setVideoQueue([]); // Clear queue as we start processing
+    
+    for (const item of queueCopy) {
+      try {
+        await compressVideo(item.file, settings);
+      } catch (error) {
+        console.error(`Failed to compress ${item.fileName}:`, error);
+      }
+    }
+    
+    setIsQueueProcessing(false);
+    
+    toast({
+      title: "Queue Complete",
+      description: `Finished processing ${queueCopy.length} video(s)`,
+    });
+  }, [videoQueue, isQueueProcessing, compressVideo, toast]);
+
   const compressVideoBatch = async (
     files: File[],
     settings: VideoCompressionSettings
@@ -430,6 +506,8 @@ export const useVideoCompression = () => {
 
   return {
     videoCompressions,
+    videoQueue,
+    isQueueProcessing,
     compressVideo,
     compressVideoBatch,
     downloadCompressedVideo,
@@ -437,6 +515,12 @@ export const useVideoCompression = () => {
     clearVideoCompressions,
     pauseCompression,
     resumeCompression,
-    cancelCompression
+    cancelCompression,
+    addToQueue,
+    removeFromQueue,
+    moveQueueItemUp,
+    moveQueueItemDown,
+    clearQueue,
+    processQueue
   };
 };

@@ -70,7 +70,8 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
     moveQueueItemUp,
     moveQueueItemDown,
     clearQueue,
-    processQueue
+    processQueue,
+    updatePriority
   } = useVideoCompression();
   
   const { toast } = useToast();
@@ -565,6 +566,7 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
               onRemove={removeFromQueue}
               onStartProcessing={() => processQueue(videoSettings)}
               onClearQueue={clearQueue}
+              onUpdatePriority={updatePriority}
             />
 
             {/* Video Compression Results */}

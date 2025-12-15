@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Settings, Upload, Crown, Download, Zap, Image, Video } from 'lucide-react';
 import { CompressionSettings, useImageCompression } from '@/hooks/useImageCompression';
-import { useVideoCompression, VideoCompressionSettings } from '@/hooks/useVideoCompression';
+import { useVideoCompression, VideoCompressionSettings, VideoOutputFormat } from '@/hooks/useVideoCompression';
 import { VideoCompressionResults } from '@/components/VideoCompressionResults';
 import { useToast } from '@/hooks/use-toast';
 
@@ -32,7 +32,8 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
     quality: 'medium',
     maxWidth: 1280,
     maxHeight: 720,
-    videoBitrate: 1000
+    videoBitrate: 1000,
+    outputFormat: 'webm'
   });
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
@@ -470,6 +471,22 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
                     <SelectItem value="854x480">480p</SelectItem>
                     <SelectItem value="1280x720">720p</SelectItem>
                     <SelectItem value="1920x1080">1080p</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Label>Format:</Label>
+                <Select 
+                  value={videoSettings.outputFormat}
+                  onValueChange={(v) => setVideoSettings(prev => ({ ...prev, outputFormat: v as VideoOutputFormat }))}
+                >
+                  <SelectTrigger className="w-32">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="webm">WebM (VP9)</SelectItem>
+                    <SelectItem value="mp4">MP4 (H.264)</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

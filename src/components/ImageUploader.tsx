@@ -67,8 +67,7 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
     cancelCompression,
     addToQueue,
     removeFromQueue,
-    moveQueueItemUp,
-    moveQueueItemDown,
+    reorderQueue,
     clearQueue,
     processQueue,
     updatePriority
@@ -561,8 +560,7 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
             <VideoQueue
               queue={videoQueue}
               isProcessing={isQueueProcessing}
-              onMoveUp={moveQueueItemUp}
-              onMoveDown={moveQueueItemDown}
+              onReorder={reorderQueue}
               onRemove={removeFromQueue}
               onStartProcessing={() => processQueue(videoSettings)}
               onClearQueue={clearQueue}

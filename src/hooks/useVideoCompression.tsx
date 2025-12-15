@@ -252,6 +252,76 @@ export const useVideoCompression = () => {
     }
   };
 
+  const compressVideoBatch = async (
+    files: File[],
+    settings: VideoCompressionSettings
+  ): Promise<string[]> => {
+    const ids: string[] = [];
+    
+    // Process videos sequentially to avoid overwhelming the browser
+    for (const file of files) {
+      try {
+        const id = await compressVideo(file, settings);
+        ids.push(id);
+      } catch (error) {
+        console.error(`Failed to compress ${file.name}:`, error);
+        // Continue with other videos even if one fails
+      }
+    }
+    
+    return ids;
+  };
+
+  const downloadAllVideos = async () => {
+    const completedCompressions = videoCompressions.filter(c => 
+      c.status === 'completed' && c.compressedVideo
+    );
+
+    if (completedCompressions.length === 0) {
+      toast({
+        title: "No Videos Ready",
+        description: "No compressed videos available for download",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Import JSZip dynamically
+    const JSZip = (await import('jszip')).default;
+    const zip = new JSZip();
+
+    completedCompressions.forEach((compression) => {
+      if (compression.compressedVideo) {
+        const extension = compression.outputFormat || 'webm';
+        const fileName = `compressed_${compression.fileName.replace(/\.[^/.]+$/, '')}.${extension}`;
+        zip.file(fileName, compression.compressedVideo);
+      }
+    });
+
+    try {
+      const zipBlob = await zip.generateAsync({ type: 'blob' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(zipBlob);
+      link.download = `compressed-videos-${Date.now()}.zip`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(link.href);
+
+      toast({
+        title: "Download Complete",
+        description: `Downloaded ${completedCompressions.length} compressed videos as ZIP`,
+      });
+    } catch (error) {
+      console.error('Bulk download error:', error);
+      toast({
+        title: "Download Failed",
+        description: "Failed to create ZIP file",
+        variant: "destructive"
+      });
+    }
+  };
+
   const clearVideoCompressions = () => {
     // Revoke object URLs to free memory
     videoCompressions.forEach(comp => {
@@ -264,7 +334,9 @@ export const useVideoCompression = () => {
   return {
     videoCompressions,
     compressVideo,
+    compressVideoBatch,
     downloadCompressedVideo,
+    downloadAllVideos,
     clearVideoCompressions
   };
 };

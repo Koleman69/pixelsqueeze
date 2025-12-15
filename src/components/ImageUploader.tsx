@@ -55,7 +55,9 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
   const {
     videoCompressions,
     compressVideo,
+    compressVideoBatch,
     downloadCompressedVideo,
+    downloadAllVideos,
     clearVideoCompressions
   } = useVideoCompression();
   
@@ -106,14 +108,19 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
     const files = event.target.files;
     if (files && files.length > 0) {
       setIsUploading(true);
+      const fileArray = Array.from(files);
       
       toast({
-        title: "Processing Video",
-        description: `Compressing ${files[0].name}...`,
+        title: "Processing Videos",
+        description: `Compressing ${fileArray.length} video(s)...`,
       });
 
       try {
-        await compressVideo(files[0], videoSettings);
+        if (fileArray.length === 1) {
+          await compressVideo(fileArray[0], videoSettings);
+        } else {
+          await compressVideoBatch(fileArray, videoSettings);
+        }
       } catch (error) {
         console.error('Video compression failed:', error);
       } finally {
@@ -194,12 +201,16 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
       setIsUploading(true);
 
       toast({
-        title: "Processing Video",
-        description: `Compressing ${videoFiles[0].name}...`,
+        title: "Processing Videos",
+        description: `Compressing ${videoFiles.length} video(s)...`,
       });
 
       try {
-        await compressVideo(videoFiles[0], videoSettings);
+        if (videoFiles.length === 1) {
+          await compressVideo(videoFiles[0], videoSettings);
+        } else {
+          await compressVideoBatch(videoFiles, videoSettings);
+        }
       } catch (error) {
         console.error('Video compression failed:', error);
       } finally {
@@ -510,6 +521,13 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
                   {videoSettings.preserveAudio ? 'Keep' : 'Remove'}
                 </span>
               </div>
+
+              {videoCompressions.some(c => c.status === 'completed') && (
+                <Button onClick={downloadAllVideos} variant="outline">
+                  <Download className="w-4 h-4 mr-2" />
+                  Download All Videos
+                </Button>
+              )}
             </div>
 
             {/* Video Upload Area */}
@@ -526,17 +544,17 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
             >
               <Video className={`w-12 h-12 mx-auto mb-4 text-muted-foreground ${isUploading ? 'animate-pulse' : isDragging ? 'text-primary animate-pulse' : ''}`} />
               <h3 className="text-lg font-semibold mb-2">
-                {isUploading ? 'Processing Video...' : isDragging ? 'Drop Video Here' : 'Upload Video'}
+                {isUploading ? 'Processing Videos...' : isDragging ? 'Drop Videos Here' : 'Upload Videos'}
               </h3>
               <p className="text-muted-foreground mb-4">
                 {isUploading 
-                  ? 'Compressing video in your browser...' 
-                  : 'Click to browse or drag and drop your video here'
+                  ? 'Compressing videos in your browser...' 
+                  : 'Click to browse or drag and drop your videos here'
                 }
               </p>
               {!isUploading && (
                 <p className="text-sm text-muted-foreground">
-                  MP4, WebM, MOV • Processed locally in your browser
+                  MP4, WebM, MOV • Multiple files supported • Processed locally
                 </p>
               )}
               
@@ -544,6 +562,7 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
                 ref={videoInputRef}
                 type="file"
                 accept="video/*"
+                multiple
                 className="hidden"
                 onChange={handleVideoChange}
                 disabled={isUploading}

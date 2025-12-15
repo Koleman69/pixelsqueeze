@@ -956,12 +956,11 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
 
             {/* Video Upload Area */}
             <div 
-              className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-all ${
+              className={`relative border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-all ${
                 isDragging 
                   ? 'border-primary bg-primary/5 scale-[1.02]' 
                   : 'border-border hover:border-primary'
               }`}
-              onClick={handleFileSelect}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={(e) => handleDrop(e, 'video')}
@@ -989,14 +988,11 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
                 multiple
                 style={{ 
                   position: 'absolute',
-                  width: '1px',
-                  height: '1px',
-                  padding: 0,
-                  margin: '-1px',
-                  overflow: 'hidden',
-                  clip: 'rect(0, 0, 0, 0)',
-                  whiteSpace: 'nowrap',
-                  border: 0
+                  inset: 0,
+                  width: '100%',
+                  height: '100%',
+                  opacity: 0,
+                  cursor: 'pointer',
                 }}
                 onChange={handleVideoChange}
                 disabled={isUploading}

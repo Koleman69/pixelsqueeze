@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Video, Trash2, Play, X, Flame, Minus, ArrowDown, GripVertical } from 'lucide-react';
+import { Video, Trash2, Play, X, Flame, Minus, ArrowDown, GripVertical, Keyboard } from 'lucide-react';
 import { QueuedVideo, QueuePriority } from '@/hooks/useVideoCompression';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface VideoQueueProps {
   queue: QueuedVideo[];
@@ -41,6 +42,83 @@ export const VideoQueue = ({
 }: VideoQueueProps) => {
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Reset selection when queue changes
+  useEffect(() => {
+    if (selectedIndex !== null && selectedIndex >= queue.length) {
+      setSelectedIndex(queue.length > 0 ? queue.length - 1 : null);
+    }
+  }, [queue.length, selectedIndex]);
+
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (isProcessing || queue.length === 0) return;
+    
+    // Only handle keys if the container or its children are focused
+    if (!containerRef.current?.contains(document.activeElement) && 
+        document.activeElement !== containerRef.current) {
+      return;
+    }
+
+    switch (e.key) {
+      case 'ArrowUp':
+        e.preventDefault();
+        setSelectedIndex(prev => {
+          if (prev === null) return 0;
+          return Math.max(0, prev - 1);
+        });
+        break;
+      case 'ArrowDown':
+        e.preventDefault();
+        setSelectedIndex(prev => {
+          if (prev === null) return 0;
+          return Math.min(queue.length - 1, prev + 1);
+        });
+        break;
+      case 'Delete':
+      case 'Backspace':
+        e.preventDefault();
+        if (selectedIndex !== null && queue[selectedIndex]) {
+          onRemove(queue[selectedIndex].id);
+        }
+        break;
+      case '1':
+        e.preventDefault();
+        if (selectedIndex !== null && queue[selectedIndex]) {
+          onUpdatePriority(queue[selectedIndex].id, 'high');
+        }
+        break;
+      case '2':
+        e.preventDefault();
+        if (selectedIndex !== null && queue[selectedIndex]) {
+          onUpdatePriority(queue[selectedIndex].id, 'normal');
+        }
+        break;
+      case '3':
+        e.preventDefault();
+        if (selectedIndex !== null && queue[selectedIndex]) {
+          onUpdatePriority(queue[selectedIndex].id, 'low');
+        }
+        break;
+      case 'Enter':
+        e.preventDefault();
+        if (queue.length > 0) {
+          onStartProcessing();
+        }
+        break;
+      case 'Escape':
+        e.preventDefault();
+        setSelectedIndex(null);
+        containerRef.current?.blur();
+        break;
+    }
+  }, [isProcessing, queue, selectedIndex, onRemove, onUpdatePriority, onStartProcessing]);
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [handleKeyDown]);
 
   if (queue.length === 0) return null;
 
@@ -54,6 +132,7 @@ export const VideoQueue = ({
   const handleDragStart = (e: React.DragEvent, index: number) => {
     if (isProcessing) return;
     setDraggedIndex(index);
+    setSelectedIndex(index);
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.setData('text/plain', index.toString());
   };
@@ -75,6 +154,7 @@ export const VideoQueue = ({
     
     if (draggedIndex !== toIndex) {
       onReorder(draggedIndex, toIndex);
+      setSelectedIndex(toIndex);
     }
     
     setDraggedIndex(null);
@@ -86,8 +166,17 @@ export const VideoQueue = ({
     setDragOverIndex(null);
   };
 
+  const handleItemClick = (index: number) => {
+    setSelectedIndex(index);
+    containerRef.current?.focus();
+  };
+
   return (
-    <div className="space-y-4">
+    <div 
+      ref={containerRef}
+      className="space-y-4 outline-none"
+      tabIndex={0}
+    >
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div className="flex items-center gap-2 flex-wrap">
           <h3 className="text-lg font-semibold flex items-center gap-2">
@@ -103,6 +192,26 @@ export const VideoQueue = ({
           )}
         </div>
         <div className="flex gap-2">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-8 w-8">
+                  <Keyboard className="w-4 h-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" className="max-w-xs">
+                <div className="text-xs space-y-1">
+                  <p className="font-semibold mb-2">Keyboard Shortcuts</p>
+                  <p><kbd className="px-1 bg-muted rounded">↑↓</kbd> Navigate items</p>
+                  <p><kbd className="px-1 bg-muted rounded">1</kbd> High priority</p>
+                  <p><kbd className="px-1 bg-muted rounded">2</kbd> Normal priority</p>
+                  <p><kbd className="px-1 bg-muted rounded">3</kbd> Low priority</p>
+                  <p><kbd className="px-1 bg-muted rounded">Del</kbd> Remove item</p>
+                  <p><kbd className="px-1 bg-muted rounded">Enter</kbd> Start processing</p>
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           <Button 
             variant="outline" 
             size="sm" 
@@ -124,7 +233,7 @@ export const VideoQueue = ({
       </div>
 
       <p className="text-xs text-muted-foreground">
-        Drag to reorder. High priority videos will be processed first.
+        Drag to reorder • Click to select • Use keyboard shortcuts for quick actions
       </p>
 
       <div className="space-y-2">
@@ -133,6 +242,7 @@ export const VideoQueue = ({
           const PriorityIcon = config.icon;
           const isDragging = draggedIndex === index;
           const isDragOver = dragOverIndex === index && draggedIndex !== index;
+          const isSelected = selectedIndex === index;
           
           return (
             <Card 
@@ -142,9 +252,12 @@ export const VideoQueue = ({
               } ${
                 isDragOver ? 'border-primary border-2 bg-primary/5' : ''
               } ${
+                isSelected ? 'ring-2 ring-primary ring-offset-2' : ''
+              } ${
                 !isProcessing ? 'cursor-grab active:cursor-grabbing' : ''
               }`}
               draggable={!isProcessing}
+              onClick={() => handleItemClick(index)}
               onDragStart={(e) => handleDragStart(e, index)}
               onDragOver={(e) => handleDragOver(e, index)}
               onDragLeave={handleDragLeave}

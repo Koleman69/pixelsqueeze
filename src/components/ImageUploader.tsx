@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { Settings, Upload, Crown, Download, Zap, Image, Video, Volume2, VolumeX, Smartphone, Globe, Archive, SlidersHorizontal, Save, Star, Trash2, Plus } from 'lucide-react';
+import { Settings, Upload, Crown, Download, Zap, Image, Video, Volume2, VolumeX, Smartphone, Globe, Archive, SlidersHorizontal, Save, Star, Trash2, Plus, FileUp, FileDown } from 'lucide-react';
 import { CompressionSettings, useImageCompression } from '@/hooks/useImageCompression';
 import { useVideoCompression, VideoCompressionSettings, VideoOutputFormat } from '@/hooks/useVideoCompression';
 import { VideoCompressionResults } from '@/components/VideoCompressionResults';
@@ -96,6 +96,102 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
       title: "Preset Deleted",
       description: "Custom preset has been removed",
     });
+  };
+
+  const exportPresets = () => {
+    if (Object.keys(savedPresets).length === 0) {
+      toast({
+        title: "No Presets to Export",
+        description: "Save some custom presets first",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const exportData = {
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      presets: savedPresets
+    };
+
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `video-presets-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    toast({
+      title: "Presets Exported",
+      description: `${Object.keys(savedPresets).length} preset(s) exported successfully`,
+    });
+  };
+
+  const importPresets = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const content = e.target?.result as string;
+        const data = JSON.parse(content);
+
+        if (!data.presets || typeof data.presets !== 'object') {
+          throw new Error('Invalid preset file format');
+        }
+
+        // Validate each preset has required fields
+        const validPresets: Record<string, { label: string; settings: VideoCompressionSettings }> = {};
+        let importedCount = 0;
+
+        for (const [key, preset] of Object.entries(data.presets)) {
+          const p = preset as { label?: string; settings?: VideoCompressionSettings };
+          if (p.label && p.settings && typeof p.settings === 'object') {
+            // Generate new key to avoid conflicts
+            const newKey = `imported_${Date.now()}_${importedCount}`;
+            validPresets[newKey] = {
+              label: p.label,
+              settings: {
+                quality: p.settings.quality || 'medium',
+                maxWidth: p.settings.maxWidth || 1280,
+                maxHeight: p.settings.maxHeight || 720,
+                videoBitrate: p.settings.videoBitrate || 1000,
+                outputFormat: p.settings.outputFormat || 'webm',
+                preserveAudio: p.settings.preserveAudio !== false
+              }
+            };
+            importedCount++;
+          }
+        }
+
+        if (importedCount === 0) {
+          throw new Error('No valid presets found in file');
+        }
+
+        const mergedPresets = { ...savedPresets, ...validPresets };
+        savePresetsToStorage(mergedPresets);
+
+        toast({
+          title: "Presets Imported",
+          description: `${importedCount} preset(s) imported successfully`,
+        });
+      } catch (error) {
+        console.error('Failed to import presets:', error);
+        toast({
+          title: "Import Failed",
+          description: error instanceof Error ? error.message : "Invalid preset file",
+          variant: "destructive"
+        });
+      }
+    };
+
+    reader.readAsText(file);
+    // Reset input so same file can be selected again
+    event.target.value = '';
   };
 
   // Built-in video compression presets
@@ -651,7 +747,41 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
               {/* Saved custom presets */}
               {Object.keys(savedPresets).length > 0 && (
                 <div className="space-y-2">
-                  <Label className="text-xs text-muted-foreground">Your Saved Presets</Label>
+                  <div className="flex items-center justify-between">
+                    <Label className="text-xs text-muted-foreground">Your Saved Presets</Label>
+                    <div className="flex items-center gap-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={exportPresets}
+                        className="h-6 px-2 text-xs"
+                        title="Export presets"
+                      >
+                        <FileDown className="w-3 h-3 mr-1" />
+                        Export
+                      </Button>
+                      <label className="cursor-pointer">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 px-2 text-xs pointer-events-none"
+                          title="Import presets"
+                          asChild
+                        >
+                          <span>
+                            <FileUp className="w-3 h-3 mr-1" />
+                            Import
+                          </span>
+                        </Button>
+                        <input
+                          type="file"
+                          accept=".json"
+                          className="hidden"
+                          onChange={importPresets}
+                        />
+                      </label>
+                    </div>
+                  </div>
                   <div className="flex flex-wrap gap-2">
                     {Object.entries(savedPresets).map(([key, preset]) => {
                       const isActive = selectedPreset === key;
@@ -686,6 +816,22 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
                       );
                     })}
                   </div>
+                </div>
+              )}
+
+              {/* Import button when no presets exist */}
+              {Object.keys(savedPresets).length === 0 && (
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <span>No saved presets yet.</span>
+                  <label className="cursor-pointer text-primary hover:underline">
+                    Import presets
+                    <input
+                      type="file"
+                      accept=".json"
+                      className="hidden"
+                      onChange={importPresets}
+                    />
+                  </label>
                 </div>
               )}
             </div>

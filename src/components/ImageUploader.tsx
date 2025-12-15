@@ -37,6 +37,7 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   
   const { 
     compressImages, 
@@ -110,6 +111,92 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
 
       try {
         await compressVideo(files[0], videoSettings);
+      } catch (error) {
+        console.error('Video compression failed:', error);
+      } finally {
+        setIsUploading(false);
+      }
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDrop = async (e: React.DragEvent, type: 'image' | 'video') => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+
+    const files = e.dataTransfer.files;
+    if (!files || files.length === 0) return;
+
+    if (type === 'image') {
+      // Filter for image files only
+      const imageFiles = Array.from(files).filter(file => file.type.startsWith('image/'));
+      if (imageFiles.length === 0) {
+        toast({
+          title: "Invalid Files",
+          description: "Please drop image files only",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Create a DataTransfer to convert array back to FileList
+      const dt = new DataTransfer();
+      imageFiles.forEach(file => dt.items.add(file));
+      const fileList = dt.files;
+
+      setSelectedFiles(fileList);
+      setIsUploading(true);
+
+      if (onUpload) {
+        onUpload(fileList);
+      }
+
+      toast({
+        title: "Uploading Images",
+        description: `Processing ${imageFiles.length} image(s)...`,
+      });
+
+      try {
+        await compressImages(fileList, settings, imageFiles.length > 1);
+        await checkSubscription();
+      } catch (error) {
+        console.error('Compression failed:', error);
+      } finally {
+        setIsUploading(false);
+      }
+    } else {
+      // Filter for video files only
+      const videoFiles = Array.from(files).filter(file => file.type.startsWith('video/'));
+      if (videoFiles.length === 0) {
+        toast({
+          title: "Invalid Files",
+          description: "Please drop video files only",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      setIsUploading(true);
+
+      toast({
+        title: "Processing Video",
+        description: `Compressing ${videoFiles[0].name}...`,
+      });
+
+      try {
+        await compressVideo(videoFiles[0], videoSettings);
       } catch (error) {
         console.error('Video compression failed:', error);
       } finally {
@@ -295,12 +382,19 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
 
             {/* Image Upload Area */}
             <div 
-              className="border-2 border-dashed border-border rounded-lg p-8 text-center cursor-pointer hover:border-primary transition-colors"
+              className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-all ${
+                isDragging 
+                  ? 'border-primary bg-primary/5 scale-[1.02]' 
+                  : 'border-border hover:border-primary'
+              }`}
               onClick={handleFileSelect}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={(e) => handleDrop(e, 'image')}
             >
-              <Upload className={`w-12 h-12 mx-auto mb-4 text-muted-foreground ${isUploading ? 'animate-bounce' : ''}`} />
+              <Upload className={`w-12 h-12 mx-auto mb-4 text-muted-foreground ${isUploading ? 'animate-bounce' : isDragging ? 'text-primary animate-pulse' : ''}`} />
               <h3 className="text-lg font-semibold mb-2">
-                {isUploading ? 'Processing Images...' : 'Upload Images'}
+                {isUploading ? 'Processing Images...' : isDragging ? 'Drop Images Here' : 'Upload Images'}
               </h3>
               <p className="text-muted-foreground mb-4">
                 {isUploading 
@@ -383,12 +477,19 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
 
             {/* Video Upload Area */}
             <div 
-              className="border-2 border-dashed border-border rounded-lg p-8 text-center cursor-pointer hover:border-primary transition-colors"
+              className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-all ${
+                isDragging 
+                  ? 'border-primary bg-primary/5 scale-[1.02]' 
+                  : 'border-border hover:border-primary'
+              }`}
               onClick={handleFileSelect}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={(e) => handleDrop(e, 'video')}
             >
-              <Video className={`w-12 h-12 mx-auto mb-4 text-muted-foreground ${isUploading ? 'animate-pulse' : ''}`} />
+              <Video className={`w-12 h-12 mx-auto mb-4 text-muted-foreground ${isUploading ? 'animate-pulse' : isDragging ? 'text-primary animate-pulse' : ''}`} />
               <h3 className="text-lg font-semibold mb-2">
-                {isUploading ? 'Processing Video...' : 'Upload Video'}
+                {isUploading ? 'Processing Video...' : isDragging ? 'Drop Video Here' : 'Upload Video'}
               </h3>
               <p className="text-muted-foreground mb-4">
                 {isUploading 

@@ -16,6 +16,7 @@ import { VideoCompressionResults } from '@/components/VideoCompressionResults';
 import { VideoQueue } from '@/components/VideoQueue';
 import { BatchRenameDialog } from '@/components/BatchRenameDialog';
 import { useToast } from '@/hooks/use-toast';
+import { CompressionStatus } from '@/components/CompressionStatus';
 
 interface ImageUploaderProps {
   onUpload?: (files: FileList) => void;
@@ -648,7 +649,7 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
             </div>
 
             {/* Image Settings Display */}
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 mb-6">
               <Badge variant="outline">Quality: {settings.quality}%</Badge>
               <Badge variant="outline">Size: {settings.maxWidth}×{settings.maxHeight}</Badge>
               <Badge variant="outline">DPI: {settings.dpi}</Badge>
@@ -656,6 +657,20 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
                 <Badge variant="destructive">Pro Required</Badge>
               )}
             </div>
+
+            {/* Recent Image Compressions */}
+            {compressions.length > 0 && (
+              <div className="space-y-4">
+                <h4 className="text-sm font-semibold text-muted-foreground">
+                  Recent compressed images (tap Download to save to your device)
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {compressions.slice(0, 4).map((compression) => (
+                    <CompressionStatus key={compression.id} {...compression} />
+                  ))}
+                </div>
+              </div>
+            )}
           </TabsContent>
 
           <TabsContent value="video" className="space-y-6 mt-6">

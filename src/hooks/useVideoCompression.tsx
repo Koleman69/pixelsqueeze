@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
 export type VideoOutputFormat = 'webm' | 'mp4';
@@ -18,7 +18,7 @@ export interface VideoCompressionResult {
   originalSize: number;
   compressedSize: number;
   compressionRatio: number;
-  status: 'processing' | 'completed' | 'failed';
+  status: 'processing' | 'completed' | 'failed' | 'paused';
   compressedVideo?: Blob;
   compressedUrl?: string;
   originalUrl?: string;
@@ -26,11 +26,18 @@ export interface VideoCompressionResult {
   progress: number;
   outputFormat?: string;
   startTime?: number;
-  estimatedTimeRemaining?: number; // in seconds
+  estimatedTimeRemaining?: number;
+  pausedTime?: number; // Track time spent paused
+}
+
+interface VideoCompressionRef {
+  video: HTMLVideoElement;
+  mediaRecorder: MediaRecorder;
 }
 
 export const useVideoCompression = () => {
   const [videoCompressions, setVideoCompressions] = useState<VideoCompressionResult[]>([]);
+  const compressionRefs = useRef<Map<string, VideoCompressionRef>>(new Map());
   const { toast } = useToast();
 
   const compressVideo = async (
@@ -151,6 +158,9 @@ export const useVideoCompression = () => {
         videoBitsPerSecond: bitrate
       });
 
+      // Store refs for pause/resume functionality
+      compressionRefs.current.set(id, { video, mediaRecorder });
+
       const chunks: Blob[] = [];
       
       mediaRecorder.ondataavailable = (e) => {
@@ -161,11 +171,15 @@ export const useVideoCompression = () => {
 
       const compressedBlob = await new Promise<Blob>((resolve, reject) => {
         mediaRecorder.onstop = () => {
+          compressionRefs.current.delete(id);
           const blob = new Blob(chunks, { type: mimeType });
           resolve(blob);
         };
         
-        mediaRecorder.onerror = () => reject(new Error('Recording failed'));
+        mediaRecorder.onerror = () => {
+          compressionRefs.current.delete(id);
+          reject(new Error('Recording failed'));
+        };
         
         mediaRecorder.start(100);
         
@@ -173,10 +187,19 @@ export const useVideoCompression = () => {
         video.play();
 
         const duration = video.duration;
+        let pausedDuration = 0;
+        let lastPauseTime = 0;
         
         const drawFrame = () => {
-          if (video.ended || video.paused) {
+          if (video.ended) {
             mediaRecorder.stop();
+            return;
+          }
+          
+          // Check if paused (video.paused but not ended)
+          if (video.paused && !video.ended) {
+            // Don't stop, just wait for resume
+            requestAnimationFrame(drawFrame);
             return;
           }
           
@@ -184,10 +207,10 @@ export const useVideoCompression = () => {
           
           // Update progress and estimate time remaining
           const progress = Math.min((video.currentTime / duration) * 100, 99);
-          const elapsedTime = (Date.now() - startTime) / 1000; // in seconds
+          const elapsedTime = (Date.now() - startTime - pausedDuration) / 1000;
           let estimatedTimeRemaining: number | undefined;
           
-          if (progress > 5) { // Only estimate after some progress
+          if (progress > 5) {
             const totalEstimatedTime = (elapsedTime / progress) * 100;
             estimatedTimeRemaining = Math.max(0, totalEstimatedTime - elapsedTime);
           }
@@ -201,6 +224,23 @@ export const useVideoCompression = () => {
         
         video.onended = () => {
           mediaRecorder.stop();
+        };
+        
+        video.onpause = () => {
+          lastPauseTime = Date.now();
+          if (mediaRecorder.state === 'recording') {
+            mediaRecorder.pause();
+          }
+        };
+        
+        video.onplay = () => {
+          if (lastPauseTime > 0) {
+            pausedDuration += Date.now() - lastPauseTime;
+            lastPauseTime = 0;
+          }
+          if (mediaRecorder.state === 'paused') {
+            mediaRecorder.resume();
+          }
         };
         
         drawFrame();
@@ -334,12 +374,33 @@ export const useVideoCompression = () => {
     }
   };
 
+  const pauseCompression = (compressionId: string) => {
+    const ref = compressionRefs.current.get(compressionId);
+    if (ref && !ref.video.paused) {
+      ref.video.pause();
+      setVideoCompressions(prev => prev.map(comp =>
+        comp.id === compressionId ? { ...comp, status: 'paused' as const } : comp
+      ));
+    }
+  };
+
+  const resumeCompression = (compressionId: string) => {
+    const ref = compressionRefs.current.get(compressionId);
+    if (ref && ref.video.paused) {
+      ref.video.play();
+      setVideoCompressions(prev => prev.map(comp =>
+        comp.id === compressionId ? { ...comp, status: 'processing' as const } : comp
+      ));
+    }
+  };
+
   const clearVideoCompressions = () => {
     // Revoke object URLs to free memory
     videoCompressions.forEach(comp => {
       if (comp.originalUrl) URL.revokeObjectURL(comp.originalUrl);
       if (comp.compressedUrl) URL.revokeObjectURL(comp.compressedUrl);
     });
+    compressionRefs.current.clear();
     setVideoCompressions([]);
   };
 
@@ -349,6 +410,8 @@ export const useVideoCompression = () => {
     compressVideoBatch,
     downloadCompressedVideo,
     downloadAllVideos,
-    clearVideoCompressions
+    clearVideoCompressions,
+    pauseCompression,
+    resumeCompression
   };
 };

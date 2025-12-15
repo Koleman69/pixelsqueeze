@@ -58,7 +58,9 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
     compressVideoBatch,
     downloadCompressedVideo,
     downloadAllVideos,
-    clearVideoCompressions
+    clearVideoCompressions,
+    pauseCompression,
+    resumeCompression
   } = useVideoCompression();
   
   const { toast } = useToast();
@@ -580,6 +582,8 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
             <VideoCompressionResults 
               compressions={videoCompressions}
               onDownload={downloadCompressedVideo}
+              onPause={pauseCompression}
+              onResume={resumeCompression}
             />
           </TabsContent>
         </Tabs>

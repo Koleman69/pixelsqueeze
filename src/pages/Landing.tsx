@@ -119,7 +119,10 @@ const Landing = () => {
         <meta property="og:type" content="website" />
         <meta property="og:title" content="Pixelsqueeze - AI Image Compression" />
         <meta property="og:description" content="Reduce image file sizes by up to 80% without losing quality. AI-powered compression for professionals." />
-        <meta property="og:image" content="https://pixelsqueeze.com/og-image.jpg" />
+        <meta property="og:image" content="/og-image.png" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="640" />
+        <meta property="og:image:alt" content="Pixelsqueeze - Compress Images Fast" />
         <meta property="og:url" content="https://pixelsqueeze.com" />
         <meta property="og:site_name" content="Pixelsqueeze" />
         
@@ -127,7 +130,8 @@ const Landing = () => {
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Pixelsqueeze - AI Image Compression" />
         <meta name="twitter:description" content="Reduce image file sizes by up to 80% without losing quality. Start compressing for free." />
-        <meta name="twitter:image" content="https://pixelsqueeze.com/twitter-image.jpg" />
+        <meta name="twitter:image" content="/og-image.png" />
+        <meta name="twitter:image:alt" content="Pixelsqueeze - Compress Images Fast" />
         
         {/* Additional SEO */}
         <meta name="robots" content="index, follow" />

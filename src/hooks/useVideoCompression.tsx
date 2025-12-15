@@ -1,11 +1,14 @@
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
+export type VideoOutputFormat = 'webm' | 'mp4';
+
 export interface VideoCompressionSettings {
   quality: 'low' | 'medium' | 'high';
   maxWidth: number;
   maxHeight: number;
   videoBitrate: number; // kbps
+  outputFormat: VideoOutputFormat;
 }
 
 export interface VideoCompressionResult {
@@ -20,6 +23,7 @@ export interface VideoCompressionResult {
   originalUrl?: string;
   error?: string;
   progress: number;
+  outputFormat?: string;
 }
 
 export const useVideoCompression = () => {
@@ -32,7 +36,8 @@ export const useVideoCompression = () => {
       quality: 'medium', 
       maxWidth: 1280, 
       maxHeight: 720, 
-      videoBitrate: 1000 
+      videoBitrate: 1000,
+      outputFormat: 'webm'
     }
   ): Promise<string> => {
     const id = Date.now().toString() + Math.random().toString(36).substr(2, 9);
@@ -90,12 +95,28 @@ export const useVideoCompression = () => {
       if (settings.quality === 'low') bitrate = 500000;
       else if (settings.quality === 'high') bitrate = 2500000;
 
-      // Check for MediaRecorder support
-      const mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp9') 
-        ? 'video/webm;codecs=vp9'
-        : MediaRecorder.isTypeSupported('video/webm;codecs=vp8')
-          ? 'video/webm;codecs=vp8'
-          : 'video/webm';
+      // Determine MIME type based on output format preference
+      let mimeType: string;
+      if (settings.outputFormat === 'mp4') {
+        // Try MP4 first (Safari, some Chrome versions)
+        if (MediaRecorder.isTypeSupported('video/mp4;codecs=avc1')) {
+          mimeType = 'video/mp4;codecs=avc1';
+        } else if (MediaRecorder.isTypeSupported('video/mp4')) {
+          mimeType = 'video/mp4';
+        } else {
+          // Fallback to WebM if MP4 not supported
+          mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp9') 
+            ? 'video/webm;codecs=vp9'
+            : 'video/webm;codecs=vp8';
+        }
+      } else {
+        // WebM format
+        mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp9') 
+          ? 'video/webm;codecs=vp9'
+          : MediaRecorder.isTypeSupported('video/webm;codecs=vp8')
+            ? 'video/webm;codecs=vp8'
+            : 'video/webm';
+      }
 
       // Create stream from canvas
       const stream = canvas.captureStream(30);
@@ -154,6 +175,9 @@ export const useVideoCompression = () => {
       const compressedUrl = URL.createObjectURL(compressedBlob);
       const compressionRatio = ((file.size - compressedBlob.size) / file.size) * 100;
 
+      // Determine actual output format from MIME type
+      const actualFormat = compressedBlob.type.includes('mp4') ? 'mp4' : 'webm';
+
       // Update with final result
       setVideoCompressions(prev => prev.map(comp => 
         comp.id === id 
@@ -164,7 +188,8 @@ export const useVideoCompression = () => {
               status: 'completed' as const,
               compressedVideo: compressedBlob,
               compressedUrl,
-              progress: 100
+              progress: 100,
+              outputFormat: actualFormat
             }
           : comp
       ));
@@ -199,7 +224,7 @@ export const useVideoCompression = () => {
     if (compression?.compressedUrl) {
       const link = document.createElement('a');
       link.href = compression.compressedUrl;
-      const extension = compression.compressedVideo?.type.includes('webm') ? 'webm' : 'mp4';
+      const extension = compression.outputFormat || (compression.compressedVideo?.type.includes('webm') ? 'webm' : 'mp4');
       link.download = `compressed_${compression.fileName.replace(/\.[^/.]+$/, '')}.${extension}`;
       link.click();
     }

@@ -87,6 +87,9 @@ export const VideoCompressionResults = ({ compressions, onDownload }: VideoCompr
                         : 'No reduction'
                       }
                     </span>
+                    {compression.outputFormat && (
+                      <span className="uppercase font-medium">{compression.outputFormat}</span>
+                    )}
                   </div>
                 )}
 

@@ -14,6 +14,7 @@ import { CompressionSettings, useImageCompression } from '@/hooks/useImageCompre
 import { useVideoCompression, VideoCompressionSettings, VideoOutputFormat } from '@/hooks/useVideoCompression';
 import { VideoCompressionResults } from '@/components/VideoCompressionResults';
 import { VideoQueue } from '@/components/VideoQueue';
+import { BatchRenameDialog } from '@/components/BatchRenameDialog';
 import { useToast } from '@/hooks/use-toast';
 
 interface ImageUploaderProps {
@@ -46,6 +47,7 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
   const [savedPresets, setSavedPresets] = useState<Record<string, { label: string; settings: VideoCompressionSettings }>>({});
   const [newPresetName, setNewPresetName] = useState('');
   const [showSavePreset, setShowSavePreset] = useState(false);
+  const [showBatchRename, setShowBatchRename] = useState(false);
 
   // Load saved presets from localStorage on mount
   useEffect(() => {
@@ -287,6 +289,7 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
     compressVideo,
     compressVideoBatch,
     downloadCompressedVideo,
+    downloadWithCustomNames,
     downloadAllVideos,
     clearVideoCompressions,
     pauseCompression,
@@ -993,6 +996,15 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
               onPause={pauseCompression}
               onResume={resumeCompression}
               onCancel={cancelCompression}
+              onBatchRename={() => setShowBatchRename(true)}
+            />
+
+            {/* Batch Rename Dialog */}
+            <BatchRenameDialog
+              isOpen={showBatchRename}
+              onClose={() => setShowBatchRename(false)}
+              compressions={videoCompressions}
+              onDownload={downloadWithCustomNames}
             />
           </TabsContent>
         </Tabs>

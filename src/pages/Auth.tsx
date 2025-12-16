@@ -25,7 +25,11 @@ const loginSchema = z.object({
   password: z.string().min(1, "Password is required")
 });
 
+const nameSchema = z.string().trim().min(1, "This field is required").max(50, "Must be less than 50 characters");
+
 const signupSchema = z.object({
+  firstName: nameSchema,
+  lastName: nameSchema,
   email: emailSchema,
   password: passwordSchema,
   confirmPassword: z.string()
@@ -39,6 +43,8 @@ const Auth = () => {
   const [showResetPassword, setShowResetPassword] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
   const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
     email: "",
     password: "",
     confirmPassword: ""
@@ -151,6 +157,8 @@ const Auth = () => {
     // Validate signup form
     try {
       signupSchema.parse({
+        firstName: formData.firstName,
+        lastName: formData.lastName,
         email: formData.email,
         password: formData.password,
         confirmPassword: formData.confirmPassword
@@ -174,7 +182,11 @@ const Auth = () => {
         email: formData.email,
         password: formData.password,
         options: {
-          emailRedirectTo: redirectUrl
+          emailRedirectTo: redirectUrl,
+          data: {
+            first_name: formData.firstName,
+            last_name: formData.lastName
+          }
         }
       });
 
@@ -375,6 +387,32 @@ const Auth = () => {
               
               <TabsContent value="signup">
                 <form onSubmit={handleSignup} className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="first-name">First Name</Label>
+                      <Input
+                        id="first-name"
+                        name="firstName"
+                        type="text"
+                        placeholder="John"
+                        value={formData.firstName}
+                        onChange={handleChange}
+                        disabled={isLoading}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="last-name">Last Name</Label>
+                      <Input
+                        id="last-name"
+                        name="lastName"
+                        type="text"
+                        placeholder="Doe"
+                        value={formData.lastName}
+                        onChange={handleChange}
+                        disabled={isLoading}
+                      />
+                    </div>
+                  </div>
                   <div className="space-y-2">
                     <Label htmlFor="signup-email">Email</Label>
                     <Input

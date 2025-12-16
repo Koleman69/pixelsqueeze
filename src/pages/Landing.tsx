@@ -233,17 +233,17 @@ const Landing = () => {
       </section>
 
       {/* Before/After Showcase */}
-      <section className="py-20 px-6 bg-secondary/20">
+      <section className="section-padding bg-secondary/20">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
             <Badge variant="outline" className="mb-4 px-4 py-2 border-primary text-primary">
               <Zap className="w-4 h-4 mr-2" />
               See the Difference
             </Badge>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+            <h2 className="section-title">
               AI-Powered Transformations
             </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="section-subtitle !mb-8">
               Slide to see the stunning before and after results of our compression technology
             </p>
           </div>
@@ -266,16 +266,14 @@ const Landing = () => {
       </section>
 
       {/* Features Grid */}
-      <section className="py-20 px-6">
+      <section className="section-padding">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              Everything You Need
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Professional-grade image compression with powerful features
-            </p>
-          </div>
+          <h2 className="section-title">
+            Everything You Need
+          </h2>
+          <p className="section-subtitle">
+            Professional-grade image compression with powerful features
+          </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <Card className="p-6 hover:shadow-lg transition-shadow">
@@ -342,17 +340,17 @@ const Landing = () => {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-20 px-6 bg-secondary/20">
+      <section className="section-padding bg-secondary/20">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
+          <div className="text-center mb-12">
             <Badge variant="outline" className="mb-4 px-4 py-2 border-primary text-primary">
               <Star className="w-4 h-4 mr-2 fill-primary" />
               Trusted by Professionals
             </Badge>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+            <h2 className="section-title">
               Loved by 50,000+ Users
             </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="section-subtitle !mb-8">
               See what our customers are saying about Pixelsqueeze
             </p>
           </div>
@@ -448,16 +446,14 @@ const Landing = () => {
       </section>
 
       {/* Pricing Section */}
-      <section className="py-20 px-6 bg-secondary/20">
+      <section className="section-padding bg-secondary/20">
         <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              Simple, Transparent Pricing
-            </h2>
-            <p className="text-xl text-muted-foreground">
-              Start free, upgrade when you need more
-            </p>
-          </div>
+          <h2 className="section-title">
+            Simple, Transparent Pricing
+          </h2>
+          <p className="section-subtitle">
+            Start free, upgrade when you need more
+          </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {/* Free Plan */}
@@ -619,17 +615,17 @@ const Landing = () => {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-20 px-6 bg-secondary/20">
+      <section className="section-padding bg-secondary/20">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
             <Badge variant="outline" className="mb-4 px-4 py-2 border-primary text-primary">
               <HelpCircle className="w-4 h-4 mr-2" />
               Got Questions?
             </Badge>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+            <h2 className="section-title">
               Frequently Asked Questions
             </h2>
-            <p className="text-xl text-muted-foreground">
+            <p className="section-subtitle !mb-8">
               Everything you need to know about Pixelsqueeze
             </p>
           </div>
@@ -710,12 +706,12 @@ const Landing = () => {
         </div>
       </section>
 
-      <section className="py-20 px-6 bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10">
+      <section className="section-padding bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">
+          <h2 className="section-title">
             Ready to Optimize Your Images?
           </h2>
-          <p className="text-xl text-muted-foreground mb-8">
+          <p className="section-subtitle !mb-8">
             Join thousands of users saving time and storage with Pixelsqueeze
           </p>
           <Link to="/auth">

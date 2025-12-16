@@ -100,8 +100,8 @@ const Account = () => {
             Back to Home
           </Link>
 
-          <h1 className="text-4xl font-bold mb-2 text-foreground">Account Settings</h1>
-          <p className="text-muted-foreground mb-8">Manage your account and subscription</p>
+          <h1 className="text-3xl md:text-4xl font-bold mb-2 text-foreground">Account Settings</h1>
+          <p className="text-lg text-muted-foreground mb-8">Manage your account and subscription</p>
 
           <div className="grid gap-6">
             {/* Account Information */}

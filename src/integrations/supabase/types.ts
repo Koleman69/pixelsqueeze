@@ -171,7 +171,9 @@ export type Database = {
           avatar_url: string | null
           created_at: string
           display_name: string | null
+          first_name: string | null
           id: string
+          last_name: string | null
           updated_at: string
           user_id: string
           username: string | null
@@ -180,7 +182,9 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string
           display_name?: string | null
+          first_name?: string | null
           id?: string
+          last_name?: string | null
           updated_at?: string
           user_id: string
           username?: string | null
@@ -189,7 +193,9 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string
           display_name?: string | null
+          first_name?: string | null
           id?: string
+          last_name?: string | null
           updated_at?: string
           user_id?: string
           username?: string | null
@@ -334,6 +340,27 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -342,6 +369,16 @@ export type Database = {
       count_subscriber_access_last_hour: {
         Args: { target_user_id?: string }
         Returns: number
+      }
+      get_all_users_for_admin: {
+        Args: never
+        Returns: {
+          created_at: string
+          email: string
+          first_name: string
+          last_name: string
+          user_id: string
+        }[]
       }
       get_my_subscription_status: { Args: never; Returns: Json }
       get_safe_subscriber_status: {
@@ -385,6 +422,13 @@ export type Database = {
         Returns: Json
       }
       get_subscriber_encryption_status: { Args: never; Returns: string }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
       log_service_access: {
         Args: { operation: string; table_name: string; target_user_id?: string }
         Returns: boolean
@@ -409,7 +453,7 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "moderator" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -536,6 +580,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "moderator", "user"],
+    },
   },
 } as const

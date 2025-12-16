@@ -14,6 +14,7 @@ import Account from "./pages/Account";
 import Landing from "./pages/Landing";
 import NotFound from "./pages/NotFound";
 import SharedFile from "./pages/SharedFile";
+import Admin from "./pages/Admin";
 
 const queryClient = new QueryClient();
 
@@ -87,6 +88,11 @@ const App = () => (
             <Route path="/account" element={
               <ProtectedRoute>
                 <Account />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin" element={
+              <ProtectedRoute>
+                <Admin />
               </ProtectedRoute>
             } />
             <Route path="/auth" element={

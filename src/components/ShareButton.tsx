@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Share2, Check, Copy, Link } from 'lucide-react';
+import { Share2, Check, Copy, Link, Cloud, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
@@ -34,6 +36,7 @@ export const ShareButton = ({
 }: ShareButtonProps) => {
   const { toast } = useToast();
   const [copied, setCopied] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
   const getMimeType = () => {
     if (isVideo) return 'video/mp4';
@@ -76,6 +79,80 @@ export const ShareButton = ({
     } catch (error) {
       console.error('Error creating file from data:', error);
       return null;
+    }
+  };
+
+  const getBase64FromData = async (): Promise<string | null> => {
+    if (!imageData) return null;
+
+    try {
+      // If already base64 (no prefix), return as-is
+      if (!imageData.startsWith('blob:') && !imageData.startsWith('data:')) {
+        return imageData;
+      }
+
+      // Convert blob or data URL to base64
+      const file = await getFileFromData();
+      if (!file) return null;
+
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const result = reader.result as string;
+          // Return with data URL prefix for the edge function
+          resolve(result);
+        };
+        reader.readAsDataURL(file);
+      });
+    } catch (error) {
+      console.error('Error converting to base64:', error);
+      return null;
+    }
+  };
+
+  const handleCloudShare = async () => {
+    setIsUploading(true);
+
+    try {
+      const base64Data = await getBase64FromData();
+      if (!base64Data) {
+        throw new Error('Could not prepare file for upload');
+      }
+
+      const file = await getFileFromData();
+      const fileSize = file?.size || 0;
+
+      const { data, error } = await supabase.functions.invoke('upload-shared-file', {
+        body: {
+          fileData: base64Data,
+          fileName,
+          fileType: getMimeType(),
+          fileSize,
+        },
+      });
+
+      if (error) throw error;
+
+      if (data.shareUrl) {
+        // Copy share URL to clipboard
+        await navigator.clipboard.writeText(data.shareUrl);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 3000);
+
+        toast({
+          title: "Share Link Created!",
+          description: "Link copied to clipboard. Expires in 7 days.",
+        });
+      }
+    } catch (error: any) {
+      console.error('Cloud share error:', error);
+      toast({
+        title: "Upload Failed",
+        description: error.message || "Could not create share link. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -154,27 +231,6 @@ export const ShareButton = ({
     }
   };
 
-  const handleCopyLink = async () => {
-    // For now, just copy a generic message since we don't have hosted URLs
-    const message = `I just compressed ${isVideo ? 'a video' : 'an image'} with Pixelsqueeze! Check it out at pixelsqueeze.lovable.app`;
-    
-    try {
-      await navigator.clipboard.writeText(message);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-      toast({
-        title: "Link Copied!",
-        description: "Share message copied to clipboard",
-      });
-    } catch (error) {
-      toast({
-        title: "Copy Failed",
-        description: "Could not copy to clipboard",
-        variant: "destructive",
-      });
-    }
-  };
-
   // Check if native share is available
   const hasNativeShare = typeof navigator !== 'undefined' && 'share' in navigator;
 
@@ -183,12 +239,23 @@ export const ShareButton = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button size={size} variant={variant} className={className}>
-          {copied ? <Check className="w-4 h-4 mr-2" /> : <Share2 className="w-4 h-4 mr-2" />}
-          {copied ? 'Copied!' : 'Share'}
+        <Button size={size} variant={variant} className={className} disabled={isUploading}>
+          {isUploading ? (
+            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+          ) : copied ? (
+            <Check className="w-4 h-4 mr-2" />
+          ) : (
+            <Share2 className="w-4 h-4 mr-2" />
+          )}
+          {isUploading ? 'Uploading...' : copied ? 'Copied!' : 'Share'}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
+        <DropdownMenuItem onClick={handleCloudShare} disabled={isUploading}>
+          <Cloud className="w-4 h-4 mr-2" />
+          Create Share Link
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
         {hasNativeShare && (
           <DropdownMenuItem onClick={handleNativeShare}>
             <Share2 className="w-4 h-4 mr-2" />
@@ -198,10 +265,6 @@ export const ShareButton = ({
         <DropdownMenuItem onClick={handleCopyImage}>
           <Copy className="w-4 h-4 mr-2" />
           Copy {isVideo ? 'Video' : 'Image'}
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={handleCopyLink}>
-          <Link className="w-4 h-4 mr-2" />
-          Copy Share Link
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

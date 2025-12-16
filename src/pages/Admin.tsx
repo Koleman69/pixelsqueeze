@@ -1,12 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Download, ArrowLeft, Users, Shield, ShieldCheck, ShieldOff } from "lucide-react";
+import { Loader2, Download, ArrowLeft, Users, Shield, ShieldCheck, ShieldOff, Search, X } from "lucide-react";
 import * as XLSX from "xlsx";
 
 interface UserData {
@@ -30,8 +31,19 @@ const Admin = () => {
   const [isExporting, setIsExporting] = useState(false);
   const [updatingRole, setUpdatingRole] = useState<string | null>(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  const filteredUsers = useMemo(() => {
+    if (!searchQuery.trim()) return users;
+    const query = searchQuery.toLowerCase();
+    return users.filter(user => 
+      user.email?.toLowerCase().includes(query) ||
+      user.first_name?.toLowerCase().includes(query) ||
+      user.last_name?.toLowerCase().includes(query)
+    );
+  }, [users, searchQuery]);
 
   useEffect(() => {
     checkAdminAndLoadUsers();
@@ -262,9 +274,35 @@ const Admin = () => {
             </div>
           </CardHeader>
           <CardContent>
-            {users.length === 0 ? (
+            <div className="flex items-center gap-2 mb-4">
+              <div className="relative flex-1 max-w-sm">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search by name or email..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-9 pr-9"
+                />
+                {searchQuery && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
+                    onClick={() => setSearchQuery("")}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+              {searchQuery && (
+                <span className="text-sm text-muted-foreground">
+                  {filteredUsers.length} of {users.length} users
+                </span>
+              )}
+            </div>
+            {filteredUsers.length === 0 ? (
               <div className="text-center py-12 text-muted-foreground">
-                No users found
+                {searchQuery ? "No users match your search" : "No users found"}
               </div>
             ) : (
               <div className="rounded-md border">
@@ -280,7 +318,7 @@ const Admin = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {users.map((user) => {
+                    {filteredUsers.map((user) => {
                       const hasAdminRole = isUserAdmin(user.user_id);
                       const isCurrentUser = user.user_id === currentUserId;
                       

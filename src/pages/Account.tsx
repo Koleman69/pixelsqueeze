@@ -6,7 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useImageCompression } from "@/hooks/useImageCompression";
 import { useToast } from "@/hooks/use-toast";
 import { Link, useNavigate } from "react-router-dom";
-import { Loader2, CreditCard, Download, User, Mail, Calendar, Shield, ArrowLeft } from "lucide-react";
+import { Loader2, CreditCard, Download, User, Mail, Calendar, Shield, ArrowLeft, Settings } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 const Account = () => {
@@ -15,12 +15,25 @@ const Account = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     if (user) {
       checkSubscription();
+      checkAdminRole();
     }
   }, [user]);
+
+  const checkAdminRole = async () => {
+    if (!user) return;
+    const { data, error } = await supabase.rpc('has_role', { 
+      _user_id: user.id, 
+      _role: 'admin' 
+    });
+    if (!error && data) {
+      setIsAdmin(true);
+    }
+  };
 
   const handleManageSubscription = async () => {
     setLoading(true);
@@ -235,7 +248,17 @@ const Account = () => {
                 <CardTitle>Account Actions</CardTitle>
                 <CardDescription>Manage your account settings</CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="space-y-3">
+                {isAdmin && (
+                  <Button 
+                    onClick={() => navigate('/admin')}
+                    variant="outline"
+                    className="w-full"
+                  >
+                    <Settings className="w-4 h-4 mr-2" />
+                    Admin Panel
+                  </Button>
+                )}
                 <Button 
                   onClick={handleSignOut}
                   variant="outline"

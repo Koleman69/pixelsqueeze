@@ -36,6 +36,8 @@ export const ImageEditor = ({ onComplete }: ImageEditorProps) => {
   const [isAiProcessing, setIsAiProcessing] = useState(false);
   const [aiEditedImage, setAiEditedImage] = useState<string | null>(null);
   const [aiUsageCount, setAiUsageCount] = useState(0);
+  const [croppedPreview, setCroppedPreview] = useState<string | null>(null);
+  const [resizedPreview, setResizedPreview] = useState<string | null>(null);
   const { toast } = useToast();
   const { subscription, createCheckout } = useImageCompression();
 
@@ -50,6 +52,8 @@ export const ImageEditor = ({ onComplete }: ImageEditorProps) => {
     if (file) {
       setFileName(file.name);
       setAiEditedImage(null);
+      setCroppedPreview(null);
+      setResizedPreview(null);
       const reader = new FileReader();
       reader.onload = () => {
         setImageSrc(reader.result as string);
@@ -228,15 +232,11 @@ export const ImageEditor = ({ onComplete }: ImageEditorProps) => {
     try {
       const croppedImage = await getCroppedImg(imageSrc, croppedAreaPixels);
       const url = URL.createObjectURL(croppedImage);
-      
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `cropped_${fileName}`;
-      link.click();
+      setCroppedPreview(url);
 
       toast({
         title: "Image Cropped",
-        description: "Your cropped image has been downloaded",
+        description: "Preview ready! Click Download to save.",
       });
 
       if (onComplete) {
@@ -252,21 +252,29 @@ export const ImageEditor = ({ onComplete }: ImageEditorProps) => {
     }
   };
 
+  const handleDownloadCropped = () => {
+    if (!croppedPreview) return;
+    const link = document.createElement('a');
+    link.href = croppedPreview;
+    link.download = `cropped_${fileName}`;
+    link.click();
+    toast({
+      title: "Download Complete",
+      description: "Your cropped image has been downloaded",
+    });
+  };
+
   const handleResize = async () => {
     if (!imageSrc) return;
 
     try {
       const resizedImage = await getResizedImg(imageSrc, customWidth, customHeight);
       const url = URL.createObjectURL(resizedImage);
-      
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `resized_${customWidth}x${customHeight}_${fileName}`;
-      link.click();
+      setResizedPreview(url);
 
       toast({
         title: "Image Resized",
-        description: `Image resized to ${customWidth}x${customHeight}px`,
+        description: `Preview ready at ${customWidth}x${customHeight}px! Click Download to save.`,
       });
 
       if (onComplete) {
@@ -280,6 +288,18 @@ export const ImageEditor = ({ onComplete }: ImageEditorProps) => {
         variant: "destructive",
       });
     }
+  };
+
+  const handleDownloadResized = () => {
+    if (!resizedPreview) return;
+    const link = document.createElement('a');
+    link.href = resizedPreview;
+    link.download = `resized_${customWidth}x${customHeight}_${fileName}`;
+    link.click();
+    toast({
+      title: "Download Complete",
+      description: "Your resized image has been downloaded",
+    });
   };
 
   const handleWidthChange = (value: number) => {
@@ -392,7 +412,7 @@ export const ImageEditor = ({ onComplete }: ImageEditorProps) => {
                   </Badge>
                 )}
               </Button>
-              <Button variant="outline" onClick={() => { setImageSrc(null); setAiEditedImage(null); }}>
+              <Button variant="outline" onClick={() => { setImageSrc(null); setAiEditedImage(null); setCroppedPreview(null); setResizedPreview(null); }}>
                 <Upload className="w-4 h-4 mr-2" />
                 Upload New Image
               </Button>
@@ -406,43 +426,87 @@ export const ImageEditor = ({ onComplete }: ImageEditorProps) => {
 
             {editorMode === 'crop' ? (
               <div className="space-y-4">
-                <div className="relative h-96 bg-black rounded-lg overflow-hidden">
-                  <Cropper
-                    image={imageSrc}
-                    crop={crop}
-                    zoom={zoom}
-                    aspect={undefined}
-                    onCropChange={setCrop}
-                    onCropComplete={onCropComplete}
-                    onZoomChange={setZoom}
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label>Zoom: {zoom.toFixed(1)}x</Label>
-                  <Slider
-                    value={[zoom]}
-                    onValueChange={([value]) => setZoom(value)}
-                    min={1}
-                    max={3}
-                    step={0.1}
-                  />
-                </div>
+                {/* Show before/after preview if cropped */}
+                {croppedPreview && imageSrc && (
+                  <div className="mb-4">
+                    <BeforeAfterSlider
+                      beforeImage={imageSrc}
+                      afterImage={croppedPreview}
+                      title="Cropped Image Preview"
+                      description="Slide to compare original vs cropped"
+                    />
+                    <Button onClick={handleDownloadCropped} className="w-full mt-4 bg-gradient-profit">
+                      <Download className="w-4 h-4 mr-2" />
+                      Download Cropped Image
+                    </Button>
+                  </div>
+                )}
 
-                <Button onClick={handleCrop} className="w-full">
-                  <Download className="w-4 h-4 mr-2" />
-                  Download Cropped Image
-                </Button>
+                {!croppedPreview && (
+                  <>
+                    <div className="relative h-96 bg-black rounded-lg overflow-hidden">
+                      <Cropper
+                        image={imageSrc}
+                        crop={crop}
+                        zoom={zoom}
+                        aspect={undefined}
+                        onCropChange={setCrop}
+                        onCropComplete={onCropComplete}
+                        onZoomChange={setZoom}
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label>Zoom: {zoom.toFixed(1)}x</Label>
+                      <Slider
+                        value={[zoom]}
+                        onValueChange={([value]) => setZoom(value)}
+                        min={1}
+                        max={3}
+                        step={0.1}
+                      />
+                    </div>
+
+                    <Button onClick={handleCrop} className="w-full">
+                      <Crop className="w-4 h-4 mr-2" />
+                      Apply Crop
+                    </Button>
+                  </>
+                )}
+
+                {croppedPreview && (
+                  <Button variant="outline" onClick={() => setCroppedPreview(null)} className="w-full">
+                    Adjust Crop Again
+                  </Button>
+                )}
               </div>
             ) : editorMode === 'resize' ? (
               <div className="space-y-4">
-                <div className="flex items-center justify-center bg-muted rounded-lg p-4">
-                  <img
-                    src={imageSrc}
-                    alt="Preview"
-                    className="max-h-96 object-contain"
-                  />
-                </div>
+                {/* Show before/after preview if resized */}
+                {resizedPreview && imageSrc && (
+                  <div className="mb-4">
+                    <BeforeAfterSlider
+                      beforeImage={imageSrc}
+                      afterImage={resizedPreview}
+                      title="Resized Image Preview"
+                      description={`Resized to ${customWidth}x${customHeight}px`}
+                    />
+                    <Button onClick={handleDownloadResized} className="w-full mt-4 bg-gradient-profit">
+                      <Download className="w-4 h-4 mr-2" />
+                      Download Resized Image
+                    </Button>
+                  </div>
+                )}
+
+                {!resizedPreview && (
+                  <div className="flex items-center justify-center bg-muted rounded-lg p-4">
+                    <img
+                      src={imageSrc}
+                      alt="Preview"
+                      className="max-h-96 object-contain"
+                    />
+                  </div>
+                )}
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
@@ -480,9 +544,9 @@ export const ImageEditor = ({ onComplete }: ImageEditorProps) => {
                   </Label>
                 </div>
 
-                <Button onClick={handleResize} className="w-full">
-                  <Download className="w-4 h-4 mr-2" />
-                  Download Resized Image ({customWidth}x{customHeight})
+                <Button onClick={() => { setResizedPreview(null); handleResize(); }} className="w-full">
+                  <Maximize2 className="w-4 h-4 mr-2" />
+                  {resizedPreview ? 'Resize Again' : `Resize to ${customWidth}x${customHeight}`}
                 </Button>
               </div>
             ) : (

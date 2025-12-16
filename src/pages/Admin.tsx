@@ -4,8 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Download, ArrowLeft, Users, Shield } from "lucide-react";
+import { Loader2, Download, ArrowLeft, Users, Shield, ShieldCheck, ShieldOff } from "lucide-react";
 import * as XLSX from "xlsx";
 
 interface UserData {
@@ -16,11 +17,19 @@ interface UserData {
   created_at: string;
 }
 
+interface UserRole {
+  user_id: string;
+  role: 'admin' | 'moderator' | 'user';
+}
+
 const Admin = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [users, setUsers] = useState<UserData[]>([]);
+  const [userRoles, setUserRoles] = useState<UserRole[]>([]);
   const [isExporting, setIsExporting] = useState(false);
+  const [updatingRole, setUpdatingRole] = useState<string | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -37,6 +46,8 @@ const Admin = () => {
         return;
       }
 
+      setCurrentUserId(user.id);
+
       // Check if user is admin using the has_role function
       const { data: roleData, error: roleError } = await supabase
         .rpc('has_role', { _user_id: user.id, _role: 'admin' });
@@ -49,15 +60,17 @@ const Admin = () => {
 
       setIsAdmin(true);
 
-      // Fetch all users using the admin function
-      const { data: usersData, error: usersError } = await supabase
-        .rpc('get_all_users_for_admin');
+      // Fetch all users and roles in parallel
+      const [usersResult, rolesResult] = await Promise.all([
+        supabase.rpc('get_all_users_for_admin'),
+        supabase.rpc('get_all_user_roles')
+      ]);
 
-      if (usersError) {
-        throw usersError;
-      }
+      if (usersResult.error) throw usersResult.error;
+      if (rolesResult.error) throw rolesResult.error;
 
-      setUsers(usersData || []);
+      setUsers(usersResult.data || []);
+      setUserRoles(rolesResult.data || []);
     } catch (error: any) {
       console.error("Error loading admin data:", error);
       toast({
@@ -70,6 +83,54 @@ const Admin = () => {
     }
   };
 
+  const isUserAdmin = (userId: string) => {
+    return userRoles.some(r => r.user_id === userId && r.role === 'admin');
+  };
+
+  const handleToggleAdminRole = async (userId: string) => {
+    setUpdatingRole(userId);
+    const hasAdminRole = isUserAdmin(userId);
+
+    try {
+      if (hasAdminRole) {
+        // Remove admin role
+        const { error } = await supabase.rpc('remove_user_role', {
+          target_user_id: userId,
+          target_role: 'admin'
+        });
+        if (error) throw error;
+        
+        setUserRoles(prev => prev.filter(r => !(r.user_id === userId && r.role === 'admin')));
+        toast({
+          title: "Role Removed",
+          description: "Admin role has been removed from the user.",
+        });
+      } else {
+        // Add admin role
+        const { error } = await supabase.rpc('add_user_role', {
+          target_user_id: userId,
+          target_role: 'admin'
+        });
+        if (error) throw error;
+        
+        setUserRoles(prev => [...prev, { user_id: userId, role: 'admin' }]);
+        toast({
+          title: "Role Added",
+          description: "Admin role has been assigned to the user.",
+        });
+      }
+    } catch (error: any) {
+      console.error("Error updating role:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update user role",
+        variant: "destructive",
+      });
+    } finally {
+      setUpdatingRole(null);
+    }
+  };
+
   const handleExportExcel = () => {
     setIsExporting(true);
 
@@ -79,6 +140,7 @@ const Admin = () => {
         "First Name": user.first_name || "",
         "Last Name": user.last_name || "",
         "Email": user.email || "",
+        "Admin": isUserAdmin(user.user_id) ? "Yes" : "No",
         "Signup Date & Time": user.created_at 
           ? new Date(user.created_at).toLocaleString()
           : ""
@@ -93,6 +155,7 @@ const Admin = () => {
         { wch: 20 }, // First Name
         { wch: 20 }, // Last Name
         { wch: 35 }, // Email
+        { wch: 10 }, // Admin
         { wch: 25 }, // Signup Date & Time
       ];
 
@@ -211,23 +274,62 @@ const Admin = () => {
                       <TableHead>First Name</TableHead>
                       <TableHead>Last Name</TableHead>
                       <TableHead>Email</TableHead>
+                      <TableHead>Role</TableHead>
                       <TableHead>Signup Date & Time</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {users.map((user) => (
-                      <TableRow key={user.user_id}>
-                        <TableCell>{user.first_name || "—"}</TableCell>
-                        <TableCell>{user.last_name || "—"}</TableCell>
-                        <TableCell>{user.email || "—"}</TableCell>
-                        <TableCell>
-                          {user.created_at 
-                            ? new Date(user.created_at).toLocaleString()
-                            : "—"
-                          }
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                    {users.map((user) => {
+                      const hasAdminRole = isUserAdmin(user.user_id);
+                      const isCurrentUser = user.user_id === currentUserId;
+                      
+                      return (
+                        <TableRow key={user.user_id}>
+                          <TableCell>{user.first_name || "—"}</TableCell>
+                          <TableCell>{user.last_name || "—"}</TableCell>
+                          <TableCell>{user.email || "—"}</TableCell>
+                          <TableCell>
+                            {hasAdminRole ? (
+                              <Badge variant="default" className="gap-1">
+                                <ShieldCheck className="h-3 w-3" />
+                                Admin
+                              </Badge>
+                            ) : (
+                              <Badge variant="secondary">User</Badge>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {user.created_at 
+                              ? new Date(user.created_at).toLocaleString()
+                              : "—"
+                            }
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <Button
+                              variant={hasAdminRole ? "destructive" : "outline"}
+                              size="sm"
+                              disabled={updatingRole === user.user_id || isCurrentUser}
+                              onClick={() => handleToggleAdminRole(user.user_id)}
+                            >
+                              {updatingRole === user.user_id ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : hasAdminRole ? (
+                                <>
+                                  <ShieldOff className="h-4 w-4 mr-1" />
+                                  Remove Admin
+                                </>
+                              ) : (
+                                <>
+                                  <ShieldCheck className="h-4 w-4 mr-1" />
+                                  Make Admin
+                                </>
+                              )}
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
                   </TableBody>
                 </Table>
               </div>

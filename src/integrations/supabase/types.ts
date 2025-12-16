@@ -366,9 +366,23 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      add_user_role: {
+        Args: {
+          target_role: Database["public"]["Enums"]["app_role"]
+          target_user_id: string
+        }
+        Returns: boolean
+      }
       count_subscriber_access_last_hour: {
         Args: { target_user_id?: string }
         Returns: number
+      }
+      get_all_user_roles: {
+        Args: never
+        Returns: {
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }[]
       }
       get_all_users_for_admin: {
         Args: never
@@ -431,6 +445,13 @@ export type Database = {
       }
       log_service_access: {
         Args: { operation: string; table_name: string; target_user_id?: string }
+        Returns: boolean
+      }
+      remove_user_role: {
+        Args: {
+          target_role: Database["public"]["Enums"]["app_role"]
+          target_user_id: string
+        }
         Returns: boolean
       }
       safe_deobfuscate_data: {

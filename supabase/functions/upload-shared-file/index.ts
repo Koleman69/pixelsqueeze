@@ -40,13 +40,21 @@ serve(async (req) => {
     logStep("User authenticated", { userId: user.id });
 
     // Parse request body
-    const { fileData, fileName, fileType, fileSize } = await req.json();
+    const { fileData, fileName, fileType, fileSize, expirationDays } = await req.json();
 
     if (!fileData || !fileName) {
       throw new Error("Missing required fields: fileData and fileName");
     }
 
-    logStep("Processing file", { fileName, fileType, fileSize });
+    // Calculate expiration date
+    let expiresAt: string | null = null;
+    if (expirationDays !== null && expirationDays !== undefined) {
+      const expDate = new Date();
+      expDate.setDate(expDate.getDate() + expirationDays);
+      expiresAt = expDate.toISOString();
+    }
+
+    logStep("Processing file", { fileName, fileType, fileSize, expirationDays, expiresAt });
 
     // Convert base64 to binary
     let binaryData: Uint8Array;
@@ -104,6 +112,7 @@ serve(async (req) => {
         file_path: filePath,
         file_size: fileSize || binaryData.length,
         file_type: fileType,
+        expires_at: expiresAt,
       })
       .select()
       .single();

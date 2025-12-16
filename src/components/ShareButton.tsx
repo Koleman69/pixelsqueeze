@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Share2, Check, Copy, Link, Cloud, Loader2 } from 'lucide-react';
+import { Share2, Check, Copy, Cloud, Loader2, Clock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import {
@@ -9,22 +9,32 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
+  DropdownMenuPortal,
 } from '@/components/ui/dropdown-menu';
 
 interface ShareButtonProps {
-  /** Base64 image data or blob URL */
   imageData?: string;
-  /** File name for the shared file */
   fileName?: string;
-  /** Whether this is a video */
   isVideo?: boolean;
-  /** Optional size variant */
   size?: 'sm' | 'default' | 'lg' | 'icon';
-  /** Optional variant */
   variant?: 'default' | 'outline' | 'secondary' | 'ghost';
-  /** Optional className */
   className?: string;
 }
+
+type ExpirationOption = {
+  label: string;
+  days: number | null;
+};
+
+const EXPIRATION_OPTIONS: ExpirationOption[] = [
+  { label: '1 day', days: 1 },
+  { label: '7 days', days: 7 },
+  { label: '30 days', days: 30 },
+  { label: 'Never', days: null },
+];
 
 export const ShareButton = ({
   imageData,
@@ -53,18 +63,13 @@ export const ShareButton = ({
     try {
       let blob: Blob;
 
-      // Check if it's a blob URL
       if (imageData.startsWith('blob:')) {
         const response = await fetch(imageData);
         blob = await response.blob();
-      }
-      // Check if it's a data URL
-      else if (imageData.startsWith('data:')) {
+      } else if (imageData.startsWith('data:')) {
         const response = await fetch(imageData);
         blob = await response.blob();
-      }
-      // Assume it's base64 without prefix
-      else {
+      } else {
         const mimeType = getMimeType();
         const binaryData = atob(imageData);
         const bytes = new Uint8Array(binaryData.length);
@@ -74,7 +79,6 @@ export const ShareButton = ({
         blob = new Blob([bytes], { type: mimeType });
       }
 
-      const ext = isVideo ? 'mp4' : fileName.split('.').pop() || 'jpg';
       return new File([blob], `${fileName}`, { type: blob.type || getMimeType() });
     } catch (error) {
       console.error('Error creating file from data:', error);
@@ -86,12 +90,10 @@ export const ShareButton = ({
     if (!imageData) return null;
 
     try {
-      // If already base64 (no prefix), return as-is
       if (!imageData.startsWith('blob:') && !imageData.startsWith('data:')) {
         return imageData;
       }
 
-      // Convert blob or data URL to base64
       const file = await getFileFromData();
       if (!file) return null;
 
@@ -99,7 +101,6 @@ export const ShareButton = ({
         const reader = new FileReader();
         reader.onloadend = () => {
           const result = reader.result as string;
-          // Return with data URL prefix for the edge function
           resolve(result);
         };
         reader.readAsDataURL(file);
@@ -110,7 +111,7 @@ export const ShareButton = ({
     }
   };
 
-  const handleCloudShare = async () => {
+  const handleCloudShare = async (expirationDays: number | null) => {
     setIsUploading(true);
 
     try {
@@ -128,20 +129,24 @@ export const ShareButton = ({
           fileName,
           fileType: getMimeType(),
           fileSize,
+          expirationDays,
         },
       });
 
       if (error) throw error;
 
       if (data.shareUrl) {
-        // Copy share URL to clipboard
         await navigator.clipboard.writeText(data.shareUrl);
         setCopied(true);
         setTimeout(() => setCopied(false), 3000);
 
+        const expirationText = expirationDays === null 
+          ? "Link never expires." 
+          : `Expires in ${expirationDays} day${expirationDays > 1 ? 's' : ''}.`;
+
         toast({
           title: "Share Link Created!",
-          description: "Link copied to clipboard. Expires in 7 days.",
+          description: `Link copied to clipboard. ${expirationText}`,
         });
       }
     } catch (error: any) {
@@ -168,7 +173,6 @@ export const ShareButton = ({
       return;
     }
 
-    // Check if Web Share API is available and supports files
     if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
       try {
         await navigator.share({
@@ -191,7 +195,6 @@ export const ShareButton = ({
         }
       }
     } else {
-      // Fallback: copy image to clipboard
       await handleCopyImage();
     }
   };
@@ -203,7 +206,6 @@ export const ShareButton = ({
       const file = await getFileFromData();
       if (!file) throw new Error('Could not create file');
 
-      // Try to copy image to clipboard
       if (navigator.clipboard && 'write' in navigator.clipboard) {
         const blob = file.slice(0, file.size, file.type);
         await navigator.clipboard.write([
@@ -222,7 +224,6 @@ export const ShareButton = ({
       }
     } catch (error) {
       console.error('Copy failed:', error);
-      // Fallback: download the file
       toast({
         title: "Copy not supported",
         description: "Your browser doesn't support copying images. Use download instead.",
@@ -231,7 +232,6 @@ export const ShareButton = ({
     }
   };
 
-  // Check if native share is available
   const hasNativeShare = typeof navigator !== 'undefined' && 'share' in navigator;
 
   if (!imageData) return null;
@@ -251,10 +251,25 @@ export const ShareButton = ({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={handleCloudShare} disabled={isUploading}>
-          <Cloud className="w-4 h-4 mr-2" />
-          Create Share Link
-        </DropdownMenuItem>
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger disabled={isUploading}>
+            <Cloud className="w-4 h-4 mr-2" />
+            Create Share Link
+          </DropdownMenuSubTrigger>
+          <DropdownMenuPortal>
+            <DropdownMenuSubContent>
+              {EXPIRATION_OPTIONS.map((option) => (
+                <DropdownMenuItem 
+                  key={option.label} 
+                  onClick={() => handleCloudShare(option.days)}
+                >
+                  <Clock className="w-4 h-4 mr-2" />
+                  {option.label}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuSubContent>
+          </DropdownMenuPortal>
+        </DropdownMenuSub>
         <DropdownMenuSeparator />
         {hasNativeShare && (
           <DropdownMenuItem onClick={handleNativeShare}>

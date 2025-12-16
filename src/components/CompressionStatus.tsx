@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, AlertCircle, XCircle, Download, Eye } from "lucide-react";
 import { BeforeAfterSlider } from "@/components/BeforeAfterSlider";
+import { ShareButton } from "@/components/ShareButton";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -168,6 +169,10 @@ export const CompressionStatus = ({
               <Download className="w-4 h-4 mr-2" />
               Download
             </Button>
+            <ShareButton 
+              imageData={compressedImage}
+              fileName={fileName}
+            />
           </div>
         </>
       )}

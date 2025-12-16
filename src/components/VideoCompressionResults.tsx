@@ -6,6 +6,7 @@ import { Progress } from '@/components/ui/progress';
 import { Download, Video, CheckCircle, XCircle, Loader2, Pause, Play, X, Ban, Eye, FileText } from 'lucide-react';
 import { VideoCompressionResult } from '@/hooks/useVideoCompression';
 import { VideoComparison } from './VideoComparison';
+import { ShareButton } from './ShareButton';
 
 interface VideoCompressionResultsProps {
   compressions: VideoCompressionResult[];
@@ -190,6 +191,11 @@ export const VideoCompressionResults = ({ compressions, onDownload, onPause, onR
                         <Eye className="w-4 h-4 mr-2" />
                         Compare
                       </Button>
+                      <ShareButton 
+                        imageData={compression.compressedUrl}
+                        fileName={compression.fileName}
+                        isVideo={true}
+                      />
                       <Button 
                         size="sm" 
                         onClick={() => onDownload(compression.id)}

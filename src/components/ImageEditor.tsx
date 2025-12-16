@@ -14,6 +14,7 @@ import { useImageCompression } from '@/hooks/useImageCompression';
 import Cropper from 'react-easy-crop';
 import { Point, Area } from 'react-easy-crop';
 import { BeforeAfterSlider } from './BeforeAfterSlider';
+import { ShareButton } from './ShareButton';
 
 interface ImageEditorProps {
   onComplete?: (blob: Blob, fileName: string) => void;
@@ -435,10 +436,16 @@ export const ImageEditor = ({ onComplete }: ImageEditorProps) => {
                       title="Cropped Image Preview"
                       description="Slide to compare original vs cropped"
                     />
-                    <Button onClick={handleDownloadCropped} className="w-full mt-4 bg-gradient-profit">
-                      <Download className="w-4 h-4 mr-2" />
-                      Download Cropped Image
-                    </Button>
+                    <div className="flex gap-2 mt-4">
+                      <Button onClick={handleDownloadCropped} className="flex-1 bg-gradient-profit">
+                        <Download className="w-4 h-4 mr-2" />
+                        Download
+                      </Button>
+                      <ShareButton 
+                        imageData={croppedPreview}
+                        fileName={`cropped_${fileName}`}
+                      />
+                    </div>
                   </div>
                 )}
 
@@ -491,10 +498,16 @@ export const ImageEditor = ({ onComplete }: ImageEditorProps) => {
                       title="Resized Image Preview"
                       description={`Resized to ${customWidth}x${customHeight}px`}
                     />
-                    <Button onClick={handleDownloadResized} className="w-full mt-4 bg-gradient-profit">
-                      <Download className="w-4 h-4 mr-2" />
-                      Download Resized Image
-                    </Button>
+                    <div className="flex gap-2 mt-4">
+                      <Button onClick={handleDownloadResized} className="flex-1 bg-gradient-profit">
+                        <Download className="w-4 h-4 mr-2" />
+                        Download
+                      </Button>
+                      <ShareButton 
+                        imageData={resizedPreview}
+                        fileName={`resized_${customWidth}x${customHeight}_${fileName}`}
+                      />
+                    </div>
                   </div>
                 )}
 
@@ -616,10 +629,16 @@ export const ImageEditor = ({ onComplete }: ImageEditorProps) => {
                   </Button>
                   
                   {aiEditedImage && (
-                    <Button onClick={handleDownloadAiEdit} variant="outline">
-                      <Download className="w-4 h-4 mr-2" />
-                      Download
-                    </Button>
+                    <>
+                      <Button onClick={handleDownloadAiEdit} variant="outline">
+                        <Download className="w-4 h-4 mr-2" />
+                        Download
+                      </Button>
+                      <ShareButton 
+                        imageData={aiEditedImage}
+                        fileName={`ai_edited_${fileName}`}
+                      />
+                    </>
                   )}
                 </div>
               </div>

@@ -193,10 +193,15 @@ const Index = () => {
               </Button>
             )}
             {!subscription.subscribed && (
-              <Button size="lg" className="bg-gradient-profit text-profit-foreground shadow-profit hover:opacity-90 px-8 py-3" onClick={createCheckout}>
-                <Crown className="w-5 h-5 mr-2" />
-                Upgrade to Pro
-              </Button>
+              <div className="flex flex-col items-center gap-2">
+                <Button size="lg" className="bg-gradient-profit text-profit-foreground shadow-profit hover:opacity-90 px-8 py-3" onClick={createCheckout}>
+                  <Crown className="w-5 h-5 mr-2" />
+                  Start 7-Day Free Trial
+                </Button>
+                <p className="text-sm text-muted-foreground">
+                  Try Pro free for 7 days. Cancel anytime.
+                </p>
+              </div>
             )}
           </div>
           

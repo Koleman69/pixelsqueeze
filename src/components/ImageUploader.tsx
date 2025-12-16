@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { Settings, Upload, Crown, Download, Zap, Image, Video, Volume2, VolumeX, Smartphone, Globe, Archive, SlidersHorizontal, Save, Star, Trash2, Plus, FileUp, FileDown } from 'lucide-react';
+import { Settings, Upload, Crown, Download, Zap, Image, Video, Volume2, VolumeX, Smartphone, Globe, Archive, SlidersHorizontal, Save, Star, Trash2, Plus, FileUp, FileDown, Clock } from 'lucide-react';
 import { CompressionSettings, useImageCompression } from '@/hooks/useImageCompression';
 import { useVideoCompression, VideoCompressionSettings, VideoOutputFormat } from '@/hooks/useVideoCompression';
 import { VideoCompressionResults } from '@/components/VideoCompressionResults';
@@ -482,14 +482,28 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
         <div className="flex items-center justify-center gap-4">
           
           {subscription.subscribed ? (
-            <div className="flex items-center gap-2">
-              <Badge variant="default" className="bg-gradient-primary">
-                <Crown className="w-3 h-3 mr-1" />
-                Pro User
-              </Badge>
-              <Button variant="outline" size="sm" onClick={openCustomerPortal}>
-                Manage Subscription
-              </Button>
+            <div className="flex flex-col items-center gap-2">
+              <div className="flex items-center gap-2">
+                {subscription.is_trialing ? (
+                  <Badge variant="outline" className="border-primary text-primary">
+                    <Clock className="w-3 h-3 mr-1" />
+                    7-Day Free Trial
+                  </Badge>
+                ) : (
+                  <Badge variant="default" className="bg-gradient-primary">
+                    <Crown className="w-3 h-3 mr-1" />
+                    Pro User
+                  </Badge>
+                )}
+                <Button variant="outline" size="sm" onClick={openCustomerPortal}>
+                  Manage Subscription
+                </Button>
+              </div>
+              {subscription.is_trialing && subscription.trial_end && (
+                <p className="text-xs text-muted-foreground">
+                  Trial ends {new Date(subscription.trial_end).toLocaleDateString()} - Your card will be charged automatically
+                </p>
+              )}
             </div>
           ) : (
             <div className="flex flex-col items-center gap-2">
@@ -498,8 +512,11 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
               </Badge>
               <Button onClick={createCheckout} className="bg-gradient-primary">
                 <Crown className="w-4 h-4 mr-2" />
-                Upgrade to Pro - $6.95/month
+                Start 7-Day Free Trial
               </Button>
+              <p className="text-xs text-muted-foreground text-center max-w-xs">
+                Try Pro free for 7 days. Card required. Cancel anytime before trial ends to avoid charges.
+              </p>
             </div>
           )}
         </div>

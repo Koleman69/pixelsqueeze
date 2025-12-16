@@ -25,6 +25,8 @@ export interface CompressionResult {
 
 export interface SubscriptionStatus {
   subscribed: boolean;
+  is_trialing?: boolean;
+  trial_end?: string;
   product_id?: string;
   subscription_end?: string;
   free_compressions_used?: number;

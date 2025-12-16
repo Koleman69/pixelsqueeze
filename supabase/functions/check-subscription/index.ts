@@ -57,31 +57,55 @@ serve(async (req) => {
     const customerId = customers.data[0].id;
     logStep("Found Stripe customer", { customerId });
 
+    // Check for both active and trialing subscriptions
     const subscriptions = await stripe.subscriptions.list({
       customer: customerId,
-      status: "active",
       limit: 1,
     });
-    const hasActiveSub = subscriptions.data.length > 0;
+    
+    // Filter for active or trialing status
+    const validSubscription = subscriptions.data.find(
+      sub => sub.status === 'active' || sub.status === 'trialing'
+    );
+    
+    const hasValidSub = !!validSubscription;
     let productId = null;
     let subscriptionEnd = null;
+    let isTrialing = false;
+    let trialEnd = null;
 
-    if (hasActiveSub) {
-      const subscription = subscriptions.data[0];
+    if (hasValidSub) {
+      const subscription = validSubscription;
+      isTrialing = subscription.status === 'trialing';
+      
       // Safely handle the subscription end date
       const periodEnd = subscription.current_period_end;
       if (periodEnd && typeof periodEnd === 'number' && periodEnd > 0) {
         subscriptionEnd = new Date(periodEnd * 1000).toISOString();
       }
-      logStep("Active subscription found", { subscriptionId: subscription.id, endDate: subscriptionEnd, rawPeriodEnd: periodEnd });
+      
+      // Get trial end date if in trial
+      if (isTrialing && subscription.trial_end) {
+        trialEnd = new Date(subscription.trial_end * 1000).toISOString();
+      }
+      
+      logStep("Valid subscription found", { 
+        subscriptionId: subscription.id, 
+        status: subscription.status,
+        isTrialing,
+        trialEnd,
+        endDate: subscriptionEnd 
+      });
       productId = subscription.items.data[0]?.price?.product || null;
       logStep("Determined subscription tier", { productId });
     } else {
-      logStep("No active subscription found");
+      logStep("No active or trialing subscription found");
     }
 
     return new Response(JSON.stringify({
-      subscribed: hasActiveSub,
+      subscribed: hasValidSub,
+      is_trialing: isTrialing,
+      trial_end: trialEnd,
       product_id: productId,
       subscription_end: subscriptionEnd
     }), {

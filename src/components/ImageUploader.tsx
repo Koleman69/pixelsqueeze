@@ -473,13 +473,13 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
     <Card className="p-6">
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-bold">Media Compression Studio</h2>
-            <p className="text-muted-foreground">
-              Compress your images and videos with advanced settings
-            </p>
-          </div>
+        <div className="flex flex-col items-center text-center mb-4">
+          <h2 className="section-title">Media Compression Studio</h2>
+          <p className="section-subtitle">
+            Compress your images and videos with advanced settings
+          </p>
+        </div>
+        <div className="flex items-center justify-center gap-4">
           
           {subscription.subscribed ? (
             <div className="flex items-center gap-2">
@@ -492,7 +492,7 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
               </Button>
             </div>
           ) : (
-            <div className="flex flex-col items-end gap-2">
+            <div className="flex flex-col items-center gap-2">
               <Badge variant="outline" className="text-xs">
                 {subscription.free_compressions_used || 0}/3 Free Compressions Used
               </Badge>
@@ -506,7 +506,7 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
 
         {/* Media Type Tabs */}
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'image' | 'video')}>
-          <TabsList className="grid w-full grid-cols-2 max-w-xs">
+          <TabsList className="grid w-full grid-cols-2 max-w-xs mx-auto">
             <TabsTrigger value="image" className="flex items-center gap-2">
               <Image className="w-4 h-4" />
               Images

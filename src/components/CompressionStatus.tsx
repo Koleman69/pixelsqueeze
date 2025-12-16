@@ -189,7 +189,17 @@ export const CompressionStatus = ({
           <div className="text-destructive text-sm">
             {error || 'Compression failed. Please try again.'}
           </div>
-          <Button size="sm" variant="outline" className="w-full">
+          <Button 
+            size="sm" 
+            variant="outline" 
+            className="w-full"
+            onClick={() => {
+              toast({
+                title: "Retry",
+                description: "Please upload the file again to retry compression",
+              });
+            }}
+          >
             Try Again
           </Button>
         </div>

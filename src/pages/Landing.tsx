@@ -735,6 +735,7 @@ const Landing = () => {
             <div className="flex gap-6 text-muted-foreground">
               <Link to="/blog" className="hover:text-foreground transition-colors">Blog</Link>
               <Link to="/company" className="hover:text-foreground transition-colors">Company</Link>
+              <Link to="/privacy" className="hover:text-foreground transition-colors">Privacy Policy</Link>
               <Link to="/auth" className="hover:text-foreground transition-colors">Sign In</Link>
             </div>
             <p className="text-sm text-muted-foreground">

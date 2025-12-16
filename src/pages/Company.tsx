@@ -150,6 +150,10 @@ const Company = () => {
 
         <footer className="border-t border-border/40 mt-16">
           <div className="container mx-auto px-4 py-8 text-center text-muted-foreground">
+            <div className="flex justify-center gap-6 mb-4">
+              <Link to="/privacy" className="hover:text-foreground transition-colors">Privacy Policy</Link>
+              <Link to="/blog" className="hover:text-foreground transition-colors">Blog</Link>
+            </div>
             <p>&copy; {new Date().getFullYear()} Pixelsqueeze LLC. All rights reserved.</p>
             <p className="mt-2">San Antonio, TX</p>
           </div>

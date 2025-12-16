@@ -213,17 +213,17 @@ const Index = () => {
       </section>
 
       {/* AI Transformation Showcase */}
-      <section className="py-20 px-6 bg-gradient-to-b from-secondary/20 to-background">
+      <section className="section-padding bg-gradient-to-b from-secondary/20 to-background">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
             <Badge variant="outline" className="mb-4 px-4 py-2 border-primary text-primary">
               <Zap className="w-4 h-4 mr-2" />
               AI-Powered Transformations
             </Badge>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+            <h2 className="section-title">
               See the Magic in Action
             </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            <p className="section-subtitle !mb-8">
               Transform blurry, imperfect images into crystal-clear masterpieces with our AI-powered editing tools. 
               Slide to reveal the stunning difference.
             </p>
@@ -245,32 +245,33 @@ const Index = () => {
             />
           </div>
 
-          <div className="text-center mt-12 mb-8">
-            <p className="text-lg font-semibold mb-4">{isUploading ? 'Processing your images...' : 'Try it with your own photos below!'}</p>
+          <div className="text-center mt-12">
+            <p className="text-lg font-semibold">{isUploading ? 'Processing your images...' : 'Try it with your own photos below!'}</p>
           </div>
         </div>
       </section>
 
       {/* Image Upload Studio */}
-      <section className="py-16 px-6">
+      <section className="section-padding">
         <div className="max-w-4xl mx-auto">
           <ImageUploader />
         </div>
       </section>
 
       {/* Image Editor */}
-      <section className="py-16 px-6 bg-secondary/20">
+      <section className="section-padding bg-secondary/20">
         <div className="max-w-4xl mx-auto">
           <ImageEditor />
         </div>
       </section>
 
       {/* Stats Overview */}
-      <section className="py-16 px-6 bg-secondary/20">
+      <section className="section-padding bg-secondary/20">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl font-bold mb-8 text-center">Your Compression Stats</h2>
+          <h2 className="section-title">Your Compression Stats</h2>
+          <p className="section-subtitle">Track your image optimization performance over time</p>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <StatsCard
               title="Files Processed"
               value="2,847"
@@ -304,17 +305,11 @@ const Index = () => {
       </section>
 
       {/* Recent Compressions */}
-      <section className="py-16 px-6 bg-secondary/20">
+      <section className="section-padding bg-secondary/20">
         <div className="max-w-7xl mx-auto">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h2 className="text-3xl font-bold mb-2">Recent Compressions</h2>
-              <p className="text-muted-foreground">Your latest image optimization results</p>
-            </div>
-            <Badge variant="outline" className="border-profit text-profit px-4 py-2">
-              <Target className="w-4 h-4 mr-2" />
-              3 Processing
-            </Badge>
+          <div className="text-center mb-12">
+            <h2 className="section-title">Recent Compressions</h2>
+            <p className="section-subtitle !mb-8">Your latest image optimization results</p>
           </div>
           
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -332,10 +327,10 @@ const Index = () => {
       </section>
 
       {/* Testimonials */}
-      <section className="py-16 px-6">
+      <section className="section-padding">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl font-bold mb-4 text-center">What Our Users Say</h2>
-          <p className="text-muted-foreground text-center mb-12 max-w-2xl mx-auto">
+          <h2 className="section-title">What Our Users Say</h2>
+          <p className="section-subtitle">
             Join thousands of satisfied users who trust Pixelsqueeze for their image compression needs
           </p>
           
@@ -464,9 +459,10 @@ const Index = () => {
       </section>
 
       {/* Features */}
-      <section className="py-16 px-6 bg-secondary/20">
+      <section className="section-padding bg-secondary/20">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl font-bold mb-12 text-center">Why Choose Pixelsqueeze</h2>
+          <h2 className="section-title">Why Choose Pixelsqueeze</h2>
+          <p className="section-subtitle">Professional-grade tools for all your image optimization needs</p>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <Card className="p-6 text-center">
@@ -503,25 +499,23 @@ const Index = () => {
       </section>
 
       {/* Analytics Section */}
-      <section className="py-16 px-6">
+      <section className="section-padding">
         <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Compression Performance</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Track your compression efficiency and storage savings over time with detailed analytics.
-            </p>
-          </div>
+          <h2 className="section-title">Compression Performance</h2>
+          <p className="section-subtitle">
+            Track your compression efficiency and storage savings over time with detailed analytics
+          </p>
           
           <CompressionResults data={compressionData} />
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 px-6">
+      <section className="section-padding">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-bold mb-6">Ready to Optimize Your Images?</h2>
-          <p className="text-xl text-muted-foreground mb-8">
-            Start compressing your images today and experience the perfect balance of quality and file size reduction.
+          <h2 className="section-title">Ready to Optimize Your Images?</h2>
+          <p className="section-subtitle !mb-8">
+            Start compressing your images today and experience the perfect balance of quality and file size reduction
           </p>
           
           <Button size="lg" className="bg-gradient-profit text-profit-foreground shadow-profit hover:opacity-90 px-8 py-4 text-lg" onClick={subscription.subscribed ? handleFileUpload : createCheckout}>

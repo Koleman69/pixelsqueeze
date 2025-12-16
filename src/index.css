@@ -202,4 +202,17 @@
   .nav-blur {
     @apply backdrop-blur-xl bg-background/80;
   }
+
+  /* Consistent Section Headings */
+  .section-title {
+    @apply text-3xl md:text-4xl font-bold text-center mb-4;
+  }
+
+  .section-subtitle {
+    @apply text-lg md:text-xl text-muted-foreground text-center max-w-2xl mx-auto mb-12;
+  }
+
+  .section-padding {
+    @apply py-16 md:py-20 px-6;
+  }
 }

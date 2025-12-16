@@ -196,6 +196,48 @@ export type Database = {
         }
         Relationships: []
       }
+      shared_files: {
+        Row: {
+          created_at: string | null
+          download_count: number | null
+          expires_at: string | null
+          file_name: string
+          file_path: string
+          file_size: number | null
+          file_type: string | null
+          id: string
+          share_code: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          download_count?: number | null
+          expires_at?: string | null
+          file_name: string
+          file_path: string
+          file_size?: number | null
+          file_type?: string | null
+          id?: string
+          share_code?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          download_count?: number | null
+          expires_at?: string | null
+          file_name?: string
+          file_path?: string
+          file_size?: number | null
+          file_type?: string | null
+          id?: string
+          share_code?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       subscriber_audit_log: {
         Row: {
           accessed_at: string

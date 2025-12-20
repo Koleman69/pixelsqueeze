@@ -26,6 +26,7 @@ import {
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { BeforeAfterSlider } from "@/components/BeforeAfterSlider";
+import InstallBanner from "@/components/InstallBanner";
 import weddingBefore from "@/assets/wedding-before.jpg";
 import weddingAfter from "@/assets/wedding-after.jpg";
 import manBefore from "@/assets/man-before.jpg";
@@ -751,6 +752,9 @@ const Landing = () => {
           </div>
         </div>
       </footer>
+      
+      {/* Mobile Install Banner */}
+      <InstallBanner />
     </div>
   );
 };

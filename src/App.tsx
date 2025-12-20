@@ -20,6 +20,7 @@ const SharedFile = lazy(() => import("./pages/SharedFile"));
 const Admin = lazy(() => import("./pages/Admin"));
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 const Install = lazy(() => import("./pages/Install"));
+const Promote = lazy(() => import("./pages/Promote"));
 
 const queryClient = new QueryClient();
 
@@ -99,6 +100,7 @@ const App = () => (
               <Route path="/company" element={<Company />} />
               <Route path="/privacy" element={<PrivacyPolicy />} />
               <Route path="/install" element={<Install />} />
+              <Route path="/promote" element={<Promote />} />
               <Route path="/share/:shareCode" element={<SharedFile />} />
               <Route path="/account" element={
                 <ProtectedRoute>

@@ -21,7 +21,8 @@ import {
   Star,
   Quote,
   HelpCircle,
-  Download
+  Download,
+  Gift
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
@@ -162,6 +163,12 @@ const Landing = () => {
             </span>
           </div>
           <div className="flex items-center gap-2 sm:gap-4">
+            <Link to="/promote" className="hidden sm:block">
+              <Button variant="ghost" size="sm">
+                <Gift className="w-4 h-4 mr-2" />
+                Promote
+              </Button>
+            </Link>
             <Link to="/install" className="hidden sm:block">
               <Button variant="ghost" size="sm">
                 <Download className="w-4 h-4 mr-2" />

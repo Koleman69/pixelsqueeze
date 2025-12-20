@@ -20,7 +20,8 @@ import {
   ArrowRight,
   Star,
   Quote,
-  HelpCircle
+  HelpCircle,
+  Download
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
@@ -159,11 +160,17 @@ const Landing = () => {
               Pixelsqueeze
             </span>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
+            <Link to="/install" className="hidden sm:block">
+              <Button variant="ghost" size="sm">
+                <Download className="w-4 h-4 mr-2" />
+                Install App
+              </Button>
+            </Link>
             <Link to="/blog">
               <Button variant="ghost" size="sm">Blog</Button>
             </Link>
-            <Link to="/company">
+            <Link to="/company" className="hidden sm:block">
               <Button variant="ghost" size="sm">Company</Button>
             </Link>
             <Link to="/auth">

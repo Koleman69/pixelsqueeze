@@ -16,6 +16,7 @@ import NotFound from "./pages/NotFound";
 import SharedFile from "./pages/SharedFile";
 import Admin from "./pages/Admin";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import Install from "./pages/Install";
 
 const queryClient = new QueryClient();
 
@@ -86,6 +87,7 @@ const App = () => (
             <Route path="/blog/:articleId" element={<BlogArticle />} />
             <Route path="/company" element={<Company />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/install" element={<Install />} />
             <Route path="/share/:shareCode" element={<SharedFile />} />
             <Route path="/account" element={
               <ProtectedRoute>

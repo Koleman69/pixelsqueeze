@@ -370,6 +370,16 @@ export const ImageEditor = ({ onComplete }: ImageEditorProps) => {
                   title="Your Photo Transformation"
                   description="Slide to see the AI-powered enhancement"
                 />
+                <div className="flex gap-2 mt-4">
+                  <Button onClick={handleDownloadAiEdit} className="flex-1 bg-gradient-profit">
+                    <Download className="w-4 h-4 mr-2" />
+                    Download Enhanced Photo
+                  </Button>
+                  <ShareButton 
+                    imageData={aiEditedImage}
+                    fileName={`ai_edited_${fileName}`}
+                  />
+                </div>
               </div>
             )}
 

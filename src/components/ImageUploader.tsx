@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { Settings, Upload, Crown, Download, Zap, Image, Video, Volume2, VolumeX, Smartphone, Globe, Archive, SlidersHorizontal, Save, Star, Trash2, Plus, FileUp, FileDown, Clock } from 'lucide-react';
+import { Settings, Upload, Crown, Download, Zap, Image, Video, Volume2, VolumeX, Smartphone, Globe, Archive, SlidersHorizontal, Save, Star, Trash2, Plus, FileUp, FileDown, Clock, Camera } from 'lucide-react';
 import { CompressionSettings, useImageCompression } from '@/hooks/useImageCompression';
 import { useVideoCompression, VideoCompressionSettings, VideoOutputFormat } from '@/hooks/useVideoCompression';
 import { VideoCompressionResults } from '@/components/VideoCompressionResults';
@@ -24,6 +24,7 @@ interface ImageUploaderProps {
 
 export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
   const [activeTab, setActiveTab] = useState<'image' | 'video'>('image');
   const [settings, setSettings] = useState<CompressionSettings>({
@@ -633,12 +634,11 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
 
             {/* Image Upload Area */}
             <div 
-              className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-all ${
+              className={`border-2 border-dashed rounded-lg p-8 text-center transition-all ${
                 isDragging 
                   ? 'border-primary bg-primary/5 scale-[1.02]' 
                   : 'border-border hover:border-primary'
               }`}
-              onClick={handleFileSelect}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={(e) => handleDrop(e, 'image')}
@@ -650,9 +650,31 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
               <p className="text-muted-foreground mb-4">
                 {isUploading 
                   ? `Compressing ${selectedFiles?.length || 0} image(s)...` 
-                  : 'Click to browse or drag and drop your images here'
+                  : 'Choose a file or take a photo with your camera'
                 }
               </p>
+              
+              {!isUploading && (
+                <div className="flex flex-col sm:flex-row gap-3 justify-center mb-4">
+                  <Button 
+                    onClick={handleFileSelect}
+                    variant="outline"
+                    className="flex-1 sm:flex-none"
+                  >
+                    <Upload className="w-4 h-4 mr-2" />
+                    Browse Files
+                  </Button>
+                  <Button 
+                    onClick={() => cameraInputRef.current?.click()}
+                    variant="outline"
+                    className="flex-1 sm:flex-none"
+                  >
+                    <Camera className="w-4 h-4 mr-2" />
+                    Take Photo
+                  </Button>
+                </div>
+              )}
+              
               {!isUploading && (
                 <p className="text-sm text-muted-foreground">
                   {subscription.subscribed 
@@ -667,6 +689,15 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
                 type="file"
                 accept="image/*"
                 multiple
+                className="hidden"
+                onChange={handleFileChange}
+                disabled={isUploading}
+              />
+              <input
+                ref={cameraInputRef}
+                type="file"
+                accept="image/*"
+                capture="environment"
                 className="hidden"
                 onChange={handleFileChange}
                 disabled={isUploading}

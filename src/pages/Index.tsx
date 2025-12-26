@@ -6,7 +6,7 @@ import { ImageEditor } from "@/components/ImageEditor";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Upload, Shield, TrendingDown, Zap, BarChart3, Target, LogOut, Image, FileImage, Minimize2, HardDrive, Crown, BookOpen, Loader2, Download, HelpCircle, Sparkles, MessageSquare, Video } from "lucide-react";
+import { Upload, Shield, TrendingDown, Zap, BarChart3, Target, LogOut, Image, FileImage, Minimize2, HardDrive, Crown, BookOpen, Loader2, Download, HelpCircle, Sparkles, MessageSquare, Video, Share2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useImageCompression } from "@/hooks/useImageCompression";
@@ -24,6 +24,7 @@ import { FeatureTip, InlineTip } from "@/components/FeatureTip";
 import { UsageLimits, FREE_LIMITS } from "@/components/UsageLimits";
 import { AICaptionGenerator } from "@/components/AICaptionGenerator";
 import { EnhancedVideoProgress } from "@/components/EnhancedVideoProgress";
+import { SocialMediaExporter } from "@/components/SocialMediaExporter";
 
 const mockCompressions = [
   {
@@ -479,6 +480,23 @@ const Index = () => {
               subtitle="Visual quality"
             />
           </div>
+        </div>
+      </section>
+
+      {/* Social Media Exporter */}
+      <section className="section-padding">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-8">
+            <Badge variant="outline" className="mb-4 px-4 py-2 border-primary text-primary">
+              <Share2 className="w-4 h-4 mr-2" />
+              Step 4: Export for Social
+            </Badge>
+            <h2 className="text-3xl font-bold mb-2">Platform Export</h2>
+            <p className="text-muted-foreground">
+              Auto-resize images for Instagram, YouTube, Twitter & more
+            </p>
+          </div>
+          <SocialMediaExporter />
         </div>
       </section>
 

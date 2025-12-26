@@ -34,7 +34,10 @@ import {
   Share2,
   Copy,
   Link,
-  QrCode
+  QrCode,
+  History,
+  RotateCcw,
+  TrendingDown
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useWebGLImageProcessor } from '@/hooks/useWebGLImageProcessor';
@@ -75,6 +78,21 @@ interface CustomPreset {
   name: string;
   description: string;
   settings: BatchSettings;
+}
+
+interface ProcessingHistoryEntry {
+  id: string;
+  timestamp: string;
+  imageCount: number;
+  successCount: number;
+  failedCount: number;
+  totalOriginalSize: number;
+  totalOptimizedSize: number;
+  totalSaved: number;
+  avgCompressionRatio: number;
+  totalProcessingTime: number;
+  settings: BatchSettings;
+  presetName?: string;
 }
 
 interface Preset {
@@ -139,6 +157,22 @@ const saveCustomPresets = (presets: CustomPreset[]) => {
   localStorage.setItem(CUSTOM_PRESETS_KEY, JSON.stringify(presets));
 };
 
+const PROCESSING_HISTORY_KEY = 'batch-optimizer-history';
+const MAX_HISTORY_ENTRIES = 20;
+
+const loadProcessingHistory = (): ProcessingHistoryEntry[] => {
+  try {
+    const stored = localStorage.getItem(PROCESSING_HISTORY_KEY);
+    return stored ? JSON.parse(stored) : [];
+  } catch {
+    return [];
+  }
+};
+
+const saveProcessingHistory = (history: ProcessingHistoryEntry[]) => {
+  localStorage.setItem(PROCESSING_HISTORY_KEY, JSON.stringify(history.slice(0, MAX_HISTORY_ENTRIES)));
+};
+
 const sharpeningStrengths = {
   none: 0,
   subtle: 0.3,
@@ -164,6 +198,8 @@ export const BatchOptimizer = () => {
   const [customPresets, setCustomPresets] = useState<CustomPreset[]>([]);
   const [showCustomDialog, setShowCustomDialog] = useState(false);
   const [showShareDialog, setShowShareDialog] = useState(false);
+  const [showHistoryDialog, setShowHistoryDialog] = useState(false);
+  const [processingHistory, setProcessingHistory] = useState<ProcessingHistoryEntry[]>([]);
   const [sharePreset, setSharePreset] = useState<CustomPreset | null>(null);
   const [shareUrl, setShareUrl] = useState('');
   const [editingPreset, setEditingPreset] = useState<CustomPreset | null>(null);
@@ -175,9 +211,10 @@ export const BatchOptimizer = () => {
   const dropZoneRef = useRef<HTMLDivElement>(null);
   const [settings, setSettings] = useState<BatchSettings>(builtInPresets.balanced.settings);
 
-  // Load custom presets on mount and check for shared preset in URL
+  // Load custom presets and history on mount and check for shared preset in URL
   useEffect(() => {
     setCustomPresets(loadCustomPresets());
+    setProcessingHistory(loadProcessingHistory());
     
     // Check for shared preset in URL
     const params = new URLSearchParams(window.location.search);
@@ -422,6 +459,19 @@ export const BatchOptimizer = () => {
     } catch {
       toast.error('Failed to copy link');
     }
+  };
+
+  const applyHistorySettings = (entry: ProcessingHistoryEntry) => {
+    setSettings(entry.settings);
+    setActivePreset('custom');
+    setShowHistoryDialog(false);
+    toast.success(`Applied settings from ${new Date(entry.timestamp).toLocaleDateString()}`);
+  };
+
+  const clearHistory = () => {
+    setProcessingHistory([]);
+    saveProcessingHistory([]);
+    toast.success('History cleared');
   };
 
   const { processImage: processWithWebGL, isWebGLSupported } = useWebGLImageProcessor();
@@ -694,8 +744,62 @@ export const BatchOptimizer = () => {
 
     setIsProcessing(false);
     
-    const successCount = images.filter(img => img.status === 'completed').length + 
-                         pendingImages.filter(img => images.find(i => i.id === img.id)?.status === 'completed').length;
+    // Calculate stats for history
+    const completedImages = images.filter(img => img.status === 'completed' && img.result);
+    const updatedCompleted = pendingImages.filter(img => {
+      const updated = images.find(i => i.id === img.id);
+      return updated?.status === 'completed' && updated?.result;
+    });
+    const allCompleted = [...completedImages, ...updatedCompleted];
+    
+    if (allCompleted.length > 0 || completed > 0) {
+      // Get current preset name
+      let presetName = activePreset;
+      if (builtInPresets[activePreset as BuiltInPresetType]) {
+        presetName = builtInPresets[activePreset as BuiltInPresetType].name;
+      } else {
+        const customPreset = customPresets.find(p => p.id === activePreset);
+        if (customPreset) presetName = customPreset.name;
+      }
+      
+      // Recalculate from current state after processing
+      const finalImages = images.map(img => {
+        const pending = pendingImages.find(p => p.id === img.id);
+        if (pending) {
+          return images.find(i => i.id === pending.id) || img;
+        }
+        return img;
+      });
+      
+      const finalCompleted = finalImages.filter(img => img.status === 'completed' && img.result);
+      const totalOriginal = finalCompleted.reduce((acc, img) => acc + (img.result?.originalSize || 0), 0);
+      const totalOptimized = finalCompleted.reduce((acc, img) => acc + (img.result?.optimizedSize || 0), 0);
+      const totalTime = finalCompleted.reduce((acc, img) => acc + (img.result?.processingTime || 0), 0);
+      const avgRatio = finalCompleted.length > 0 
+        ? Math.round(finalCompleted.reduce((acc, img) => acc + (img.result?.compressionRatio || 0), 0) / finalCompleted.length)
+        : 0;
+      
+      const historyEntry: ProcessingHistoryEntry = {
+        id: `history-${Date.now()}`,
+        timestamp: new Date().toISOString(),
+        imageCount: pendingImages.length,
+        successCount: completed,
+        failedCount: pendingImages.length - completed,
+        totalOriginalSize: totalOriginal,
+        totalOptimizedSize: totalOptimized,
+        totalSaved: totalOriginal - totalOptimized,
+        avgCompressionRatio: avgRatio,
+        totalProcessingTime: totalTime,
+        settings: { ...settings },
+        presetName,
+      };
+      
+      setProcessingHistory(prev => {
+        const updated = [historyEntry, ...prev].slice(0, MAX_HISTORY_ENTRIES);
+        saveProcessingHistory(updated);
+        return updated;
+      });
+    }
     
     toast.success(`Batch complete! ${completed} images processed${webGLAvailable ? ' (GPU accelerated)' : ''}`);
   };
@@ -760,6 +864,17 @@ export const BatchOptimizer = () => {
             Batch Optimizer
           </CardTitle>
           <div className="flex items-center gap-2">
+            {processingHistory.length > 0 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowHistoryDialog(true)}
+                className="h-8"
+                title="Processing history"
+              >
+                <History className="h-4 w-4" />
+              </Button>
+            )}
             {webGLAvailable && (
               <Badge variant="outline" className="text-green-600 border-green-600/30">
                 <Zap className="h-3 w-3 mr-1" />
@@ -1188,6 +1303,108 @@ export const BatchOptimizer = () => {
 
             <DialogFooter>
               <Button variant="outline" onClick={() => setShowShareDialog(false)}>
+                Close
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* History Dialog */}
+        <Dialog open={showHistoryDialog} onOpenChange={setShowHistoryDialog}>
+          <DialogContent className="sm:max-w-lg max-h-[80vh]">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <History className="h-5 w-5 text-primary" />
+                Processing History
+              </DialogTitle>
+              <DialogDescription>
+                View past optimizations and reuse their settings.
+              </DialogDescription>
+            </DialogHeader>
+            
+            {processingHistory.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <History className="h-12 w-12 mx-auto mb-3 opacity-30" />
+                <p>No processing history yet</p>
+                <p className="text-sm">Complete a batch to see it here</p>
+              </div>
+            ) : (
+              <ScrollArea className="max-h-[400px] pr-4">
+                <div className="space-y-3">
+                  {processingHistory.map((entry) => (
+                    <div
+                      key={entry.id}
+                      className="border rounded-lg p-3 space-y-2 hover:bg-muted/30 transition-colors"
+                    >
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <p className="text-sm font-medium">
+                            {new Date(entry.timestamp).toLocaleDateString()} at{' '}
+                            {new Date(entry.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {entry.presetName && `${entry.presetName} • `}
+                            {entry.successCount}/{entry.imageCount} images
+                          </p>
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => applyHistorySettings(entry)}
+                          className="h-7 text-xs"
+                        >
+                          <RotateCcw className="h-3 w-3 mr-1" />
+                          Reuse
+                        </Button>
+                      </div>
+                      
+                      <div className="grid grid-cols-3 gap-2 text-center">
+                        <div className="bg-muted/50 rounded p-2">
+                          <p className="text-lg font-semibold text-green-600">
+                            {entry.avgCompressionRatio}%
+                          </p>
+                          <p className="text-[10px] text-muted-foreground">Avg Saved</p>
+                        </div>
+                        <div className="bg-muted/50 rounded p-2">
+                          <p className="text-lg font-semibold">
+                            <TrendingDown className="h-4 w-4 inline mr-1 text-primary" />
+                            {formatBytes(entry.totalSaved)}
+                          </p>
+                          <p className="text-[10px] text-muted-foreground">Total Saved</p>
+                        </div>
+                        <div className="bg-muted/50 rounded p-2">
+                          <p className="text-lg font-semibold">
+                            {(entry.totalProcessingTime / 1000).toFixed(1)}s
+                          </p>
+                          <p className="text-[10px] text-muted-foreground">Duration</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex flex-wrap gap-1">
+                        <Badge variant="outline" className="text-[10px]">
+                          Q: {entry.settings.quality}%
+                        </Badge>
+                        <Badge variant="outline" className="text-[10px]">
+                          {entry.settings.format.toUpperCase()}
+                        </Badge>
+                        <Badge variant="outline" className="text-[10px]">
+                          Sharp: {entry.settings.sharpening}
+                        </Badge>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </ScrollArea>
+            )}
+
+            <DialogFooter className="gap-2">
+              {processingHistory.length > 0 && (
+                <Button variant="destructive" size="sm" onClick={clearHistory}>
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Clear History
+                </Button>
+              )}
+              <Button variant="outline" onClick={() => setShowHistoryDialog(false)}>
                 Close
               </Button>
             </DialogFooter>

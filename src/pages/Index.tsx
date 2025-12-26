@@ -27,6 +27,7 @@ import { EnhancedVideoProgress } from "@/components/EnhancedVideoProgress";
 import { SocialMediaExporter } from "@/components/SocialMediaExporter";
 import { ProfessionalOptimizer } from "@/components/ProfessionalOptimizer";
 import { BatchOptimizer } from "@/components/BatchOptimizer";
+import { BatchAnalyticsDashboard } from "@/components/BatchAnalyticsDashboard";
 
 const mockCompressions = [
   {
@@ -516,6 +517,23 @@ const Index = () => {
             </p>
           </div>
           <BatchOptimizer />
+        </div>
+      </section>
+
+      {/* Analytics Dashboard */}
+      <section className="section-padding">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-8">
+            <Badge variant="outline" className="mb-4 px-4 py-2 border-primary text-primary">
+              <BarChart3 className="w-4 h-4 mr-2" />
+              Your Stats
+            </Badge>
+            <h2 className="text-3xl font-bold mb-2">Analytics Dashboard</h2>
+            <p className="text-muted-foreground">
+              Track your optimization history and storage savings over time
+            </p>
+          </div>
+          <BatchAnalyticsDashboard />
         </div>
       </section>
 

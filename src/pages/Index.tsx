@@ -6,10 +6,11 @@ import { ImageEditor } from "@/components/ImageEditor";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Upload, Shield, TrendingDown, Zap, BarChart3, Target, LogOut, Image, FileImage, Minimize2, HardDrive, Crown, BookOpen, Loader2, Download, HelpCircle, Sparkles } from "lucide-react";
+import { Upload, Shield, TrendingDown, Zap, BarChart3, Target, LogOut, Image, FileImage, Minimize2, HardDrive, Crown, BookOpen, Loader2, Download, HelpCircle, Sparkles, MessageSquare, Video } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useImageCompression } from "@/hooks/useImageCompression";
+import { useVideoCompression } from "@/hooks/useVideoCompression";
 import { useRef, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import heroImage from "@/assets/compression-hero.jpg";
@@ -20,6 +21,9 @@ import manAfter from "@/assets/man-after.jpg";
 import { BeforeAfterSlider } from "@/components/BeforeAfterSlider";
 import { OnboardingFlow, OnboardingTrigger } from "@/components/OnboardingFlow";
 import { FeatureTip, InlineTip } from "@/components/FeatureTip";
+import { UsageLimits, FREE_LIMITS } from "@/components/UsageLimits";
+import { AICaptionGenerator } from "@/components/AICaptionGenerator";
+import { EnhancedVideoProgress } from "@/components/EnhancedVideoProgress";
 
 const mockCompressions = [
   {
@@ -60,10 +64,15 @@ const compressionData = [
 const Index = () => {
   const { user, signOut } = useAuth();
   const { toast } = useToast();
-  const { compressions, subscription, createCheckout, checkSubscription, compressImages, downloadBulk } = useImageCompression();
+  const { compressions, subscription, createCheckout, checkSubscription, compressImages, downloadBulk, openCustomerPortal } = useImageCompression();
+  const { videoCompressions, compressVideo, downloadCompressedVideo, pauseCompression, resumeCompression, cancelCompression } = useVideoCompression();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const videoInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
+  
+  // Track daily usage (in real app, this would come from backend)
+  const [dailyUsage, setDailyUsage] = useState({ images: 0, videos: 0 });
 
   useEffect(() => {
     if (user) {
@@ -82,6 +91,18 @@ const Index = () => {
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files && files.length > 0) {
+      // Check free tier limits
+      if (!subscription.subscribed && !subscription.is_trialing) {
+        if (dailyUsage.images >= FREE_LIMITS.images) {
+          toast({
+            title: "Daily Limit Reached",
+            description: "Upgrade to Pro for unlimited compressions",
+            variant: "destructive"
+          });
+          return;
+        }
+      }
+      
       setIsUploading(true);
       toast({
         title: "Processing images",
@@ -89,8 +110,45 @@ const Index = () => {
       });
       try {
         await compressImages(files);
+        if (!subscription.subscribed && !subscription.is_trialing) {
+          setDailyUsage(prev => ({ ...prev, images: prev.images + files.length }));
+        }
       } finally {
         setIsUploading(false);
+      }
+    }
+  };
+
+  const handleVideoUpload = () => {
+    // Check free tier limits
+    if (!subscription.subscribed && !subscription.is_trialing) {
+      if (dailyUsage.videos >= FREE_LIMITS.videos) {
+        toast({
+          title: "Daily Limit Reached",
+          description: "Upgrade to Pro for unlimited video compressions",
+          variant: "destructive"
+        });
+        return;
+      }
+    }
+    videoInputRef.current?.click();
+  };
+
+  const handleVideoChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      const file = files[0];
+      toast({
+        title: "Processing video",
+        description: `Compressing ${file.name}...`,
+      });
+      try {
+        await compressVideo(file);
+        if (!subscription.subscribed && !subscription.is_trialing) {
+          setDailyUsage(prev => ({ ...prev, videos: prev.videos + 1 }));
+        }
+      } catch (error) {
+        console.error('Video compression error:', error);
       }
     }
   };
@@ -226,17 +284,21 @@ const Index = () => {
                 Download All ({compressions.filter(c => c.status === 'completed').length})
               </Button>
             )}
-            {!subscription.subscribed && (
+            {!subscription.subscribed && !subscription.is_trialing && (
               <div className="flex flex-col items-center gap-2">
                 <Button size="lg" className="bg-gradient-profit text-profit-foreground shadow-profit hover:opacity-90 px-8 py-3" onClick={createCheckout}>
                   <Crown className="w-5 h-5 mr-2" />
-                  Start 7-Day Free Trial
+                  Start 3-Day Free Trial
                 </Button>
                 <p className="text-sm text-muted-foreground">
-                  Try Pro free for 7 days. Cancel anytime.
+                  Try Pro free for 3 days. Cancel anytime. $6.95/month after.
                 </p>
               </div>
             )}
+            <Button size="lg" variant="secondary" className="gap-2" onClick={handleVideoUpload}>
+              <Video className="w-5 h-5" />
+              Compress Video
+            </Button>
           </div>
           
           <input
@@ -248,8 +310,44 @@ const Index = () => {
              onChange={handleFileChange}
              disabled={isUploading}
            />
+          <input
+             ref={videoInputRef}
+             type="file"
+             accept="video/*"
+             className="hidden"
+             onChange={handleVideoChange}
+           />
         </div>
       </section>
+
+      {/* Usage Limits Banner */}
+      <section className="px-6 -mt-10 relative z-10">
+        <div className="max-w-4xl mx-auto">
+          <UsageLimits 
+            imageUsed={dailyUsage.images}
+            videoUsed={dailyUsage.videos}
+            isSubscribed={subscription.subscribed}
+            isTrialing={subscription.is_trialing || false}
+            trialEndsAt={subscription.trial_end}
+            onUpgrade={subscription.subscribed ? openCustomerPortal : createCheckout}
+          />
+        </div>
+      </section>
+
+      {/* Video Compression Results */}
+      {videoCompressions.length > 0 && (
+        <section className="section-padding pt-8">
+          <div className="max-w-4xl mx-auto">
+            <EnhancedVideoProgress
+              compressions={videoCompressions}
+              onDownload={downloadCompressedVideo}
+              onPause={pauseCompression}
+              onResume={resumeCompression}
+              onCancel={cancelCompression}
+            />
+          </div>
+        </section>
+      )}
 
       {/* AI Transformation Showcase */}
       <section className="section-padding bg-gradient-to-b from-secondary/20 to-background">
@@ -325,6 +423,23 @@ const Index = () => {
             </p>
           </div>
           <ImageEditor />
+        </div>
+      </section>
+
+      {/* AI Caption Generator */}
+      <section className="section-padding">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-8">
+            <Badge variant="outline" className="mb-4 px-4 py-2 border-primary text-primary">
+              <MessageSquare className="w-4 h-4 mr-2" />
+              Step 3: Create Captions
+            </Badge>
+            <h2 className="text-3xl font-bold mb-2">AI Social Captions</h2>
+            <p className="text-muted-foreground">
+              Generate viral captions optimized for each social platform
+            </p>
+          </div>
+          <AICaptionGenerator />
         </div>
       </section>
 

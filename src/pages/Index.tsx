@@ -6,7 +6,7 @@ import { ImageEditor } from "@/components/ImageEditor";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Upload, Shield, TrendingDown, Zap, BarChart3, Target, LogOut, Image, FileImage, Minimize2, HardDrive, Crown, BookOpen, Loader2, Download } from "lucide-react";
+import { Upload, Shield, TrendingDown, Zap, BarChart3, Target, LogOut, Image, FileImage, Minimize2, HardDrive, Crown, BookOpen, Loader2, Download, HelpCircle, Sparkles } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useImageCompression } from "@/hooks/useImageCompression";
@@ -18,6 +18,8 @@ import weddingAfter from "@/assets/wedding-after.jpg";
 import manBefore from "@/assets/man-before.jpg";
 import manAfter from "@/assets/man-after.jpg";
 import { BeforeAfterSlider } from "@/components/BeforeAfterSlider";
+import { OnboardingFlow, OnboardingTrigger } from "@/components/OnboardingFlow";
+import { FeatureTip, InlineTip } from "@/components/FeatureTip";
 
 const mockCompressions = [
   {
@@ -61,6 +63,7 @@ const Index = () => {
   const { compressions, subscription, createCheckout, checkSubscription, compressImages, downloadBulk } = useImageCompression();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -94,6 +97,9 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Onboarding Flow */}
+      <OnboardingFlow onComplete={() => setShowWelcome(true)} />
+
       {/* Navigation Bar */}
       <nav className="bg-card border-b border-border px-6 py-4">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
@@ -120,6 +126,12 @@ const Index = () => {
             </Link>
           </div>
           <div className="flex items-center gap-4">
+            <OnboardingTrigger>
+              <Button variant="ghost" size="sm" className="text-muted-foreground">
+                <HelpCircle className="w-4 h-4 mr-2" />
+                Help
+              </Button>
+            </OnboardingTrigger>
             <span className="text-sm text-muted-foreground hidden sm:inline">
               Welcome, {user?.email}
             </span>
@@ -130,6 +142,28 @@ const Index = () => {
           </div>
         </div>
       </nav>
+
+      {/* Welcome Message (after onboarding) */}
+      {showWelcome && (
+        <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border-b border-primary/20 px-6 py-3">
+          <div className="max-w-7xl mx-auto flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Sparkles className="w-5 h-5 text-primary animate-pulse" />
+              <p className="text-sm">
+                <strong>Welcome aboard!</strong> You're all set to start compressing. Try uploading your first image below!
+              </p>
+            </div>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => setShowWelcome(false)}
+              className="text-muted-foreground"
+            >
+              Dismiss
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Hero Section */}
       <section className="relative py-20 px-6 overflow-hidden">
@@ -251,14 +285,28 @@ const Index = () => {
           </div>
 
           <div className="text-center mt-12">
-            <p className="text-lg font-semibold">{isUploading ? 'Processing your images...' : 'Try it with your own photos below!'}</p>
+            <InlineTip 
+              text={isUploading ? 'Processing your images...' : 'Scroll down to try it with your own photos!'} 
+              variant="info"
+              className="inline-flex mx-auto"
+            />
           </div>
         </div>
       </section>
 
       {/* Image Upload Studio */}
-      <section className="section-padding">
+      <section className="section-padding" id="upload-section">
         <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-8">
+            <Badge variant="outline" className="mb-4 px-4 py-2 border-primary text-primary">
+              <Upload className="w-4 h-4 mr-2" />
+              Step 1: Upload
+            </Badge>
+            <h2 className="text-3xl font-bold mb-2">Compression Studio</h2>
+            <p className="text-muted-foreground">
+              Upload your images and let our AI find the perfect settings
+            </p>
+          </div>
           <ImageUploader />
         </div>
       </section>
@@ -266,6 +314,16 @@ const Index = () => {
       {/* Image Editor */}
       <section className="section-padding bg-secondary/20">
         <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-8">
+            <Badge variant="outline" className="mb-4 px-4 py-2 border-primary text-primary">
+              <Sparkles className="w-4 h-4 mr-2" />
+              Step 2: Edit
+            </Badge>
+            <h2 className="text-3xl font-bold mb-2">AI Image Editor</h2>
+            <p className="text-muted-foreground">
+              Crop, resize, and apply AI transformations
+            </p>
+          </div>
           <ImageEditor />
         </div>
       </section>

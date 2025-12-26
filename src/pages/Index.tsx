@@ -6,7 +6,7 @@ import { ImageEditor } from "@/components/ImageEditor";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Upload, Shield, TrendingDown, Zap, BarChart3, Target, LogOut, Image, FileImage, Minimize2, HardDrive, Crown, BookOpen, Loader2, Download, HelpCircle, Sparkles, MessageSquare, Video, Share2 } from "lucide-react";
+import { Upload, Shield, TrendingDown, Zap, BarChart3, Target, LogOut, Image, FileImage, Minimize2, HardDrive, Crown, BookOpen, Loader2, Download, HelpCircle, Sparkles, MessageSquare, Video, Share2, Package } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useImageCompression } from "@/hooks/useImageCompression";
@@ -26,6 +26,7 @@ import { AICaptionGenerator } from "@/components/AICaptionGenerator";
 import { EnhancedVideoProgress } from "@/components/EnhancedVideoProgress";
 import { SocialMediaExporter } from "@/components/SocialMediaExporter";
 import { ProfessionalOptimizer } from "@/components/ProfessionalOptimizer";
+import { BatchOptimizer } from "@/components/BatchOptimizer";
 
 const mockCompressions = [
   {
@@ -498,6 +499,23 @@ const Index = () => {
             </p>
           </div>
           <ProfessionalOptimizer />
+        </div>
+      </section>
+
+      {/* Batch Optimizer */}
+      <section className="section-padding bg-secondary/20">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-8">
+            <Badge variant="outline" className="mb-4 px-4 py-2 border-primary text-primary">
+              <Package className="w-4 h-4 mr-2" />
+              Batch Processing
+            </Badge>
+            <h2 className="text-3xl font-bold mb-2">Batch Optimizer</h2>
+            <p className="text-muted-foreground">
+              Process multiple images at once with GPU-accelerated optimization
+            </p>
+          </div>
+          <BatchOptimizer />
         </div>
       </section>
 

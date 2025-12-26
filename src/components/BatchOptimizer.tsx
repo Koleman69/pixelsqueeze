@@ -1,0 +1,545 @@
+import { useState, useRef, useCallback } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { 
+  Sparkles, 
+  Download, 
+  Upload,
+  Zap,
+  CheckCircle2,
+  XCircle,
+  Loader2,
+  Trash2,
+  FolderOpen,
+  Package,
+  Clock,
+  ImageIcon
+} from 'lucide-react';
+import { toast } from 'sonner';
+import { useWebGLImageProcessor } from '@/hooks/useWebGLImageProcessor';
+import JSZip from 'jszip';
+
+interface BatchImage {
+  id: string;
+  file: File;
+  preview: string;
+  status: 'pending' | 'processing' | 'completed' | 'failed';
+  progress: number;
+  result?: {
+    blob: Blob;
+    url: string;
+    originalSize: number;
+    optimizedSize: number;
+    compressionRatio: number;
+    processingTime: number;
+  };
+  error?: string;
+}
+
+interface BatchSettings {
+  quality: number;
+  sharpening: 'none' | 'subtle' | 'moderate' | 'strong';
+  noiseReduction: number;
+  format: 'jpeg' | 'png' | 'webp';
+}
+
+const sharpeningStrengths = {
+  none: 0,
+  subtle: 0.3,
+  moderate: 0.6,
+  strong: 1.2,
+};
+
+const sharpeningKernels = {
+  none: null,
+  subtle: [0, -0.5, 0, -0.5, 3, -0.5, 0, -0.5, 0],
+  moderate: [0, -1, 0, -1, 5, -1, 0, -1, 0],
+  strong: [-1, -1, -1, -1, 9, -1, -1, -1, -1],
+};
+
+export const BatchOptimizer = () => {
+  const [images, setImages] = useState<BatchImage[]>([]);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [overallProgress, setOverallProgress] = useState(0);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [settings] = useState<BatchSettings>({
+    quality: 85,
+    sharpening: 'moderate',
+    noiseReduction: 20,
+    format: 'webp',
+  });
+
+  const { processImage: processWithWebGL, isWebGLSupported } = useWebGLImageProcessor();
+  const webGLAvailable = isWebGLSupported();
+
+  const handleFilesSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+
+    const newImages: BatchImage[] = [];
+    
+    Array.from(files).forEach((file) => {
+      const id = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      const reader = new FileReader();
+      
+      reader.onload = (e) => {
+        const preview = e.target?.result as string;
+        setImages(prev => [...prev, {
+          id,
+          file,
+          preview,
+          status: 'pending',
+          progress: 0,
+        }]);
+      };
+      
+      reader.readAsDataURL(file);
+    });
+
+    // Reset input
+    event.target.value = '';
+  };
+
+  const removeImage = (id: string) => {
+    setImages(prev => prev.filter(img => img.id !== id));
+  };
+
+  const clearAll = () => {
+    setImages([]);
+    setOverallProgress(0);
+  };
+
+  const applyConvolution = useCallback((
+    imageData: ImageData,
+    kernel: number[]
+  ): ImageData => {
+    const { data, width, height } = imageData;
+    const output = new Uint8ClampedArray(data);
+    const kSize = 3;
+    const half = Math.floor(kSize / 2);
+
+    for (let y = half; y < height - half; y++) {
+      for (let x = half; x < width - half; x++) {
+        for (let c = 0; c < 3; c++) {
+          let sum = 0;
+          for (let ky = 0; ky < kSize; ky++) {
+            for (let kx = 0; kx < kSize; kx++) {
+              const px = x + kx - half;
+              const py = y + ky - half;
+              const idx = (py * width + px) * 4 + c;
+              sum += data[idx] * kernel[ky * kSize + kx];
+            }
+          }
+          const idx = (y * width + x) * 4 + c;
+          output[idx] = Math.min(255, Math.max(0, sum));
+        }
+      }
+    }
+
+    return new ImageData(output, width, height);
+  }, []);
+
+  const processImageCPU = useCallback((img: HTMLImageElement): ImageData => {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d', { willReadFrequently: true })!;
+    canvas.width = img.width;
+    canvas.height = img.height;
+    ctx.drawImage(img, 0, 0);
+
+    let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    
+    const kernel = sharpeningKernels[settings.sharpening];
+    if (kernel) {
+      imageData = applyConvolution(imageData, kernel);
+    }
+
+    return imageData;
+  }, [settings.sharpening, applyConvolution]);
+
+  const processImageWebGL = useCallback(async (img: HTMLImageElement): Promise<ImageData | null> => {
+    return await processWithWebGL(img, {
+      sharpenStrength: sharpeningStrengths[settings.sharpening],
+      noiseReduction: settings.noiseReduction / 100,
+      detailEnhancement: 0,
+      contrast: 1.0,
+      saturation: 1.0,
+      brightness: 0,
+    });
+  }, [processWithWebGL, settings]);
+
+  const optimizeSingleImage = useCallback(async (batchImage: BatchImage): Promise<BatchImage> => {
+    const startTime = performance.now();
+    
+    return new Promise((resolve) => {
+      const img = new Image();
+      
+      img.onload = async () => {
+        try {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d', { 
+            willReadFrequently: true,
+            alpha: settings.format === 'png' 
+          });
+          
+          if (!ctx) {
+            resolve({ ...batchImage, status: 'failed', error: 'Canvas error' });
+            return;
+          }
+
+          canvas.width = img.width;
+          canvas.height = img.height;
+
+          let imageData: ImageData | null = null;
+          
+          // Try WebGL first
+          if (webGLAvailable) {
+            try {
+              imageData = await processImageWebGL(img);
+            } catch (e) {
+              console.warn('WebGL failed, using CPU:', e);
+            }
+          }
+
+          // Fallback to CPU
+          if (!imageData) {
+            imageData = processImageCPU(img);
+          }
+
+          ctx.putImageData(imageData, 0, 0);
+
+          const mimeType = `image/${settings.format}`;
+          const quality = settings.quality / 100;
+
+          canvas.toBlob(
+            (blob) => {
+              if (!blob) {
+                resolve({ ...batchImage, status: 'failed', error: 'Blob creation failed' });
+                return;
+              }
+
+              const url = URL.createObjectURL(blob);
+              const processingTime = Math.round(performance.now() - startTime);
+
+              resolve({
+                ...batchImage,
+                status: 'completed',
+                progress: 100,
+                result: {
+                  blob,
+                  url,
+                  originalSize: batchImage.file.size,
+                  optimizedSize: blob.size,
+                  compressionRatio: Math.round((1 - blob.size / batchImage.file.size) * 100),
+                  processingTime,
+                },
+              });
+            },
+            mimeType,
+            settings.format === 'png' ? undefined : quality
+          );
+        } catch (error) {
+          resolve({ 
+            ...batchImage, 
+            status: 'failed', 
+            error: error instanceof Error ? error.message : 'Unknown error' 
+          });
+        }
+      };
+
+      img.onerror = () => {
+        resolve({ ...batchImage, status: 'failed', error: 'Failed to load image' });
+      };
+
+      img.src = batchImage.preview;
+    });
+  }, [settings, webGLAvailable, processImageWebGL, processImageCPU]);
+
+  const processBatch = async () => {
+    const pendingImages = images.filter(img => img.status === 'pending' || img.status === 'failed');
+    if (pendingImages.length === 0) {
+      toast.error('No images to process');
+      return;
+    }
+
+    setIsProcessing(true);
+    setOverallProgress(0);
+
+    let completed = 0;
+    const total = pendingImages.length;
+
+    for (const batchImage of pendingImages) {
+      // Update status to processing
+      setImages(prev => prev.map(img => 
+        img.id === batchImage.id ? { ...img, status: 'processing' as const, progress: 0 } : img
+      ));
+
+      const result = await optimizeSingleImage(batchImage);
+      
+      // Update with result
+      setImages(prev => prev.map(img => 
+        img.id === batchImage.id ? result : img
+      ));
+
+      completed++;
+      setOverallProgress(Math.round((completed / total) * 100));
+    }
+
+    setIsProcessing(false);
+    
+    const successCount = images.filter(img => img.status === 'completed').length + 
+                         pendingImages.filter(img => images.find(i => i.id === img.id)?.status === 'completed').length;
+    
+    toast.success(`Batch complete! ${completed} images processed${webGLAvailable ? ' (GPU accelerated)' : ''}`);
+  };
+
+  const downloadAll = async () => {
+    const completedImages = images.filter(img => img.status === 'completed' && img.result);
+    if (completedImages.length === 0) {
+      toast.error('No optimized images to download');
+      return;
+    }
+
+    if (completedImages.length === 1) {
+      // Single file download
+      const img = completedImages[0];
+      const link = document.createElement('a');
+      link.href = img.result!.url;
+      link.download = `${img.file.name.replace(/\.[^/.]+$/, '')}_optimized.${settings.format}`;
+      link.click();
+      return;
+    }
+
+    // Multiple files - create ZIP
+    toast.loading('Creating ZIP file...');
+    
+    const zip = new JSZip();
+    
+    for (const img of completedImages) {
+      const baseName = img.file.name.replace(/\.[^/.]+$/, '');
+      zip.file(`${baseName}_optimized.${settings.format}`, img.result!.blob);
+    }
+
+    const zipBlob = await zip.generateAsync({ type: 'blob' });
+    const url = URL.createObjectURL(zipBlob);
+    
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `batch_optimized_${Date.now()}.zip`;
+    link.click();
+    
+    URL.revokeObjectURL(url);
+    toast.dismiss();
+    toast.success('ZIP download started!');
+  };
+
+  const formatBytes = (bytes: number) => {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+  };
+
+  const completedCount = images.filter(img => img.status === 'completed').length;
+  const totalSaved = images
+    .filter(img => img.status === 'completed' && img.result)
+    .reduce((acc, img) => acc + (img.result!.originalSize - img.result!.optimizedSize), 0);
+
+  return (
+    <Card className="border-primary/20 bg-gradient-to-br from-background to-primary/5">
+      <CardHeader className="pb-4">
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <Package className="h-5 w-5 text-primary" />
+            Batch Optimizer
+          </CardTitle>
+          <div className="flex items-center gap-2">
+            {webGLAvailable && (
+              <Badge variant="outline" className="text-green-600 border-green-600/30">
+                <Zap className="h-3 w-3 mr-1" />
+                GPU Ready
+              </Badge>
+            )}
+            <Badge variant="secondary" className="bg-primary/10 text-primary">
+              {images.length} images
+            </Badge>
+          </div>
+        </div>
+      </CardHeader>
+
+      <CardContent className="space-y-4">
+        {/* Upload Area */}
+        <div 
+          className="border-2 border-dashed border-primary/30 rounded-lg p-6 text-center hover:border-primary/50 transition-colors cursor-pointer"
+          onClick={() => fileInputRef.current?.click()}
+        >
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            multiple
+            className="hidden"
+            onChange={handleFilesSelect}
+          />
+          <FolderOpen className="h-10 w-10 mx-auto text-primary/60 mb-3" />
+          <p className="text-sm font-medium">Drop images here or click to browse</p>
+          <p className="text-xs text-muted-foreground mt-1">
+            Supports JPG, PNG, WebP • Multiple selection enabled
+          </p>
+        </div>
+
+        {/* Image Queue */}
+        {images.length > 0 && (
+          <>
+            <div className="flex items-center justify-between">
+              <h4 className="text-sm font-medium">Image Queue</h4>
+              <Button variant="ghost" size="sm" onClick={clearAll} disabled={isProcessing}>
+                <Trash2 className="h-4 w-4 mr-1" />
+                Clear All
+              </Button>
+            </div>
+
+            <ScrollArea className="h-[240px] rounded-md border">
+              <div className="p-2 space-y-2">
+                {images.map((img) => (
+                  <div 
+                    key={img.id}
+                    className="flex items-center gap-3 p-2 rounded-lg bg-muted/50 hover:bg-muted/80 transition-colors"
+                  >
+                    {/* Thumbnail */}
+                    <div className="w-12 h-12 rounded overflow-hidden flex-shrink-0 bg-muted">
+                      <img 
+                        src={img.preview} 
+                        alt={img.file.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+
+                    {/* Info */}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate">{img.file.name}</p>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <span>{formatBytes(img.file.size)}</span>
+                        {img.result && (
+                          <>
+                            <span>→</span>
+                            <span className="text-primary font-medium">
+                              {formatBytes(img.result.optimizedSize)} (-{img.result.compressionRatio}%)
+                            </span>
+                          </>
+                        )}
+                      </div>
+                      {img.status === 'processing' && (
+                        <Progress value={img.progress} className="h-1 mt-1" />
+                      )}
+                    </div>
+
+                    {/* Status */}
+                    <div className="flex-shrink-0">
+                      {img.status === 'pending' && (
+                        <Clock className="h-4 w-4 text-muted-foreground" />
+                      )}
+                      {img.status === 'processing' && (
+                        <Loader2 className="h-4 w-4 text-primary animate-spin" />
+                      )}
+                      {img.status === 'completed' && (
+                        <CheckCircle2 className="h-4 w-4 text-green-500" />
+                      )}
+                      {img.status === 'failed' && (
+                        <XCircle className="h-4 w-4 text-destructive" />
+                      )}
+                    </div>
+
+                    {/* Remove */}
+                    {!isProcessing && (
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-8 w-8 flex-shrink-0"
+                        onClick={() => removeImage(img.id)}
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
+
+            {/* Stats */}
+            {completedCount > 0 && (
+              <div className="grid grid-cols-3 gap-4 p-3 rounded-lg bg-muted/50">
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-primary">{completedCount}</p>
+                  <p className="text-xs text-muted-foreground">Completed</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-green-500">{formatBytes(totalSaved)}</p>
+                  <p className="text-xs text-muted-foreground">Saved</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-primary">
+                    {images.filter(i => i.result).reduce((acc, i) => acc + i.result!.compressionRatio, 0) / completedCount || 0}%
+                  </p>
+                  <p className="text-xs text-muted-foreground">Avg Reduction</p>
+                </div>
+              </div>
+            )}
+
+            {/* Overall Progress */}
+            {isProcessing && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-muted-foreground flex items-center gap-1">
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                    Processing batch...
+                  </span>
+                  <span className="font-mono">{overallProgress}%</span>
+                </div>
+                <Progress value={overallProgress} className="h-2" />
+              </div>
+            )}
+
+            {/* Actions */}
+            <div className="grid grid-cols-2 gap-3">
+              <Button
+                onClick={processBatch}
+                disabled={isProcessing || images.filter(i => i.status === 'pending').length === 0}
+                className="w-full"
+              >
+                {isProcessing ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="h-4 w-4 mr-2" />
+                    Optimize All ({images.filter(i => i.status === 'pending' || i.status === 'failed').length})
+                  </>
+                )}
+              </Button>
+              <Button
+                variant="outline"
+                onClick={downloadAll}
+                disabled={isProcessing || completedCount === 0}
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Download {completedCount > 1 ? 'ZIP' : ''} ({completedCount})
+              </Button>
+            </div>
+          </>
+        )}
+
+        {/* Empty State */}
+        {images.length === 0 && (
+          <div className="text-center py-8 text-muted-foreground">
+            <ImageIcon className="h-12 w-12 mx-auto mb-3 opacity-30" />
+            <p className="text-sm">Add images to start batch optimization</p>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+};

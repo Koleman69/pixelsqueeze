@@ -30,13 +30,19 @@ import {
   Save,
   Pencil,
   FileDown,
-  FileUp
+  FileUp,
+  Share2,
+  Copy,
+  Link,
+  QrCode
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useWebGLImageProcessor } from '@/hooks/useWebGLImageProcessor';
 import { ImageCompareSlider } from '@/components/ImageCompareSlider';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import JSZip from 'jszip';
+import { QRCodeSVG } from 'qrcode.react';
 
 interface BatchImage {
   id: string;
@@ -157,6 +163,9 @@ export const BatchOptimizer = () => {
   const [activePreset, setActivePreset] = useState<string>('balanced');
   const [customPresets, setCustomPresets] = useState<CustomPreset[]>([]);
   const [showCustomDialog, setShowCustomDialog] = useState(false);
+  const [showShareDialog, setShowShareDialog] = useState(false);
+  const [sharePreset, setSharePreset] = useState<CustomPreset | null>(null);
+  const [shareUrl, setShareUrl] = useState('');
   const [editingPreset, setEditingPreset] = useState<CustomPreset | null>(null);
   const [customName, setCustomName] = useState('');
   const [customDescription, setCustomDescription] = useState('');
@@ -166,9 +175,65 @@ export const BatchOptimizer = () => {
   const dropZoneRef = useRef<HTMLDivElement>(null);
   const [settings, setSettings] = useState<BatchSettings>(builtInPresets.balanced.settings);
 
-  // Load custom presets on mount
+  // Load custom presets on mount and check for shared preset in URL
   useEffect(() => {
     setCustomPresets(loadCustomPresets());
+    
+    // Check for shared preset in URL
+    const params = new URLSearchParams(window.location.search);
+    const sharedPreset = params.get('preset');
+    if (sharedPreset) {
+      try {
+        const decoded = JSON.parse(atob(sharedPreset));
+        if (decoded.name && decoded.settings) {
+          const validFormats = ['jpeg', 'png', 'webp'];
+          const validSharpening = ['none', 'subtle', 'moderate', 'strong'];
+          const s = decoded.settings;
+          
+          if (
+            typeof s.quality === 'number' && s.quality >= 10 && s.quality <= 100 &&
+            validFormats.includes(s.format) &&
+            validSharpening.includes(s.sharpening) &&
+            typeof s.noiseReduction === 'number' && s.noiseReduction >= 0 && s.noiseReduction <= 100
+          ) {
+            const newPreset: CustomPreset = {
+              id: `shared-${Date.now()}`,
+              name: String(decoded.name).slice(0, 30),
+              description: String(decoded.description || 'Shared preset').slice(0, 50),
+              settings: {
+                quality: s.quality,
+                format: s.format,
+                sharpening: s.sharpening,
+                noiseReduction: s.noiseReduction,
+              },
+            };
+            
+            setCustomPresets(prev => {
+              const exists = prev.some(p => 
+                p.name === newPreset.name && 
+                JSON.stringify(p.settings) === JSON.stringify(newPreset.settings)
+              );
+              if (exists) {
+                toast.info('This preset already exists in your collection');
+                return prev;
+              }
+              const updated = [...prev, newPreset];
+              saveCustomPresets(updated);
+              toast.success(`Added shared preset: ${newPreset.name}`);
+              return updated;
+            });
+            
+            setActivePreset(newPreset.id);
+            setSettings(newPreset.settings);
+            
+            // Clean URL
+            window.history.replaceState({}, '', window.location.pathname);
+          }
+        }
+      } catch {
+        // Invalid preset data, ignore
+      }
+    }
   }, []);
 
   const handleBuiltInPresetChange = (preset: BuiltInPresetType) => {
@@ -335,6 +400,28 @@ export const BatchOptimizer = () => {
     
     reader.readAsText(file);
     event.target.value = '';
+  };
+
+  const openSharePresetDialog = (preset: CustomPreset) => {
+    const presetData = {
+      name: preset.name,
+      description: preset.description,
+      settings: preset.settings,
+    };
+    const encoded = btoa(JSON.stringify(presetData));
+    const url = `${window.location.origin}${window.location.pathname}?preset=${encoded}`;
+    setSharePreset(preset);
+    setShareUrl(url);
+    setShowShareDialog(true);
+  };
+
+  const copyShareUrl = async () => {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      toast.success('Link copied to clipboard!');
+    } catch {
+      toast.error('Failed to copy link');
+    }
   };
 
   const { processImage: processWithWebGL, isWebGLSupported } = useWebGLImageProcessor();
@@ -876,17 +963,26 @@ export const BatchOptimizer = () => {
                           <CheckCircle2 className="h-4 w-4 text-current" />
                         </div>
                       )}
-                      {/* Edit/Delete buttons */}
+                      {/* Edit/Delete/Share buttons */}
                       <div className="absolute top-1 left-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); openSharePresetDialog(preset); }}
+                          className="p-1 rounded bg-background/80 hover:bg-primary/20"
+                          title="Share preset"
+                        >
+                          <Share2 className="h-3 w-3" />
+                        </button>
                         <button
                           onClick={(e) => { e.stopPropagation(); openEditPresetDialog(preset); }}
                           className="p-1 rounded bg-background/80 hover:bg-primary/20"
+                          title="Edit preset"
                         >
                           <Pencil className="h-3 w-3" />
                         </button>
                         <button
                           onClick={(e) => { e.stopPropagation(); deleteCustomPreset(preset.id); }}
                           className="p-1 rounded bg-background/80 hover:bg-destructive/20 text-destructive"
+                          title="Delete preset"
                         >
                           <Trash2 className="h-3 w-3" />
                         </button>
@@ -1012,6 +1108,87 @@ export const BatchOptimizer = () => {
               <Button onClick={saveCustomPreset}>
                 <Save className="h-4 w-4 mr-2" />
                 {editingPreset ? 'Update' : 'Save'} Preset
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Share Preset Dialog */}
+        <Dialog open={showShareDialog} onOpenChange={setShowShareDialog}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Share2 className="h-5 w-5 text-primary" />
+                Share Preset
+              </DialogTitle>
+              <DialogDescription>
+                Share "{sharePreset?.name}" with others via link or QR code.
+              </DialogDescription>
+            </DialogHeader>
+            
+            <Tabs defaultValue="link" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="link" className="flex items-center gap-2">
+                  <Link className="h-4 w-4" />
+                  Link
+                </TabsTrigger>
+                <TabsTrigger value="qr" className="flex items-center gap-2">
+                  <QrCode className="h-4 w-4" />
+                  QR Code
+                </TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="link" className="space-y-4 mt-4">
+                <div className="flex gap-2">
+                  <Input 
+                    readOnly 
+                    value={shareUrl} 
+                    className="text-xs font-mono"
+                  />
+                  <Button onClick={copyShareUrl} size="icon" variant="outline">
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Anyone with this link can import this preset into their Batch Optimizer.
+                </p>
+              </TabsContent>
+              
+              <TabsContent value="qr" className="flex flex-col items-center gap-4 mt-4">
+                <div className="p-4 bg-white rounded-lg">
+                  <QRCodeSVG 
+                    value={shareUrl} 
+                    size={200}
+                    level="M"
+                    includeMargin={true}
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground text-center">
+                  Scan this QR code to import the preset on another device.
+                </p>
+              </TabsContent>
+            </Tabs>
+
+            {sharePreset && (
+              <div className="border rounded-lg p-3 bg-muted/30 space-y-2">
+                <p className="text-sm font-medium">{sharePreset.name}</p>
+                <div className="flex flex-wrap gap-1">
+                  <Badge variant="outline" className="text-xs">
+                    Quality: {sharePreset.settings.quality}%
+                  </Badge>
+                  <Badge variant="outline" className="text-xs">
+                    {sharePreset.settings.format.toUpperCase()}
+                  </Badge>
+                  <Badge variant="outline" className="text-xs">
+                    Sharpening: {sharePreset.settings.sharpening}
+                  </Badge>
+                </div>
+              </div>
+            )}
+
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setShowShareDialog(false)}>
+                Close
               </Button>
             </DialogFooter>
           </DialogContent>

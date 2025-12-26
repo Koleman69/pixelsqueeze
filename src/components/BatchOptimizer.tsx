@@ -17,7 +17,10 @@ import {
   Package,
   Clock,
   ImageIcon,
-  SplitSquareHorizontal
+  SplitSquareHorizontal,
+  Rocket,
+  Scale,
+  Crown
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useWebGLImageProcessor } from '@/hooks/useWebGLImageProcessor';
@@ -49,6 +52,55 @@ interface BatchSettings {
   format: 'jpeg' | 'png' | 'webp';
 }
 
+type PresetType = 'fast' | 'balanced' | 'quality';
+
+interface Preset {
+  name: string;
+  description: string;
+  icon: typeof Rocket;
+  settings: BatchSettings;
+  color: string;
+}
+
+const presets: Record<PresetType, Preset> = {
+  fast: {
+    name: 'Fast',
+    description: 'Maximum speed, good compression',
+    icon: Rocket,
+    color: 'text-orange-500 border-orange-500/30 bg-orange-500/10',
+    settings: {
+      quality: 70,
+      sharpening: 'none',
+      noiseReduction: 0,
+      format: 'webp',
+    },
+  },
+  balanced: {
+    name: 'Balanced',
+    description: 'Best mix of speed and quality',
+    icon: Scale,
+    color: 'text-blue-500 border-blue-500/30 bg-blue-500/10',
+    settings: {
+      quality: 85,
+      sharpening: 'moderate',
+      noiseReduction: 20,
+      format: 'webp',
+    },
+  },
+  quality: {
+    name: 'Quality',
+    description: 'Maximum quality preservation',
+    icon: Crown,
+    color: 'text-purple-500 border-purple-500/30 bg-purple-500/10',
+    settings: {
+      quality: 95,
+      sharpening: 'subtle',
+      noiseReduction: 30,
+      format: 'png',
+    },
+  },
+};
+
 const sharpeningStrengths = {
   none: 0,
   subtle: 0.3,
@@ -70,14 +122,16 @@ export const BatchOptimizer = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [dragCounter, setDragCounter] = useState(0);
   const [compareImage, setCompareImage] = useState<BatchImage | null>(null);
+  const [activePreset, setActivePreset] = useState<PresetType>('balanced');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dropZoneRef = useRef<HTMLDivElement>(null);
-  const [settings] = useState<BatchSettings>({
-    quality: 85,
-    sharpening: 'moderate',
-    noiseReduction: 20,
-    format: 'webp',
-  });
+  const [settings, setSettings] = useState<BatchSettings>(presets.balanced.settings);
+
+  const handlePresetChange = (preset: PresetType) => {
+    setActivePreset(preset);
+    setSettings(presets[preset].settings);
+    toast.success(`Switched to ${presets[preset].name} preset`);
+  };
 
   const { processImage: processWithWebGL, isWebGLSupported } = useWebGLImageProcessor();
   const webGLAvailable = isWebGLSupported();
@@ -489,6 +543,63 @@ export const BatchOptimizer = () => {
                 </Badge>
               )}
             </div>
+          </div>
+        </div>
+
+        {/* Preset Selector */}
+        <div className="space-y-2">
+          <h4 className="text-sm font-medium flex items-center gap-2">
+            <Sparkles className="h-4 w-4 text-primary" />
+            Processing Preset
+          </h4>
+          <div className="grid grid-cols-3 gap-2">
+            {(Object.keys(presets) as PresetType[]).map((key) => {
+              const preset = presets[key];
+              const Icon = preset.icon;
+              const isActive = activePreset === key;
+              
+              return (
+                <button
+                  key={key}
+                  onClick={() => handlePresetChange(key)}
+                  disabled={isProcessing}
+                  className={`
+                    relative p-3 rounded-lg border-2 transition-all duration-200
+                    ${isActive 
+                      ? `${preset.color} border-current shadow-md` 
+                      : 'border-border hover:border-primary/50 hover:bg-primary/5'
+                    }
+                    ${isProcessing ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+                  `}
+                >
+                  <div className="flex flex-col items-center gap-1">
+                    <Icon className={`h-5 w-5 ${isActive ? '' : 'text-muted-foreground'}`} />
+                    <span className={`text-sm font-medium ${isActive ? '' : 'text-foreground'}`}>
+                      {preset.name}
+                    </span>
+                    <span className="text-[10px] text-muted-foreground leading-tight text-center">
+                      {preset.description}
+                    </span>
+                  </div>
+                  {isActive && (
+                    <div className="absolute -top-1 -right-1">
+                      <CheckCircle2 className="h-4 w-4 text-current" />
+                    </div>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+          <div className="flex flex-wrap gap-2 text-xs text-muted-foreground mt-2">
+            <Badge variant="outline" className="font-normal">
+              Quality: {settings.quality}%
+            </Badge>
+            <Badge variant="outline" className="font-normal">
+              Format: {settings.format.toUpperCase()}
+            </Badge>
+            <Badge variant="outline" className="font-normal">
+              Sharpening: {settings.sharpening}
+            </Badge>
           </div>
         </div>
 

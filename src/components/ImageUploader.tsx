@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { Settings, Upload, Crown, Download, Zap, Image, Video, Volume2, VolumeX, Smartphone, Globe, Archive, SlidersHorizontal, Save, Star, Trash2, Plus, FileUp, FileDown, Clock, Camera } from 'lucide-react';
+import { Settings, Upload, Crown, Download, Zap, Image, Video, Volume2, VolumeX, Smartphone, Globe, Archive, SlidersHorizontal, Save, Star, Trash2, Plus, FileUp, FileDown, Clock, Camera, Sparkles } from 'lucide-react';
 import { CompressionSettings, useImageCompression } from '@/hooks/useImageCompression';
 import { useVideoCompression, VideoCompressionSettings, VideoOutputFormat } from '@/hooks/useVideoCompression';
 import { VideoCompressionResults } from '@/components/VideoCompressionResults';
@@ -17,6 +17,8 @@ import { VideoQueue } from '@/components/VideoQueue';
 import { BatchRenameDialog } from '@/components/BatchRenameDialog';
 import { useToast } from '@/hooks/use-toast';
 import { CompressionStatus } from '@/components/CompressionStatus';
+import { ImagePresets } from '@/components/ImagePresets';
+import { AIRecommendation } from '@/components/AIRecommendation';
 
 interface ImageUploaderProps {
   onUpload?: (files: FileList) => void;
@@ -41,7 +43,8 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
     outputFormat: 'webm',
     preserveAudio: true
   });
-  const [selectedPreset, setSelectedPreset] = useState<string>('custom');
+  const [selectedPreset, setSelectedPreset] = useState<string>('web');
+  const [selectedImagePreset, setSelectedImagePreset] = useState<string>('web');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -536,25 +539,56 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
           </TabsList>
 
           <TabsContent value="image" className="space-y-6 mt-6">
-            {/* Image Settings */}
+            {/* Step 1: Image Presets - One-Click Selection */}
+            <ImagePresets
+              selectedPreset={selectedImagePreset}
+              onSelectPreset={(key, presetSettings) => {
+                setSelectedImagePreset(key);
+                setSettings(presetSettings);
+              }}
+              isSubscribed={subscription.subscribed}
+            />
+
+            {/* Step 2: AI Recommendation */}
+            <AIRecommendation
+              selectedFiles={selectedFiles}
+              currentSettings={settings}
+              onApplyRecommendation={(newSettings, presetKey) => {
+                setSettings(newSettings);
+                setSelectedImagePreset(presetKey);
+                toast({
+                  title: "Settings Applied",
+                  description: "AI-recommended settings have been applied",
+                });
+              }}
+              isSubscribed={subscription.subscribed}
+            />
+
+            {/* Step 3: Fine-tune Settings (Collapsible) */}
             <div className="flex items-center gap-4">
               <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
                 <DialogTrigger asChild>
-                  <Button variant="outline">
-                    <Settings className="w-4 h-4 mr-2" />
-                    Image Settings
+                  <Button variant="outline" size="sm">
+                    <SlidersHorizontal className="w-4 h-4 mr-2" />
+                    Fine-tune Settings
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="max-w-md">
                   <DialogHeader>
-                    <DialogTitle>Image Compression Settings</DialogTitle>
+                    <DialogTitle className="flex items-center gap-2">
+                      <Settings className="w-5 h-5" />
+                      Image Compression Settings
+                    </DialogTitle>
                   </DialogHeader>
                   <div className="space-y-6">
                     <div className="space-y-2">
                       <Label>Quality: {settings.quality}%</Label>
                       <Slider
                         value={[settings.quality]}
-                        onValueChange={([value]) => setSettings(prev => ({ ...prev, quality: value }))}
+                        onValueChange={([value]) => {
+                          setSettings(prev => ({ ...prev, quality: value }));
+                          setSelectedImagePreset('custom');
+                        }}
                         max={subscription.subscribed ? 100 : 85}
                         min={10}
                         step={5}
@@ -572,7 +606,10 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
                         <Input
                           type="number"
                           value={settings.maxWidth}
-                          onChange={(e) => setSettings(prev => ({ ...prev, maxWidth: parseInt(e.target.value) || 1920 }))}
+                          onChange={(e) => {
+                            setSettings(prev => ({ ...prev, maxWidth: parseInt(e.target.value) || 1920 }));
+                            setSelectedImagePreset('custom');
+                          }}
                           max={subscription.subscribed ? 4096 : 1920}
                           min={100}
                         />
@@ -582,7 +619,10 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
                         <Input
                           type="number"
                           value={settings.maxHeight}
-                          onChange={(e) => setSettings(prev => ({ ...prev, maxHeight: parseInt(e.target.value) || 1920 }))}
+                          onChange={(e) => {
+                            setSettings(prev => ({ ...prev, maxHeight: parseInt(e.target.value) || 1920 }));
+                            setSelectedImagePreset('custom');
+                          }}
                           max={subscription.subscribed ? 4096 : 1920}
                           min={100}
                         />
@@ -593,7 +633,10 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
                       <Label>DPI: {settings.dpi}</Label>
                       <Slider
                         value={[settings.dpi]}
-                        onValueChange={([value]) => setSettings(prev => ({ ...prev, dpi: value }))}
+                        onValueChange={([value]) => {
+                          setSettings(prev => ({ ...prev, dpi: value }));
+                          setSelectedImagePreset('custom');
+                        }}
                         max={subscription.subscribed ? 300 : 72}
                         min={72}
                         step={1}
@@ -618,39 +661,57 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
               </Dialog>
 
               {subscription.subscribed && selectedFiles && selectedFiles.length > 1 && (
-                <Button onClick={handleBulkCompress} variant="outline">
+                <Button onClick={handleBulkCompress} variant="outline" size="sm">
                   <Zap className="w-4 h-4 mr-2" />
                   Bulk Compress ({selectedFiles.length} files)
                 </Button>
               )}
 
               {compressions.some(c => c.status === 'completed') && (
-                <Button onClick={handleBulkDownload} variant="outline">
+                <Button onClick={handleBulkDownload} variant="outline" size="sm">
                   <Download className="w-4 h-4 mr-2" />
                   Download All
                 </Button>
               )}
             </div>
 
-            {/* Image Upload Area */}
+            {/* Current Settings Display */}
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs text-muted-foreground">Current:</span>
+              <Badge variant="outline" className="text-xs">
+                {selectedImagePreset === 'custom' ? 'Custom' : selectedImagePreset.charAt(0).toUpperCase() + selectedImagePreset.slice(1)}
+              </Badge>
+              <Badge variant="secondary" className="text-xs">Quality: {settings.quality}%</Badge>
+              <Badge variant="secondary" className="text-xs">{settings.maxWidth}×{settings.maxHeight}</Badge>
+              <Badge variant="secondary" className="text-xs">{settings.dpi} DPI</Badge>
+              {requiresSubscription && (
+                <Badge variant="destructive" className="text-xs">Pro Required</Badge>
+              )}
+            </div>
+
+            {/* Step 4: Upload Area */}
             <div 
-              className={`border-2 border-dashed rounded-lg p-8 text-center transition-all ${
+              className={`border-2 border-dashed rounded-xl p-8 text-center transition-all ${
                 isDragging 
                   ? 'border-primary bg-primary/5 scale-[1.02]' 
-                  : 'border-border hover:border-primary'
+                  : 'border-border hover:border-primary/50 bg-muted/20'
               }`}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={(e) => handleDrop(e, 'image')}
             >
-              <Upload className={`w-12 h-12 mx-auto mb-4 text-muted-foreground ${isUploading ? 'animate-bounce' : isDragging ? 'text-primary animate-pulse' : ''}`} />
+              <div className={`w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center ${
+                isUploading ? 'bg-primary/10 animate-pulse' : isDragging ? 'bg-primary/20' : 'bg-muted'
+              }`}>
+                <Upload className={`w-8 h-8 ${isUploading ? 'animate-bounce text-primary' : isDragging ? 'text-primary' : 'text-muted-foreground'}`} />
+              </div>
               <h3 className="text-lg font-semibold mb-2">
-                {isUploading ? 'Processing Images...' : isDragging ? 'Drop Images Here' : 'Upload Images'}
+                {isUploading ? 'Compressing...' : isDragging ? 'Drop Images Here' : 'Upload Your Images'}
               </h3>
-              <p className="text-muted-foreground mb-4">
+              <p className="text-muted-foreground mb-4 text-sm">
                 {isUploading 
-                  ? `Compressing ${selectedFiles?.length || 0} image(s)...` 
-                  : 'Choose a file or take a photo with your camera'
+                  ? `Processing ${selectedFiles?.length || 0} image(s) with ${selectedImagePreset} preset...` 
+                  : 'Drag & drop or use the buttons below'
                 }
               </p>
               
@@ -658,8 +719,7 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
                 <div className="flex flex-col sm:flex-row gap-3 justify-center mb-4">
                   <Button 
                     onClick={handleFileSelect}
-                    variant="outline"
-                    className="flex-1 sm:flex-none"
+                    className="flex-1 sm:flex-none bg-gradient-primary"
                   >
                     <Upload className="w-4 h-4 mr-2" />
                     Browse Files
@@ -676,7 +736,7 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
               )}
               
               {!isUploading && (
-                <p className="text-sm text-muted-foreground">
+                <p className="text-xs text-muted-foreground">
                   {subscription.subscribed 
                     ? "Unlimited files • All formats • Up to 50MB each" 
                     : "Up to 3 files • JPEG, PNG, WebP • Up to 10MB each"
@@ -702,16 +762,6 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
                 onChange={handleFileChange}
                 disabled={isUploading}
               />
-            </div>
-
-            {/* Image Settings Display */}
-            <div className="flex flex-wrap gap-2 mb-6">
-              <Badge variant="outline">Quality: {settings.quality}%</Badge>
-              <Badge variant="outline">Size: {settings.maxWidth}×{settings.maxHeight}</Badge>
-              <Badge variant="outline">DPI: {settings.dpi}</Badge>
-              {requiresSubscription && (
-                <Badge variant="destructive">Pro Required</Badge>
-              )}
             </div>
 
             {/* Recent Image Compressions */}

@@ -56,6 +56,57 @@ export type Database = {
         }
         Relationships: []
       }
+      batch_processing_stats: {
+        Row: {
+          avg_compression_ratio: number
+          created_at: string
+          failed_count: number
+          id: string
+          image_count: number
+          preset_name: string | null
+          processed_at: string
+          processing_time_ms: number
+          settings: Json | null
+          success_count: number
+          total_optimized_size: number
+          total_original_size: number
+          total_saved: number
+          user_id: string
+        }
+        Insert: {
+          avg_compression_ratio?: number
+          created_at?: string
+          failed_count?: number
+          id?: string
+          image_count?: number
+          preset_name?: string | null
+          processed_at?: string
+          processing_time_ms?: number
+          settings?: Json | null
+          success_count?: number
+          total_optimized_size?: number
+          total_original_size?: number
+          total_saved?: number
+          user_id: string
+        }
+        Update: {
+          avg_compression_ratio?: number
+          created_at?: string
+          failed_count?: number
+          id?: string
+          image_count?: number
+          preset_name?: string | null
+          processed_at?: string
+          processing_time_ms?: number
+          settings?: Json | null
+          success_count?: number
+          total_optimized_size?: number
+          total_original_size?: number
+          total_saved?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       blog_posts: {
         Row: {
           author_id: string

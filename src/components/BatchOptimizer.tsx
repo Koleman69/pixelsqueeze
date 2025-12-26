@@ -8,6 +8,8 @@ import { Slider } from '@/components/ui/slider';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 import { 
   Sparkles, 
   Download, 
@@ -188,6 +190,7 @@ const sharpeningKernels = {
 };
 
 export const BatchOptimizer = () => {
+  const { user } = useAuth();
   const [images, setImages] = useState<BatchImage[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [overallProgress, setOverallProgress] = useState(0);
@@ -799,6 +802,30 @@ export const BatchOptimizer = () => {
         saveProcessingHistory(updated);
         return updated;
       });
+
+      // Save to database if user is logged in
+      if (user) {
+        try {
+          const statsData = {
+            user_id: user.id,
+            processed_at: new Date().toISOString(),
+            image_count: pendingImages.length,
+            success_count: completed,
+            failed_count: pendingImages.length - completed,
+            total_original_size: totalOriginal,
+            total_optimized_size: totalOptimized,
+            total_saved: totalOriginal - totalOptimized,
+            avg_compression_ratio: avgRatio,
+            processing_time_ms: totalTime,
+            preset_name: presetName,
+            settings: settings as unknown,
+          };
+          // Use type assertion since table was just created and types may not be updated
+          await (supabase.from('batch_processing_stats' as 'batch_jobs') as unknown as ReturnType<typeof supabase.from>).insert(statsData);
+        } catch (err) {
+          console.error('Failed to save stats:', err);
+        }
+      }
     }
     
     toast.success(`Batch complete! ${completed} images processed${webGLAvailable ? ' (GPU accelerated)' : ''}`);

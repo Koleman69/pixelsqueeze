@@ -3,6 +3,9 @@ project_id = "xjqysurmwoukskgkwjjc"
 [functions.ai-edit-image]
 verify_jwt = true
 
+[functions.analyze-image]
+verify_jwt = false
+
 [functions.compress-image]
 verify_jwt = true
 

@@ -25,6 +25,7 @@ import { UsageLimits, FREE_LIMITS } from "@/components/UsageLimits";
 import { AICaptionGenerator } from "@/components/AICaptionGenerator";
 import { EnhancedVideoProgress } from "@/components/EnhancedVideoProgress";
 import { SocialMediaExporter } from "@/components/SocialMediaExporter";
+import { ProfessionalOptimizer } from "@/components/ProfessionalOptimizer";
 
 const mockCompressions = [
   {
@@ -483,13 +484,30 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Social Media Exporter */}
+      {/* Professional AI Optimizer */}
       <section className="section-padding">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-8">
             <Badge variant="outline" className="mb-4 px-4 py-2 border-primary text-primary">
+              <Sparkles className="w-4 h-4 mr-2" />
+              Step 4: Pro Optimization
+            </Badge>
+            <h2 className="text-3xl font-bold mb-2">Professional AI Optimizer</h2>
+            <p className="text-muted-foreground">
+              Maximum fidelity with minimal file size. Web-ready & print-ready exports.
+            </p>
+          </div>
+          <ProfessionalOptimizer />
+        </div>
+      </section>
+
+      {/* Social Media Exporter */}
+      <section className="section-padding bg-secondary/20">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-8">
+            <Badge variant="outline" className="mb-4 px-4 py-2 border-primary text-primary">
               <Share2 className="w-4 h-4 mr-2" />
-              Step 4: Export for Social
+              Step 5: Export for Social
             </Badge>
             <h2 className="text-3xl font-bold mb-2">Platform Export</h2>
             <p className="text-muted-foreground">

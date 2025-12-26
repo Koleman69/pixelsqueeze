@@ -16,10 +16,13 @@ import {
   FolderOpen,
   Package,
   Clock,
-  ImageIcon
+  ImageIcon,
+  SplitSquareHorizontal
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useWebGLImageProcessor } from '@/hooks/useWebGLImageProcessor';
+import { ImageCompareSlider } from '@/components/ImageCompareSlider';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import JSZip from 'jszip';
 
 interface BatchImage {
@@ -66,6 +69,7 @@ export const BatchOptimizer = () => {
   const [overallProgress, setOverallProgress] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [dragCounter, setDragCounter] = useState(0);
+  const [compareImage, setCompareImage] = useState<BatchImage | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dropZoneRef = useRef<HTMLDivElement>(null);
   const [settings] = useState<BatchSettings>({
@@ -507,9 +511,13 @@ export const BatchOptimizer = () => {
                     className="flex items-center gap-3 p-2 rounded-lg bg-muted/50 hover:bg-muted/80 transition-colors"
                   >
                     {/* Thumbnail */}
-                    <div className="w-12 h-12 rounded overflow-hidden flex-shrink-0 bg-muted">
+                    <div 
+                      className="w-12 h-12 rounded overflow-hidden flex-shrink-0 bg-muted cursor-pointer hover:ring-2 hover:ring-primary/50 transition-all"
+                      onClick={() => img.status === 'completed' && img.result && setCompareImage(img)}
+                      title={img.status === 'completed' ? 'Click to compare' : undefined}
+                    >
                       <img 
-                        src={img.preview} 
+                        src={img.status === 'completed' && img.result ? img.result.url : img.preview} 
                         alt={img.file.name}
                         className="w-full h-full object-cover"
                       />
@@ -533,6 +541,19 @@ export const BatchOptimizer = () => {
                         <Progress value={img.progress} className="h-1 mt-1" />
                       )}
                     </div>
+
+                    {/* Compare button for completed */}
+                    {img.status === 'completed' && img.result && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 flex-shrink-0"
+                        onClick={() => setCompareImage(img)}
+                        title="Compare original vs optimized"
+                      >
+                        <SplitSquareHorizontal className="h-4 w-4 text-primary" />
+                      </Button>
+                    )}
 
                     {/* Status */}
                     <div className="flex-shrink-0">
@@ -639,6 +660,45 @@ export const BatchOptimizer = () => {
           </div>
         )}
       </CardContent>
+
+      {/* Comparison Dialog */}
+      <Dialog open={!!compareImage} onOpenChange={() => setCompareImage(null)}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <SplitSquareHorizontal className="h-5 w-5 text-primary" />
+              Compare: {compareImage?.file.name}
+            </DialogTitle>
+          </DialogHeader>
+          {compareImage && compareImage.result && (
+            <div className="space-y-4">
+              <ImageCompareSlider
+                beforeImage={compareImage.preview}
+                afterImage={compareImage.result.url}
+                beforeLabel="Original"
+                afterLabel="Optimized"
+                beforeSize={formatBytes(compareImage.file.size)}
+                afterSize={formatBytes(compareImage.result.optimizedSize)}
+                compressionRatio={compareImage.result.compressionRatio}
+              />
+              <div className="grid grid-cols-3 gap-4 p-3 rounded-lg bg-muted/50 text-center">
+                <div>
+                  <p className="text-lg font-bold">{formatBytes(compareImage.file.size)}</p>
+                  <p className="text-xs text-muted-foreground">Original</p>
+                </div>
+                <div>
+                  <p className="text-lg font-bold text-primary">{formatBytes(compareImage.result.optimizedSize)}</p>
+                  <p className="text-xs text-muted-foreground">Optimized</p>
+                </div>
+                <div>
+                  <p className="text-lg font-bold text-green-500">-{compareImage.result.compressionRatio}%</p>
+                  <p className="text-xs text-muted-foreground">Saved</p>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 };

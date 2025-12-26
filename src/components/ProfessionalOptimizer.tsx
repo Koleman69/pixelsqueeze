@@ -28,6 +28,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useWebGLImageProcessor } from '@/hooks/useWebGLImageProcessor';
+import { ImageCompareSlider } from '@/components/ImageCompareSlider';
 
 export interface OptimizationSettings {
   preset: 'web' | 'print';
@@ -524,55 +525,55 @@ export const ProfessionalOptimizer = () => {
       </CardHeader>
 
       <CardContent className="space-y-6">
-        {/* Image Preview */}
-        <div className="grid grid-cols-2 gap-4">
+        {/* Image Preview - Show comparison slider when optimized */}
+        {optimizedPreview && result ? (
           <div className="space-y-2">
-            <Label className="text-xs text-muted-foreground">Original</Label>
-            <div className="relative aspect-video rounded-lg overflow-hidden bg-muted">
-              <img 
-                src={imagePreview} 
-                alt="Original" 
-                className="w-full h-full object-contain"
-              />
-              {imageFile && (
-                <Badge className="absolute bottom-2 right-2 bg-background/80 text-foreground text-xs">
-                  {formatBytes(imageFile.size)}
-                </Badge>
-              )}
+            <div className="flex items-center justify-between">
+              <Label className="text-xs text-muted-foreground">Compare Original vs Optimized</Label>
+              <Badge variant="outline" className="text-xs">
+                Saved {formatBytes(result.originalSize - result.optimizedSize)} ({result.compressionRatio}%)
+              </Badge>
             </div>
+            <ImageCompareSlider
+              beforeImage={imagePreview!}
+              afterImage={optimizedPreview}
+              beforeLabel="Original"
+              afterLabel="Optimized"
+              beforeSize={formatBytes(imageFile!.size)}
+              afterSize={formatBytes(result.optimizedSize)}
+              compressionRatio={result.compressionRatio}
+            />
           </div>
-          <div className="space-y-2">
-            <Label className="text-xs text-muted-foreground">
-              {result ? 'Optimized' : 'Preview'}
-            </Label>
-            <div className="relative aspect-video rounded-lg overflow-hidden bg-muted">
-              {optimizedPreview ? (
-                <>
-                  <img 
-                    src={optimizedPreview} 
-                    alt="Optimized" 
-                    className="w-full h-full object-contain"
-                  />
-                  {result && (
-                    <Badge className="absolute bottom-2 right-2 bg-primary text-primary-foreground text-xs">
-                      {formatBytes(result.optimizedSize)} (-{result.compressionRatio}%)
-                    </Badge>
-                  )}
-                  <div className="absolute top-2 right-2">
-                    <CheckCircle2 className="h-5 w-5 text-green-500" />
-                  </div>
-                </>
-              ) : (
+        ) : (
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label className="text-xs text-muted-foreground">Original</Label>
+              <div className="relative aspect-video rounded-lg overflow-hidden bg-muted">
+                <img 
+                  src={imagePreview} 
+                  alt="Original" 
+                  className="w-full h-full object-contain"
+                />
+                {imageFile && (
+                  <Badge className="absolute bottom-2 right-2 bg-background/80 text-foreground text-xs">
+                    {formatBytes(imageFile.size)}
+                  </Badge>
+                )}
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs text-muted-foreground">Preview</Label>
+              <div className="relative aspect-video rounded-lg overflow-hidden bg-muted">
                 <div className="w-full h-full flex items-center justify-center text-muted-foreground">
                   <div className="text-center">
                     <Eye className="h-8 w-8 mx-auto mb-2 opacity-50" />
                     <p className="text-xs">Click optimize to preview</p>
                   </div>
                 </div>
-              )}
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Progress Bar */}
         {isProcessing && (

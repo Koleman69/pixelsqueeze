@@ -19,6 +19,7 @@ import { useToast } from '@/hooks/use-toast';
 import { CompressionStatus } from '@/components/CompressionStatus';
 import { ImagePresets } from '@/components/ImagePresets';
 import { AIRecommendation } from '@/components/AIRecommendation';
+import { SmartImageAnalysis } from '@/components/SmartImageAnalysis';
 
 interface ImageUploaderProps {
   onUpload?: (files: FileList) => void;
@@ -53,6 +54,9 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
   const [newPresetName, setNewPresetName] = useState('');
   const [showSavePreset, setShowSavePreset] = useState(false);
   const [showBatchRename, setShowBatchRename] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [currentImageFile, setCurrentImageFile] = useState<File | null>(null);
+  const [appliedFilter, setAppliedFilter] = useState<string>('none');
 
   // Load saved presets from localStorage on mount
   useEffect(() => {
@@ -330,6 +334,17 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
     const files = event.target.files;
     if (files && files.length > 0) {
       setSelectedFiles(files);
+      
+      // Create preview for first file (for AI analysis)
+      if (files[0]) {
+        setCurrentImageFile(files[0]);
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          setImagePreview(e.target?.result as string);
+        };
+        reader.readAsDataURL(files[0]);
+      }
+      
       setIsUploading(true);
       
       if (onUpload) {
@@ -549,7 +564,21 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
               isSubscribed={subscription.subscribed}
             />
 
-            {/* Step 2: AI Recommendation */}
+            {/* Step 2: Smart AI Analysis */}
+            <SmartImageAnalysis
+              imageFile={currentImageFile}
+              imagePreview={imagePreview}
+              onApplySettings={(newSettings, presetKey) => {
+                setSettings(newSettings);
+                setSelectedImagePreset(presetKey);
+              }}
+              onApplyFilter={(filter) => {
+                setAppliedFilter(filter);
+              }}
+              isSubscribed={subscription.subscribed}
+            />
+
+            {/* Step 3: Quick AI Recommendation (for basic analysis) */}
             <AIRecommendation
               selectedFiles={selectedFiles}
               currentSettings={settings}

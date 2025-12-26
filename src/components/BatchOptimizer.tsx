@@ -64,7 +64,10 @@ export const BatchOptimizer = () => {
   const [images, setImages] = useState<BatchImage[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [overallProgress, setOverallProgress] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragCounter, setDragCounter] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const dropZoneRef = useRef<HTMLDivElement>(null);
   const [settings] = useState<BatchSettings>({
     quality: 85,
     sharpening: 'moderate',
@@ -75,13 +78,20 @@ export const BatchOptimizer = () => {
   const { processImage: processWithWebGL, isWebGLSupported } = useWebGLImageProcessor();
   const webGLAvailable = isWebGLSupported();
 
-  const handleFilesSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (!files || files.length === 0) return;
-
-    const newImages: BatchImage[] = [];
+  const addFiles = useCallback((files: FileList | File[]) => {
+    const fileArray = Array.from(files);
+    const imageFiles = fileArray.filter(file => file.type.startsWith('image/'));
     
-    Array.from(files).forEach((file) => {
+    if (imageFiles.length === 0) {
+      toast.error('Please select valid image files');
+      return;
+    }
+
+    if (imageFiles.length !== fileArray.length) {
+      toast.warning(`${fileArray.length - imageFiles.length} non-image files were skipped`);
+    }
+    
+    imageFiles.forEach((file) => {
       const id = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
       const reader = new FileReader();
       
@@ -99,9 +109,55 @@ export const BatchOptimizer = () => {
       reader.readAsDataURL(file);
     });
 
-    // Reset input
+    toast.success(`Added ${imageFiles.length} image${imageFiles.length > 1 ? 's' : ''}`);
+  }, []);
+
+  const handleFilesSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+    addFiles(files);
     event.target.value = '';
   };
+
+  // Drag and drop handlers
+  const handleDragEnter = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragCounter(prev => prev + 1);
+    
+    if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
+      setIsDragging(true);
+    }
+  }, []);
+
+  const handleDragLeave = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragCounter(prev => {
+      const newCount = prev - 1;
+      if (newCount === 0) {
+        setIsDragging(false);
+      }
+      return newCount;
+    });
+  }, []);
+
+  const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+  }, []);
+
+  const handleDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    setDragCounter(0);
+    
+    const { files } = e.dataTransfer;
+    if (files && files.length > 0) {
+      addFiles(files);
+    }
+  }, [addFiles]);
 
   const removeImage = (id: string) => {
     setImages(prev => prev.filter(img => img.id !== id));
@@ -369,10 +425,21 @@ export const BatchOptimizer = () => {
       </CardHeader>
 
       <CardContent className="space-y-4">
-        {/* Upload Area */}
+        {/* Upload Area with Drag & Drop */}
         <div 
-          className="border-2 border-dashed border-primary/30 rounded-lg p-6 text-center hover:border-primary/50 transition-colors cursor-pointer"
+          ref={dropZoneRef}
+          className={`
+            relative border-2 border-dashed rounded-lg p-6 text-center transition-all duration-200 cursor-pointer
+            ${isDragging 
+              ? 'border-primary bg-primary/10 scale-[1.02] shadow-lg shadow-primary/20' 
+              : 'border-primary/30 hover:border-primary/50 hover:bg-primary/5'
+            }
+          `}
           onClick={() => fileInputRef.current?.click()}
+          onDragEnter={handleDragEnter}
+          onDragLeave={handleDragLeave}
+          onDragOver={handleDragOver}
+          onDrop={handleDrop}
         >
           <input
             ref={fileInputRef}
@@ -382,11 +449,43 @@ export const BatchOptimizer = () => {
             className="hidden"
             onChange={handleFilesSelect}
           />
-          <FolderOpen className="h-10 w-10 mx-auto text-primary/60 mb-3" />
-          <p className="text-sm font-medium">Drop images here or click to browse</p>
-          <p className="text-xs text-muted-foreground mt-1">
-            Supports JPG, PNG, WebP • Multiple selection enabled
-          </p>
+          
+          {/* Drag overlay */}
+          {isDragging && (
+            <div className="absolute inset-0 flex items-center justify-center bg-primary/5 rounded-lg z-10 pointer-events-none">
+              <div className="text-center animate-pulse">
+                <Download className="h-12 w-12 mx-auto text-primary mb-2" />
+                <p className="text-lg font-semibold text-primary">Drop images here</p>
+                <p className="text-sm text-primary/70">Release to add to queue</p>
+              </div>
+            </div>
+          )}
+          
+          {/* Default state */}
+          <div className={isDragging ? 'opacity-0' : 'opacity-100 transition-opacity'}>
+            <div className="relative mx-auto w-16 h-16 mb-3">
+              <FolderOpen className={`h-10 w-10 mx-auto text-primary/60 transition-transform ${isDragging ? 'scale-110' : ''}`} />
+              <div className="absolute -bottom-1 -right-1 bg-primary rounded-full p-1">
+                <Upload className="h-3 w-3 text-primary-foreground" />
+              </div>
+            </div>
+            <p className="text-sm font-medium">Drag & drop images here</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              or click to browse • Supports JPG, PNG, WebP
+            </p>
+            <div className="flex items-center justify-center gap-4 mt-3">
+              <Badge variant="outline" className="text-xs">
+                <ImageIcon className="h-3 w-3 mr-1" />
+                Multiple files
+              </Badge>
+              {webGLAvailable && (
+                <Badge variant="outline" className="text-xs text-green-600 border-green-600/30">
+                  <Zap className="h-3 w-3 mr-1" />
+                  GPU accelerated
+                </Badge>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* Image Queue */}

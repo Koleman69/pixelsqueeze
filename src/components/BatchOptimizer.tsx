@@ -28,7 +28,9 @@ import {
   Plus,
   Settings2,
   Save,
-  Pencil
+  Pencil,
+  FileDown,
+  FileUp
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useWebGLImageProcessor } from '@/hooks/useWebGLImageProcessor';
@@ -160,6 +162,7 @@ export const BatchOptimizer = () => {
   const [customDescription, setCustomDescription] = useState('');
   const [customSettings, setCustomSettings] = useState<BatchSettings>(builtInPresets.balanced.settings);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const importInputRef = useRef<HTMLInputElement>(null);
   const dropZoneRef = useRef<HTMLDivElement>(null);
   const [settings, setSettings] = useState<BatchSettings>(builtInPresets.balanced.settings);
 
@@ -245,6 +248,93 @@ export const BatchOptimizer = () => {
       setSettings(builtInPresets.balanced.settings);
     }
     toast.success('Preset deleted');
+  };
+
+  const exportPresets = () => {
+    if (customPresets.length === 0) {
+      toast.error('No custom presets to export');
+      return;
+    }
+    
+    const exportData = {
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      presets: customPresets.map(({ name, description, settings }) => ({
+        name,
+        description,
+        settings,
+      })),
+    };
+    
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `batch-optimizer-presets-${Date.now()}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+    
+    toast.success(`Exported ${customPresets.length} preset${customPresets.length > 1 ? 's' : ''}`);
+  };
+
+  const handleImportFile = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const content = e.target?.result as string;
+        const data = JSON.parse(content);
+        
+        if (!data.presets || !Array.isArray(data.presets)) {
+          throw new Error('Invalid preset file format');
+        }
+        
+        const validFormats = ['jpeg', 'png', 'webp'];
+        const validSharpening = ['none', 'subtle', 'moderate', 'strong'];
+        
+        const importedPresets: CustomPreset[] = data.presets
+          .filter((p: unknown) => {
+            if (!p || typeof p !== 'object') return false;
+            const preset = p as Record<string, unknown>;
+            if (!preset.name || typeof preset.name !== 'string') return false;
+            if (!preset.settings || typeof preset.settings !== 'object') return false;
+            const settings = preset.settings as Record<string, unknown>;
+            if (typeof settings.quality !== 'number' || settings.quality < 10 || settings.quality > 100) return false;
+            if (!validFormats.includes(settings.format as string)) return false;
+            if (!validSharpening.includes(settings.sharpening as string)) return false;
+            if (typeof settings.noiseReduction !== 'number' || settings.noiseReduction < 0 || settings.noiseReduction > 100) return false;
+            return true;
+          })
+          .map((p: { name: string; description?: string; settings: BatchSettings }) => ({
+            id: `custom-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            name: String(p.name).slice(0, 30),
+            description: String(p.description || '').slice(0, 50),
+            settings: {
+              quality: p.settings.quality,
+              format: p.settings.format,
+              sharpening: p.settings.sharpening,
+              noiseReduction: p.settings.noiseReduction,
+            },
+          }));
+        
+        if (importedPresets.length === 0) {
+          throw new Error('No valid presets found in file');
+        }
+        
+        const updated = [...customPresets, ...importedPresets];
+        setCustomPresets(updated);
+        saveCustomPresets(updated);
+        
+        toast.success(`Imported ${importedPresets.length} preset${importedPresets.length > 1 ? 's' : ''}`);
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : 'Failed to import presets');
+      }
+    };
+    
+    reader.readAsText(file);
+    event.target.value = '';
   };
 
   const { processImage: processWithWebGL, isWebGLSupported } = useWebGLImageProcessor();
@@ -667,16 +757,47 @@ export const BatchOptimizer = () => {
               <Sparkles className="h-4 w-4 text-primary" />
               Processing Preset
             </h4>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={openCreatePresetDialog}
-              disabled={isProcessing}
-              className="h-7 text-xs"
-            >
-              <Plus className="h-3 w-3 mr-1" />
-              Custom
-            </Button>
+            <div className="flex items-center gap-1">
+              {customPresets.length > 0 && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={exportPresets}
+                  disabled={isProcessing}
+                  className="h-7 text-xs"
+                  title="Export presets"
+                >
+                  <FileDown className="h-3 w-3" />
+                </Button>
+              )}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => importInputRef.current?.click()}
+                disabled={isProcessing}
+                className="h-7 text-xs"
+                title="Import presets"
+              >
+                <FileUp className="h-3 w-3" />
+              </Button>
+              <input
+                ref={importInputRef}
+                type="file"
+                accept=".json"
+                className="hidden"
+                onChange={handleImportFile}
+              />
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={openCreatePresetDialog}
+                disabled={isProcessing}
+                className="h-7 text-xs"
+              >
+                <Plus className="h-3 w-3 mr-1" />
+                Custom
+              </Button>
+            </div>
           </div>
 
           {/* Built-in Presets */}

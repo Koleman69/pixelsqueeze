@@ -1,9 +1,13 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Slider } from '@/components/ui/slider';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { 
   Sparkles, 
   Download, 
@@ -20,12 +24,16 @@ import {
   SplitSquareHorizontal,
   Rocket,
   Scale,
-  Crown
+  Crown,
+  Plus,
+  Settings2,
+  Save,
+  Pencil
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useWebGLImageProcessor } from '@/hooks/useWebGLImageProcessor';
 import { ImageCompareSlider } from '@/components/ImageCompareSlider';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import JSZip from 'jszip';
 
 interface BatchImage {
@@ -52,17 +60,24 @@ interface BatchSettings {
   format: 'jpeg' | 'png' | 'webp';
 }
 
-type PresetType = 'fast' | 'balanced' | 'quality';
+type BuiltInPresetType = 'fast' | 'balanced' | 'quality';
+
+interface CustomPreset {
+  id: string;
+  name: string;
+  description: string;
+  settings: BatchSettings;
+}
 
 interface Preset {
   name: string;
   description: string;
-  icon: typeof Rocket;
+  icon: React.ComponentType<{ className?: string }>;
   settings: BatchSettings;
   color: string;
 }
 
-const presets: Record<PresetType, Preset> = {
+const builtInPresets: Record<BuiltInPresetType, Preset> = {
   fast: {
     name: 'Fast',
     description: 'Maximum speed, good compression',
@@ -101,6 +116,21 @@ const presets: Record<PresetType, Preset> = {
   },
 };
 
+const CUSTOM_PRESETS_KEY = 'batch-optimizer-custom-presets';
+
+const loadCustomPresets = (): CustomPreset[] => {
+  try {
+    const stored = localStorage.getItem(CUSTOM_PRESETS_KEY);
+    return stored ? JSON.parse(stored) : [];
+  } catch {
+    return [];
+  }
+};
+
+const saveCustomPresets = (presets: CustomPreset[]) => {
+  localStorage.setItem(CUSTOM_PRESETS_KEY, JSON.stringify(presets));
+};
+
 const sharpeningStrengths = {
   none: 0,
   subtle: 0.3,
@@ -122,15 +152,99 @@ export const BatchOptimizer = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [dragCounter, setDragCounter] = useState(0);
   const [compareImage, setCompareImage] = useState<BatchImage | null>(null);
-  const [activePreset, setActivePreset] = useState<PresetType>('balanced');
+  const [activePreset, setActivePreset] = useState<string>('balanced');
+  const [customPresets, setCustomPresets] = useState<CustomPreset[]>([]);
+  const [showCustomDialog, setShowCustomDialog] = useState(false);
+  const [editingPreset, setEditingPreset] = useState<CustomPreset | null>(null);
+  const [customName, setCustomName] = useState('');
+  const [customDescription, setCustomDescription] = useState('');
+  const [customSettings, setCustomSettings] = useState<BatchSettings>(builtInPresets.balanced.settings);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dropZoneRef = useRef<HTMLDivElement>(null);
-  const [settings, setSettings] = useState<BatchSettings>(presets.balanced.settings);
+  const [settings, setSettings] = useState<BatchSettings>(builtInPresets.balanced.settings);
 
-  const handlePresetChange = (preset: PresetType) => {
+  // Load custom presets on mount
+  useEffect(() => {
+    setCustomPresets(loadCustomPresets());
+  }, []);
+
+  const handleBuiltInPresetChange = (preset: BuiltInPresetType) => {
     setActivePreset(preset);
-    setSettings(presets[preset].settings);
-    toast.success(`Switched to ${presets[preset].name} preset`);
+    setSettings(builtInPresets[preset].settings);
+    toast.success(`Switched to ${builtInPresets[preset].name} preset`);
+  };
+
+  const handleCustomPresetChange = (preset: CustomPreset) => {
+    setActivePreset(preset.id);
+    setSettings(preset.settings);
+    toast.success(`Switched to ${preset.name} preset`);
+  };
+
+  const openCreatePresetDialog = () => {
+    setEditingPreset(null);
+    setCustomName('');
+    setCustomDescription('');
+    setCustomSettings({ ...settings });
+    setShowCustomDialog(true);
+  };
+
+  const openEditPresetDialog = (preset: CustomPreset) => {
+    setEditingPreset(preset);
+    setCustomName(preset.name);
+    setCustomDescription(preset.description);
+    setCustomSettings({ ...preset.settings });
+    setShowCustomDialog(true);
+  };
+
+  const saveCustomPreset = () => {
+    const trimmedName = customName.trim();
+    if (!trimmedName) {
+      toast.error('Please enter a preset name');
+      return;
+    }
+    if (trimmedName.length > 30) {
+      toast.error('Name must be less than 30 characters');
+      return;
+    }
+
+    if (editingPreset) {
+      // Update existing
+      const updated = customPresets.map(p => 
+        p.id === editingPreset.id 
+          ? { ...p, name: trimmedName, description: customDescription.trim().slice(0, 50), settings: customSettings }
+          : p
+      );
+      setCustomPresets(updated);
+      saveCustomPresets(updated);
+      setSettings(customSettings);
+      toast.success(`Updated "${trimmedName}" preset`);
+    } else {
+      // Create new
+      const newPreset: CustomPreset = {
+        id: `custom-${Date.now()}`,
+        name: trimmedName,
+        description: customDescription.trim().slice(0, 50),
+        settings: customSettings,
+      };
+      const updated = [...customPresets, newPreset];
+      setCustomPresets(updated);
+      saveCustomPresets(updated);
+      setActivePreset(newPreset.id);
+      setSettings(customSettings);
+      toast.success(`Created "${trimmedName}" preset`);
+    }
+    setShowCustomDialog(false);
+  };
+
+  const deleteCustomPreset = (id: string) => {
+    const updated = customPresets.filter(p => p.id !== id);
+    setCustomPresets(updated);
+    saveCustomPresets(updated);
+    if (activePreset === id) {
+      setActivePreset('balanced');
+      setSettings(builtInPresets.balanced.settings);
+    }
+    toast.success('Preset deleted');
   };
 
   const { processImage: processWithWebGL, isWebGLSupported } = useWebGLImageProcessor();
@@ -547,21 +661,35 @@ export const BatchOptimizer = () => {
         </div>
 
         {/* Preset Selector */}
-        <div className="space-y-2">
-          <h4 className="text-sm font-medium flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-primary" />
-            Processing Preset
-          </h4>
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h4 className="text-sm font-medium flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-primary" />
+              Processing Preset
+            </h4>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={openCreatePresetDialog}
+              disabled={isProcessing}
+              className="h-7 text-xs"
+            >
+              <Plus className="h-3 w-3 mr-1" />
+              Custom
+            </Button>
+          </div>
+
+          {/* Built-in Presets */}
           <div className="grid grid-cols-3 gap-2">
-            {(Object.keys(presets) as PresetType[]).map((key) => {
-              const preset = presets[key];
+            {(Object.keys(builtInPresets) as BuiltInPresetType[]).map((key) => {
+              const preset = builtInPresets[key];
               const Icon = preset.icon;
               const isActive = activePreset === key;
               
               return (
                 <button
                   key={key}
-                  onClick={() => handlePresetChange(key)}
+                  onClick={() => handleBuiltInPresetChange(key)}
                   disabled={isProcessing}
                   className={`
                     relative p-3 rounded-lg border-2 transition-all duration-200
@@ -590,6 +718,65 @@ export const BatchOptimizer = () => {
               );
             })}
           </div>
+
+          {/* Custom Presets */}
+          {customPresets.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-xs text-muted-foreground">Custom Presets</p>
+              <div className="grid grid-cols-2 gap-2">
+                {customPresets.map((preset) => {
+                  const isActive = activePreset === preset.id;
+                  return (
+                    <div
+                      key={preset.id}
+                      className={`
+                        relative p-3 rounded-lg border-2 transition-all duration-200 group
+                        ${isActive 
+                          ? 'text-emerald-500 border-emerald-500/30 bg-emerald-500/10 shadow-md' 
+                          : 'border-border hover:border-primary/50 hover:bg-primary/5'
+                        }
+                        ${isProcessing ? 'opacity-50' : 'cursor-pointer'}
+                      `}
+                      onClick={() => !isProcessing && handleCustomPresetChange(preset)}
+                    >
+                      <div className="flex flex-col items-center gap-1">
+                        <Settings2 className={`h-5 w-5 ${isActive ? '' : 'text-muted-foreground'}`} />
+                        <span className={`text-sm font-medium ${isActive ? '' : 'text-foreground'}`}>
+                          {preset.name}
+                        </span>
+                        {preset.description && (
+                          <span className="text-[10px] text-muted-foreground leading-tight text-center line-clamp-1">
+                            {preset.description}
+                          </span>
+                        )}
+                      </div>
+                      {isActive && (
+                        <div className="absolute -top-1 -right-1">
+                          <CheckCircle2 className="h-4 w-4 text-current" />
+                        </div>
+                      )}
+                      {/* Edit/Delete buttons */}
+                      <div className="absolute top-1 left-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); openEditPresetDialog(preset); }}
+                          className="p-1 rounded bg-background/80 hover:bg-primary/20"
+                        >
+                          <Pencil className="h-3 w-3" />
+                        </button>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); deleteCustomPreset(preset.id); }}
+                          className="p-1 rounded bg-background/80 hover:bg-destructive/20 text-destructive"
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
           <div className="flex flex-wrap gap-2 text-xs text-muted-foreground mt-2">
             <Badge variant="outline" className="font-normal">
               Quality: {settings.quality}%
@@ -602,6 +789,112 @@ export const BatchOptimizer = () => {
             </Badge>
           </div>
         </div>
+
+        {/* Custom Preset Dialog */}
+        <Dialog open={showCustomDialog} onOpenChange={setShowCustomDialog}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Settings2 className="h-5 w-5 text-primary" />
+                {editingPreset ? 'Edit Preset' : 'Create Custom Preset'}
+              </DialogTitle>
+              <DialogDescription>
+                Configure your optimization settings and save them for reuse.
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="preset-name">Preset Name</Label>
+                <Input
+                  id="preset-name"
+                  placeholder="My Custom Preset"
+                  value={customName}
+                  onChange={(e) => setCustomName(e.target.value)}
+                  maxLength={30}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="preset-description">Description (optional)</Label>
+                <Input
+                  id="preset-description"
+                  placeholder="For social media images..."
+                  value={customDescription}
+                  onChange={(e) => setCustomDescription(e.target.value)}
+                  maxLength={50}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Quality: {customSettings.quality}%</Label>
+                <Slider
+                  value={[customSettings.quality]}
+                  onValueChange={([v]) => setCustomSettings(s => ({ ...s, quality: v }))}
+                  min={10}
+                  max={100}
+                  step={5}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Output Format</Label>
+                <Select
+                  value={customSettings.format}
+                  onValueChange={(v) => setCustomSettings(s => ({ ...s, format: v as BatchSettings['format'] }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="webp">WebP (Best compression)</SelectItem>
+                    <SelectItem value="jpeg">JPEG (Wide compatibility)</SelectItem>
+                    <SelectItem value="png">PNG (Lossless)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Sharpening</Label>
+                <Select
+                  value={customSettings.sharpening}
+                  onValueChange={(v) => setCustomSettings(s => ({ ...s, sharpening: v as BatchSettings['sharpening'] }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">None</SelectItem>
+                    <SelectItem value="subtle">Subtle</SelectItem>
+                    <SelectItem value="moderate">Moderate</SelectItem>
+                    <SelectItem value="strong">Strong</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Noise Reduction: {customSettings.noiseReduction}%</Label>
+                <Slider
+                  value={[customSettings.noiseReduction]}
+                  onValueChange={([v]) => setCustomSettings(s => ({ ...s, noiseReduction: v }))}
+                  min={0}
+                  max={100}
+                  step={5}
+                />
+              </div>
+            </div>
+
+            <DialogFooter className="gap-2">
+              <Button variant="outline" onClick={() => setShowCustomDialog(false)}>
+                Cancel
+              </Button>
+              <Button onClick={saveCustomPreset}>
+                <Save className="h-4 w-4 mr-2" />
+                {editingPreset ? 'Update' : 'Save'} Preset
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
         {/* Image Queue */}
         {images.length > 0 && (

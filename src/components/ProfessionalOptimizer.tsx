@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -22,9 +22,12 @@ import {
   Info,
   Upload,
   CheckCircle2,
-  RotateCcw
+  RotateCcw,
+  Cpu,
+  MonitorSmartphone
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useWebGLImageProcessor } from '@/hooks/useWebGLImageProcessor';
 
 export interface OptimizationSettings {
   preset: 'web' | 'print';
@@ -44,6 +47,8 @@ interface OptimizationResult {
   originalSize: number;
   optimizedSize: number;
   compressionRatio: number;
+  processingTime: number;
+  usedWebGL: boolean;
 }
 
 const presetConfigs: Record<'web' | 'print', Partial<OptimizationSettings>> = {
@@ -69,12 +74,20 @@ const presetConfigs: Record<'web' | 'print', Partial<OptimizationSettings>> = {
   },
 };
 
-// Sharpening kernel matrices
+// Sharpening kernel matrices for CPU fallback
 const sharpeningKernels = {
   none: null,
   subtle: [0, -0.5, 0, -0.5, 3, -0.5, 0, -0.5, 0],
   moderate: [0, -1, 0, -1, 5, -1, 0, -1, 0],
   strong: [-1, -1, -1, -1, 9, -1, -1, -1, -1],
+};
+
+// Map sharpening levels to WebGL strength values
+const sharpeningStrengths = {
+  none: 0,
+  subtle: 0.3,
+  moderate: 0.6,
+  strong: 1.2,
 };
 
 export const ProfessionalOptimizer = () => {
@@ -87,10 +100,23 @@ export const ProfessionalOptimizer = () => {
   const [activePreset, setActivePreset] = useState<'web' | 'print'>('web');
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [useWebGL, setUseWebGL] = useState(true);
+  const [webGLAvailable, setWebGLAvailable] = useState(false);
   const [settings, setSettings] = useState<OptimizationSettings>({
     preset: 'web',
     ...presetConfigs.web,
   } as OptimizationSettings);
+
+  const { processImage: processWithWebGL, isWebGLSupported, cleanup } = useWebGLImageProcessor();
+
+  // Check WebGL support on mount
+  useEffect(() => {
+    const supported = isWebGLSupported();
+    setWebGLAvailable(supported);
+    setUseWebGL(supported);
+    
+    return () => cleanup();
+  }, [isWebGLSupported, cleanup]);
 
   const handlePresetChange = (preset: 'web' | 'print') => {
     setActivePreset(preset);
@@ -228,7 +254,53 @@ export const ProfessionalOptimizer = () => {
     return new ImageData(output, width, height);
   }, []);
 
+  const optimizeImageWithWebGL = useCallback(async (img: HTMLImageElement): Promise<ImageData | null> => {
+    setProgress(15);
+    
+    const processedData = await processWithWebGL(img, {
+      sharpenStrength: sharpeningStrengths[settings.sharpening],
+      noiseReduction: settings.noiseReduction / 100,
+      detailEnhancement: (100 - settings.detailPreservation) / 100,
+      contrast: settings.dynamicRange === 'hdr' ? 1.1 : 1.0,
+      saturation: 1.0,
+      brightness: 0,
+    });
+    
+    setProgress(70);
+    return processedData;
+  }, [processWithWebGL, settings]);
+
+  const optimizeImageWithCPU = useCallback((img: HTMLImageElement, ctx: CanvasRenderingContext2D): ImageData => {
+    ctx.drawImage(img, 0, 0);
+    setProgress(20);
+
+    let imageData = ctx.getImageData(0, 0, img.width, img.height);
+    
+    // Apply noise reduction
+    if (settings.noiseReduction > 0) {
+      imageData = applyNoiseReduction(imageData, settings.noiseReduction);
+      setProgress(40);
+    }
+
+    // Apply sharpening
+    const kernel = sharpeningKernels[settings.sharpening];
+    if (kernel) {
+      imageData = applyConvolution(imageData, kernel);
+      setProgress(60);
+    }
+
+    // Enhance details
+    if (settings.detailPreservation < 100) {
+      imageData = enhanceDetails(imageData, settings.detailPreservation);
+      setProgress(70);
+    }
+
+    return imageData;
+  }, [settings, applyNoiseReduction, applyConvolution, enhanceDetails]);
+
   const optimizeImage = useCallback(async (): Promise<OptimizationResult> => {
+    const startTime = performance.now();
+    
     return new Promise((resolve, reject) => {
       if (!imagePreview || !imageFile) {
         reject(new Error('No image loaded'));
@@ -236,7 +308,7 @@ export const ProfessionalOptimizer = () => {
       }
 
       const img = new Image();
-      img.onload = () => {
+      img.onload = async () => {
         setProgress(10);
 
         // Create canvas
@@ -254,30 +326,22 @@ export const ProfessionalOptimizer = () => {
         canvas.width = img.width;
         canvas.height = img.height;
         
-        // Draw original image
-        ctx.drawImage(img, 0, 0);
-        setProgress(20);
+        let imageData: ImageData | null = null;
+        let usedWebGL = false;
 
-        // Get image data for processing
-        let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        
-        // Apply noise reduction
-        if (settings.noiseReduction > 0) {
-          imageData = applyNoiseReduction(imageData, settings.noiseReduction);
-          setProgress(40);
+        // Try WebGL processing first if enabled and available
+        if (useWebGL && webGLAvailable) {
+          try {
+            imageData = await optimizeImageWithWebGL(img);
+            usedWebGL = true;
+          } catch (error) {
+            console.warn('WebGL processing failed, falling back to CPU:', error);
+          }
         }
 
-        // Apply sharpening
-        const kernel = sharpeningKernels[settings.sharpening];
-        if (kernel) {
-          imageData = applyConvolution(imageData, kernel);
-          setProgress(60);
-        }
-
-        // Enhance details
-        if (settings.detailPreservation < 100) {
-          imageData = enhanceDetails(imageData, settings.detailPreservation);
-          setProgress(70);
+        // Fall back to CPU processing
+        if (!imageData) {
+          imageData = optimizeImageWithCPU(img, ctx);
         }
 
         // Put processed image data back
@@ -297,7 +361,6 @@ export const ProfessionalOptimizer = () => {
             qualityValue = 1; // PNG doesn't use quality parameter
             break;
           case 'avif':
-            // AVIF fallback to WebP if not supported
             mimeType = 'image/avif';
             break;
           case 'jpeg':
@@ -336,6 +399,7 @@ export const ProfessionalOptimizer = () => {
           const originalSize = imageFile!.size;
           const optimizedSize = blob.size;
           const compressionRatio = Math.round((1 - optimizedSize / originalSize) * 100);
+          const processingTime = Math.round(performance.now() - startTime);
 
           setProgress(100);
 
@@ -345,6 +409,8 @@ export const ProfessionalOptimizer = () => {
             originalSize,
             optimizedSize,
             compressionRatio,
+            processingTime,
+            usedWebGL,
           });
         }
       };
@@ -352,7 +418,7 @@ export const ProfessionalOptimizer = () => {
       img.onerror = () => reject(new Error('Failed to load image'));
       img.src = imagePreview;
     });
-  }, [imagePreview, imageFile, settings, applyConvolution, applyNoiseReduction, enhanceDetails]);
+  }, [imagePreview, imageFile, settings, useWebGL, webGLAvailable, optimizeImageWithWebGL, optimizeImageWithCPU]);
 
   const handleOptimize = async (andDownload = false) => {
     if (!imageFile) {
@@ -369,8 +435,9 @@ export const ProfessionalOptimizer = () => {
       setOptimizedPreview(optimizationResult.url);
       
       const savedKB = Math.round((optimizationResult.originalSize - optimizationResult.optimizedSize) / 1024);
+      const accelInfo = optimizationResult.usedWebGL ? ' (GPU accelerated)' : ' (CPU)';
       toast.success(
-        `${activePreset === 'web' ? 'Web-ready' : 'Print-ready'} version created! Saved ${savedKB}KB (${optimizationResult.compressionRatio}% smaller)`
+        `${activePreset === 'web' ? 'Web-ready' : 'Print-ready'} version created in ${optimizationResult.processingTime}ms${accelInfo}! Saved ${savedKB}KB (${optimizationResult.compressionRatio}% smaller)`
       );
 
       if (andDownload) {
@@ -677,6 +744,26 @@ export const ProfessionalOptimizer = () => {
 
           {/* Toggles */}
           <div className="space-y-3 pt-2">
+            {/* WebGL Acceleration Toggle */}
+            <div className="flex items-center justify-between">
+              <Label className="text-xs flex items-center gap-2">
+                {webGLAvailable ? (
+                  <MonitorSmartphone className="h-3 w-3 text-green-500" />
+                ) : (
+                  <Cpu className="h-3 w-3 text-muted-foreground" />
+                )}
+                GPU Acceleration (WebGL)
+                {!webGLAvailable && (
+                  <span className="text-muted-foreground text-[10px]">(not available)</span>
+                )}
+              </Label>
+              <Switch
+                checked={useWebGL && webGLAvailable}
+                onCheckedChange={(checked) => setUseWebGL(checked)}
+                disabled={!webGLAvailable}
+              />
+            </div>
+
             <div className="flex items-center justify-between">
               <Label className="text-xs flex items-center gap-2">
                 <Shield className="h-3 w-3" />
@@ -706,10 +793,18 @@ export const ProfessionalOptimizer = () => {
         {/* Info Banner */}
         <div className="flex items-start gap-2 p-3 rounded-lg bg-primary/5 border border-primary/10">
           <Info className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-          <p className="text-xs text-muted-foreground">
-            AI optimization uses advanced algorithms to reduce file size while preserving 
-            sharp edges, texture clarity, and accurate colors. No softening or quality loss.
-          </p>
+          <div className="text-xs text-muted-foreground space-y-1">
+            <p>
+              AI optimization uses advanced algorithms to reduce file size while preserving 
+              sharp edges, texture clarity, and accurate colors. No softening or quality loss.
+            </p>
+            {webGLAvailable && useWebGL && (
+              <p className="text-primary flex items-center gap-1">
+                <Zap className="h-3 w-3" />
+                WebGL GPU acceleration enabled for faster processing on large images.
+              </p>
+            )}
+          </div>
         </div>
 
         {/* Action Buttons */}

@@ -87,7 +87,7 @@ serve(async (req) => {
       ],
       mode: "subscription",
       subscription_data: {
-        trial_period_days: 7,
+        trial_period_days: 3,
       },
       payment_method_collection: "always",
       success_url: `${origin}/success`,

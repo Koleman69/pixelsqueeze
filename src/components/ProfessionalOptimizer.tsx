@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
+import { Progress } from '@/components/ui/progress';
 import { 
   Sparkles, 
   Download, 
@@ -19,7 +20,9 @@ import {
   Zap,
   Shield,
   Info,
-  Upload
+  Upload,
+  CheckCircle2,
+  RotateCcw
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -33,6 +36,14 @@ export interface OptimizationSettings {
   detailPreservation: number;
   dynamicRange: 'standard' | 'hdr';
   format: 'jpeg' | 'png' | 'webp' | 'avif';
+}
+
+interface OptimizationResult {
+  blob: Blob;
+  url: string;
+  originalSize: number;
+  optimizedSize: number;
+  compressionRatio: number;
 }
 
 const presetConfigs: Record<'web' | 'print', Partial<OptimizationSettings>> = {
@@ -58,12 +69,24 @@ const presetConfigs: Record<'web' | 'print', Partial<OptimizationSettings>> = {
   },
 };
 
+// Sharpening kernel matrices
+const sharpeningKernels = {
+  none: null,
+  subtle: [0, -0.5, 0, -0.5, 3, -0.5, 0, -0.5, 0],
+  moderate: [0, -1, 0, -1, 5, -1, 0, -1, 0],
+  strong: [-1, -1, -1, -1, 9, -1, -1, -1, -1],
+};
+
 export const ProfessionalOptimizer = () => {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [optimizedPreview, setOptimizedPreview] = useState<string | null>(null);
+  const [result, setResult] = useState<OptimizationResult | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const [activePreset, setActivePreset] = useState<'web' | 'print'>('web');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [progress, setProgress] = useState(0);
   const [settings, setSettings] = useState<OptimizationSettings>({
     preset: 'web',
     ...presetConfigs.web,
@@ -76,31 +99,309 @@ export const ProfessionalOptimizer = () => {
       preset,
       ...presetConfigs[preset],
     });
+    setResult(null);
+    setOptimizedPreview(null);
   };
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       setImageFile(file);
+      setResult(null);
+      setOptimizedPreview(null);
       const reader = new FileReader();
       reader.onload = (e) => setImagePreview(e.target?.result as string);
       reader.readAsDataURL(file);
     }
   };
 
-  const handleOptimize = async () => {
+  const resetImage = () => {
+    setImageFile(null);
+    setImagePreview(null);
+    setOptimizedPreview(null);
+    setResult(null);
+    setProgress(0);
+  };
+
+  // Apply convolution kernel for sharpening
+  const applyConvolution = useCallback((
+    imageData: ImageData,
+    kernel: number[]
+  ): ImageData => {
+    const { data, width, height } = imageData;
+    const output = new Uint8ClampedArray(data);
+    const kSize = 3;
+    const half = Math.floor(kSize / 2);
+
+    for (let y = half; y < height - half; y++) {
+      for (let x = half; x < width - half; x++) {
+        for (let c = 0; c < 3; c++) {
+          let sum = 0;
+          for (let ky = 0; ky < kSize; ky++) {
+            for (let kx = 0; kx < kSize; kx++) {
+              const px = x + kx - half;
+              const py = y + ky - half;
+              const idx = (py * width + px) * 4 + c;
+              sum += data[idx] * kernel[ky * kSize + kx];
+            }
+          }
+          const idx = (y * width + x) * 4 + c;
+          output[idx] = Math.min(255, Math.max(0, sum));
+        }
+      }
+    }
+
+    return new ImageData(output, width, height);
+  }, []);
+
+  // Apply noise reduction using simple box blur
+  const applyNoiseReduction = useCallback((
+    imageData: ImageData,
+    strength: number
+  ): ImageData => {
+    if (strength === 0) return imageData;
+    
+    const { data, width, height } = imageData;
+    const output = new Uint8ClampedArray(data);
+    const radius = Math.ceil(strength / 20);
+
+    for (let y = radius; y < height - radius; y++) {
+      for (let x = radius; x < width - radius; x++) {
+        for (let c = 0; c < 3; c++) {
+          let sum = 0;
+          let count = 0;
+          
+          for (let dy = -radius; dy <= radius; dy++) {
+            for (let dx = -radius; dx <= radius; dx++) {
+              const idx = ((y + dy) * width + (x + dx)) * 4 + c;
+              sum += data[idx];
+              count++;
+            }
+          }
+          
+          const idx = (y * width + x) * 4 + c;
+          const blurred = sum / count;
+          // Blend original with blurred based on strength
+          const blend = strength / 100;
+          output[idx] = Math.round(data[idx] * (1 - blend * 0.5) + blurred * (blend * 0.5));
+        }
+      }
+    }
+
+    return new ImageData(output, width, height);
+  }, []);
+
+  // Enhance detail preservation
+  const enhanceDetails = useCallback((
+    imageData: ImageData,
+    preservation: number
+  ): ImageData => {
+    if (preservation >= 100) return imageData;
+    
+    const { data, width, height } = imageData;
+    const output = new Uint8ClampedArray(data);
+    
+    // Apply unsharp mask for detail enhancement
+    const amount = (100 - preservation) / 100 * 0.3;
+    
+    for (let y = 1; y < height - 1; y++) {
+      for (let x = 1; x < width - 1; x++) {
+        for (let c = 0; c < 3; c++) {
+          const idx = (y * width + x) * 4 + c;
+          const current = data[idx];
+          
+          // Simple edge detection
+          const neighbors = [
+            data[((y - 1) * width + x) * 4 + c],
+            data[((y + 1) * width + x) * 4 + c],
+            data[(y * width + (x - 1)) * 4 + c],
+            data[(y * width + (x + 1)) * 4 + c],
+          ];
+          const avg = neighbors.reduce((a, b) => a + b, 0) / 4;
+          const diff = current - avg;
+          
+          output[idx] = Math.min(255, Math.max(0, current + diff * amount));
+        }
+      }
+    }
+
+    return new ImageData(output, width, height);
+  }, []);
+
+  const optimizeImage = useCallback(async (): Promise<OptimizationResult> => {
+    return new Promise((resolve, reject) => {
+      if (!imagePreview || !imageFile) {
+        reject(new Error('No image loaded'));
+        return;
+      }
+
+      const img = new Image();
+      img.onload = () => {
+        setProgress(10);
+
+        // Create canvas
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d', { 
+          willReadFrequently: true,
+          alpha: settings.format === 'png' 
+        });
+        
+        if (!ctx) {
+          reject(new Error('Failed to create canvas context'));
+          return;
+        }
+
+        canvas.width = img.width;
+        canvas.height = img.height;
+        
+        // Draw original image
+        ctx.drawImage(img, 0, 0);
+        setProgress(20);
+
+        // Get image data for processing
+        let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        
+        // Apply noise reduction
+        if (settings.noiseReduction > 0) {
+          imageData = applyNoiseReduction(imageData, settings.noiseReduction);
+          setProgress(40);
+        }
+
+        // Apply sharpening
+        const kernel = sharpeningKernels[settings.sharpening];
+        if (kernel) {
+          imageData = applyConvolution(imageData, kernel);
+          setProgress(60);
+        }
+
+        // Enhance details
+        if (settings.detailPreservation < 100) {
+          imageData = enhanceDetails(imageData, settings.detailPreservation);
+          setProgress(70);
+        }
+
+        // Put processed image data back
+        ctx.putImageData(imageData, 0, 0);
+        setProgress(80);
+
+        // Determine MIME type and quality
+        let mimeType: string;
+        let qualityValue = settings.quality / 100;
+        
+        switch (settings.format) {
+          case 'webp':
+            mimeType = 'image/webp';
+            break;
+          case 'png':
+            mimeType = 'image/png';
+            qualityValue = 1; // PNG doesn't use quality parameter
+            break;
+          case 'avif':
+            // AVIF fallback to WebP if not supported
+            mimeType = 'image/avif';
+            break;
+          case 'jpeg':
+          default:
+            mimeType = 'image/jpeg';
+        }
+
+        setProgress(90);
+
+        // Convert to blob
+        canvas.toBlob(
+          (blob) => {
+            if (!blob) {
+              // Fallback for unsupported formats
+              canvas.toBlob(
+                (fallbackBlob) => {
+                  if (!fallbackBlob) {
+                    reject(new Error('Failed to create image blob'));
+                    return;
+                  }
+                  finishOptimization(fallbackBlob);
+                },
+                'image/jpeg',
+                qualityValue
+              );
+              return;
+            }
+            finishOptimization(blob);
+          },
+          mimeType,
+          mimeType === 'image/png' ? undefined : qualityValue
+        );
+
+        function finishOptimization(blob: Blob) {
+          const url = URL.createObjectURL(blob);
+          const originalSize = imageFile!.size;
+          const optimizedSize = blob.size;
+          const compressionRatio = Math.round((1 - optimizedSize / originalSize) * 100);
+
+          setProgress(100);
+
+          resolve({
+            blob,
+            url,
+            originalSize,
+            optimizedSize,
+            compressionRatio,
+          });
+        }
+      };
+
+      img.onerror = () => reject(new Error('Failed to load image'));
+      img.src = imagePreview;
+    });
+  }, [imagePreview, imageFile, settings, applyConvolution, applyNoiseReduction, enhanceDetails]);
+
+  const handleOptimize = async (andDownload = false) => {
     if (!imageFile) {
       toast.error('Please upload an image first');
       return;
     }
 
     setIsProcessing(true);
-    
-    // Simulate AI processing
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    toast.success(`${activePreset === 'web' ? 'Web-ready' : 'Print-ready'} version created!`);
-    setIsProcessing(false);
+    setProgress(0);
+
+    try {
+      const optimizationResult = await optimizeImage();
+      setResult(optimizationResult);
+      setOptimizedPreview(optimizationResult.url);
+      
+      const savedKB = Math.round((optimizationResult.originalSize - optimizationResult.optimizedSize) / 1024);
+      toast.success(
+        `${activePreset === 'web' ? 'Web-ready' : 'Print-ready'} version created! Saved ${savedKB}KB (${optimizationResult.compressionRatio}% smaller)`
+      );
+
+      if (andDownload) {
+        downloadResult(optimizationResult);
+      }
+    } catch (error) {
+      console.error('Optimization error:', error);
+      toast.error('Failed to optimize image');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const downloadResult = (optimizationResult?: OptimizationResult) => {
+    const res = optimizationResult || result;
+    if (!res || !imageFile) return;
+
+    const link = document.createElement('a');
+    link.href = res.url;
+    const baseName = imageFile.name.replace(/\.[^/.]+$/, '');
+    link.download = `${baseName}_optimized_${activePreset}.${settings.format}`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success('Download started!');
+  };
+
+  const formatBytes = (bytes: number) => {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
   };
 
   if (!imageFile || !imagePreview) {
@@ -142,14 +443,81 @@ export const ProfessionalOptimizer = () => {
             <Sparkles className="h-5 w-5 text-primary" />
             Professional AI Optimizer
           </CardTitle>
-          <Badge variant="secondary" className="bg-primary/10 text-primary">
-            <Zap className="h-3 w-3 mr-1" />
-            Pro Grade
-          </Badge>
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="sm" onClick={resetImage}>
+              <RotateCcw className="h-4 w-4 mr-1" />
+              Reset
+            </Button>
+            <Badge variant="secondary" className="bg-primary/10 text-primary">
+              <Zap className="h-3 w-3 mr-1" />
+              Pro Grade
+            </Badge>
+          </div>
         </div>
       </CardHeader>
 
       <CardContent className="space-y-6">
+        {/* Image Preview */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label className="text-xs text-muted-foreground">Original</Label>
+            <div className="relative aspect-video rounded-lg overflow-hidden bg-muted">
+              <img 
+                src={imagePreview} 
+                alt="Original" 
+                className="w-full h-full object-contain"
+              />
+              {imageFile && (
+                <Badge className="absolute bottom-2 right-2 bg-background/80 text-foreground text-xs">
+                  {formatBytes(imageFile.size)}
+                </Badge>
+              )}
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label className="text-xs text-muted-foreground">
+              {result ? 'Optimized' : 'Preview'}
+            </Label>
+            <div className="relative aspect-video rounded-lg overflow-hidden bg-muted">
+              {optimizedPreview ? (
+                <>
+                  <img 
+                    src={optimizedPreview} 
+                    alt="Optimized" 
+                    className="w-full h-full object-contain"
+                  />
+                  {result && (
+                    <Badge className="absolute bottom-2 right-2 bg-primary text-primary-foreground text-xs">
+                      {formatBytes(result.optimizedSize)} (-{result.compressionRatio}%)
+                    </Badge>
+                  )}
+                  <div className="absolute top-2 right-2">
+                    <CheckCircle2 className="h-5 w-5 text-green-500" />
+                  </div>
+                </>
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                  <div className="text-center">
+                    <Eye className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                    <p className="text-xs">Click optimize to preview</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Progress Bar */}
+        {isProcessing && (
+          <div className="space-y-2">
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-muted-foreground">Optimizing...</span>
+              <span className="font-mono">{progress}%</span>
+            </div>
+            <Progress value={progress} className="h-2" />
+          </div>
+        )}
+
         {/* Output Preset Selection */}
         <Tabs value={activePreset} onValueChange={(v) => handlePresetChange(v as 'web' | 'print')}>
           <TabsList className="grid w-full grid-cols-2">
@@ -347,7 +715,7 @@ export const ProfessionalOptimizer = () => {
         {/* Action Buttons */}
         <div className="grid grid-cols-2 gap-3">
           <Button
-            onClick={handleOptimize}
+            onClick={() => handleOptimize(false)}
             disabled={isProcessing}
             className="w-full"
           >
@@ -365,16 +733,16 @@ export const ProfessionalOptimizer = () => {
           </Button>
           <Button
             variant="outline"
-            onClick={() => {
-              handleOptimize();
-              // Trigger download after optimization
-            }}
-            disabled={isProcessing || !imageFile}
+            onClick={() => result ? downloadResult() : handleOptimize(true)}
+            disabled={isProcessing}
           >
             <Download className="h-4 w-4 mr-2" />
-            Optimize & Download
+            {result ? 'Download' : 'Optimize & Download'}
           </Button>
         </div>
+
+        {/* Hidden canvas for processing */}
+        <canvas ref={canvasRef} className="hidden" />
       </CardContent>
     </Card>
   );

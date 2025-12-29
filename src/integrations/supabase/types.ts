@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      alert_preferences: {
+        Row: {
+          created_at: string
+          digest_time: string | null
+          email_daily_digest: boolean | null
+          email_instant_alerts: boolean | null
+          id: string
+          notify_content_changes: boolean | null
+          notify_feature_updates: boolean | null
+          notify_price_changes: boolean | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          digest_time?: string | null
+          email_daily_digest?: boolean | null
+          email_instant_alerts?: boolean | null
+          id?: string
+          notify_content_changes?: boolean | null
+          notify_feature_updates?: boolean | null
+          notify_price_changes?: boolean | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          digest_time?: string | null
+          email_daily_digest?: boolean | null
+          email_instant_alerts?: boolean | null
+          id?: string
+          notify_content_changes?: boolean | null
+          notify_feature_updates?: boolean | null
+          notify_price_changes?: boolean | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       batch_jobs: {
         Row: {
           completed_at: string | null
@@ -163,6 +202,107 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      competitor_alerts: {
+        Row: {
+          alert_type: string
+          competitor_id: string | null
+          created_at: string
+          id: string
+          is_read: boolean | null
+          message: string
+          priority: string | null
+          snapshot_id: string | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          alert_type: string
+          competitor_id?: string | null
+          created_at?: string
+          id?: string
+          is_read?: boolean | null
+          message: string
+          priority?: string | null
+          snapshot_id?: string | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          alert_type?: string
+          competitor_id?: string | null
+          created_at?: string
+          id?: string
+          is_read?: boolean | null
+          message?: string
+          priority?: string | null
+          snapshot_id?: string | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "competitor_alerts_competitor_id_fkey"
+            columns: ["competitor_id"]
+            isOneToOne: false
+            referencedRelation: "tracked_competitors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "competitor_alerts_snapshot_id_fkey"
+            columns: ["snapshot_id"]
+            isOneToOne: false
+            referencedRelation: "competitor_snapshots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      competitor_snapshots: {
+        Row: {
+          captured_at: string
+          change_detected: boolean | null
+          competitor_id: string
+          created_at: string
+          data: Json | null
+          description: string | null
+          id: string
+          snapshot_type: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          captured_at?: string
+          change_detected?: boolean | null
+          competitor_id: string
+          created_at?: string
+          data?: Json | null
+          description?: string | null
+          id?: string
+          snapshot_type: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          captured_at?: string
+          change_detected?: boolean | null
+          competitor_id?: string
+          created_at?: string
+          data?: Json | null
+          description?: string | null
+          id?: string
+          snapshot_type?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "competitor_snapshots_competitor_id_fkey"
+            columns: ["competitor_id"]
+            isOneToOne: false
+            referencedRelation: "tracked_competitors"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       file_jobs: {
         Row: {
@@ -388,6 +528,45 @@ export type Database = {
           subscription_tier?: string | null
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      tracked_competitors: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          industry: string | null
+          is_active: boolean | null
+          name: string
+          tracking_frequency: string | null
+          updated_at: string
+          user_id: string
+          website_url: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          industry?: string | null
+          is_active?: boolean | null
+          name: string
+          tracking_frequency?: string | null
+          updated_at?: string
+          user_id: string
+          website_url: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          industry?: string | null
+          is_active?: boolean | null
+          name?: string
+          tracking_frequency?: string | null
+          updated_at?: string
+          user_id?: string
+          website_url?: string
         }
         Relationships: []
       }

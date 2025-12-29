@@ -28,6 +28,7 @@ import { SocialMediaExporter } from "@/components/SocialMediaExporter";
 import { ProfessionalOptimizer } from "@/components/ProfessionalOptimizer";
 import { BatchOptimizer } from "@/components/BatchOptimizer";
 import { BatchAnalyticsDashboard } from "@/components/BatchAnalyticsDashboard";
+import CompetitorTracker from "@/components/CompetitorTracker";
 
 const mockCompressions = [
   {
@@ -534,6 +535,23 @@ const Index = () => {
             </p>
           </div>
           <BatchAnalyticsDashboard />
+        </div>
+      </section>
+
+      {/* Competitor Intelligence */}
+      <section className="section-padding bg-secondary/20">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-8">
+            <Badge variant="outline" className="mb-4 px-4 py-2 border-primary text-primary">
+              <Target className="w-4 h-4 mr-2" />
+              Market Intelligence
+            </Badge>
+            <h2 className="text-3xl font-bold mb-2">Competitor Tracking</h2>
+            <p className="text-muted-foreground">
+              Monitor competitor websites and receive AI-powered insights and alerts
+            </p>
+          </div>
+          <CompetitorTracker />
         </div>
       </section>
 

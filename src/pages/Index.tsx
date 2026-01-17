@@ -6,7 +6,7 @@ import { ImageEditor } from "@/components/ImageEditor";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Upload, Shield, TrendingDown, Zap, BarChart3, Target, LogOut, Image, FileImage, Minimize2, HardDrive, Crown, BookOpen, Loader2, Download, HelpCircle, Sparkles, MessageSquare, Video, Share2, Package } from "lucide-react";
+import { Upload, Shield, TrendingDown, Zap, BarChart3, Target, LogOut, Image, FileImage, Minimize2, HardDrive, Crown, BookOpen, Loader2, Download, HelpCircle, Sparkles, MessageSquare, Video, Share2, Package, Wand2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useImageCompression } from "@/hooks/useImageCompression";
@@ -29,6 +29,7 @@ import { ProfessionalOptimizer } from "@/components/ProfessionalOptimizer";
 import { BatchOptimizer } from "@/components/BatchOptimizer";
 import { BatchAnalyticsDashboard } from "@/components/BatchAnalyticsDashboard";
 import CompetitorTracker from "@/components/CompetitorTracker";
+import { AIVideoEnhancer } from "@/components/AIVideoEnhancer";
 
 const mockCompressions = [
   {
@@ -353,6 +354,13 @@ const Index = () => {
           </div>
         </section>
       )}
+
+      {/* AI Video Enhancer - Featured Section */}
+      <section className="section-padding bg-gradient-to-br from-purple-50 via-pink-50 to-background dark:from-purple-950/20 dark:via-pink-950/20 dark:to-background" id="video-enhance">
+        <div className="max-w-5xl mx-auto">
+          <AIVideoEnhancer />
+        </div>
+      </section>
 
       {/* AI Transformation Showcase */}
       <section className="section-padding bg-gradient-to-b from-secondary/20 to-background">

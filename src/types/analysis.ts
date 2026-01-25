@@ -9,6 +9,8 @@ export interface AnalysisResult {
   timestamp: Date;
   status: 'pending' | 'processing' | 'completed' | 'error';
   error?: string;
+  isImage?: boolean;
+  preview?: string;
 }
 
 export interface ProcessedFile {
@@ -18,6 +20,7 @@ export interface ProcessedFile {
   status: 'pending' | 'uploading' | 'analyzing' | 'completed' | 'error';
   progress: number;
   result?: AnalysisResult;
+  isImage?: boolean;
 }
 
 export interface AnalysisRequest {
@@ -26,4 +29,6 @@ export interface AnalysisRequest {
   fileSize: number;
   content: string;
   analysisType: 'general' | 'detailed' | 'summary';
+  isImage?: boolean;
+  imageData?: string;
 }

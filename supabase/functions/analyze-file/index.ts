@@ -11,14 +11,46 @@ serve(async (req) => {
   }
 
   try {
-    const { fileName, fileType, fileSize, content, analysisType } = await req.json();
+    const { fileName, fileType, fileSize, content, analysisType, isImage, imageData } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    const systemPrompt = `You are an expert file analyzer. Analyze the provided file content and provide:
+    let systemPrompt: string;
+    let userContent: any[];
+
+    if (isImage && imageData) {
+      // Image analysis with vision
+      systemPrompt = `You are an expert image analyst. Analyze the provided image and provide:
+1. A comprehensive description of the image content (subjects, composition, colors, style)
+2. Image quality assessment (sharpness, exposure, noise, artifacts)
+3. Technical insights (estimated resolution quality, compression artifacts, color balance)
+4. Optimization suggestions (compression recommendations, enhancement opportunities, best use cases)
+
+Respond in JSON format:
+{
+  "analysis": "detailed analysis of image content and composition",
+  "insights": ["quality insight 1", "technical insight 2", ...],
+  "suggestions": ["optimization suggestion 1", "enhancement suggestion 2", ...]
+}`;
+
+      userContent = [
+        {
+          type: "text",
+          text: `Analyze this image named "${fileName}" (${(fileSize / 1024).toFixed(2)} KB, type: ${fileType}). Provide content analysis, quality assessment, and optimization suggestions.`
+        },
+        {
+          type: "image_url",
+          image_url: {
+            url: imageData
+          }
+        }
+      ];
+    } else {
+      // Text/document analysis
+      systemPrompt = `You are an expert file analyzer. Analyze the provided file content and provide:
 1. A comprehensive analysis of the file's purpose and content
 2. Key insights (as a JSON array of strings)
 3. Actionable suggestions for improvement (as a JSON array of strings)
@@ -30,11 +62,19 @@ Respond in JSON format:
   "suggestions": ["suggestion 1", "suggestion 2", ...]
 }`;
 
-    const userPrompt = `Analyze this ${fileType} file named "${fileName}" (${(fileSize / 1024).toFixed(2)} KB):
+      userContent = [
+        {
+          type: "text",
+          text: `Analyze this ${fileType} file named "${fileName}" (${(fileSize / 1024).toFixed(2)} KB):
 
 ${content.substring(0, 10000)}${content.length > 10000 ? '\n\n[Content truncated...]' : ''}
 
-Analysis type: ${analysisType}`;
+Analysis type: ${analysisType}`
+        }
+      ];
+    }
+
+    console.log(`Analyzing ${isImage ? 'image' : 'file'}: ${fileName}`);
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -46,7 +86,7 @@ Analysis type: ${analysisType}`;
         model: "google/gemini-3-flash-preview",
         messages: [
           { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt }
+          { role: "user", content: userContent }
         ],
         response_format: { type: "json_object" }
       }),
@@ -83,6 +123,8 @@ Analysis type: ${analysisType}`;
         suggestions: ["Review the analysis above"]
       };
     }
+
+    console.log(`Analysis complete for: ${fileName}`);
 
     return new Response(JSON.stringify(parsedResult), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

@@ -13,7 +13,10 @@ import {
   ChevronUp,
   Copy,
   Check,
-  Trash2
+  Trash2,
+  Image as ImageIcon,
+  Palette,
+  Zap
 } from "lucide-react";
 import { AnalysisResult } from "@/types/analysis";
 import { cn } from "@/lib/utils";
@@ -62,7 +65,7 @@ ${result.suggestions.map(s => `• ${s}`).join('\n')}
           <Brain className="h-12 w-12 text-muted-foreground mb-4" />
           <p className="text-foreground font-medium mb-1">No analyses yet</p>
           <p className="text-sm text-muted-foreground text-center">
-            Upload and analyze files to see AI insights here
+            Upload files or images to get AI-powered insights
           </p>
         </CardContent>
       </Card>
@@ -95,12 +98,28 @@ ${result.suggestions.map(s => `• ${s}`).join('\n')}
                   onClick={() => toggleExpand(result.id)}
                 >
                   <div className="flex items-center gap-3">
-                    <FileText className="h-5 w-5 text-primary" />
+                    {result.isImage && result.preview ? (
+                      <img 
+                        src={result.preview} 
+                        alt={result.fileName}
+                        className="h-10 w-10 rounded object-cover"
+                      />
+                    ) : result.isImage ? (
+                      <ImageIcon className="h-5 w-5 text-purple-500" />
+                    ) : (
+                      <FileText className="h-5 w-5 text-primary" />
+                    )}
                     <div>
                       <p className="font-medium text-foreground">{result.fileName}</p>
                       <div className="flex items-center gap-2 mt-1">
-                        <Badge variant="outline" className="text-xs">
-                          {result.fileType}
+                        <Badge 
+                          variant="outline" 
+                          className={cn(
+                            "text-xs",
+                            result.isImage && "border-purple-500/50 text-purple-500"
+                          )}
+                        >
+                          {result.isImage ? "🖼️ Vision AI" : result.fileType}
                         </Badge>
                         <span className="text-xs text-muted-foreground flex items-center gap-1">
                           <Clock className="h-3 w-3" />
@@ -141,11 +160,31 @@ ${result.suggestions.map(s => `• ${s}`).join('\n')}
                   )}
                 >
                   <div className="p-4 space-y-4 border-t border-border/50">
+                    {/* Image Preview for image analysis */}
+                    {result.isImage && result.preview && (
+                      <div className="mb-4">
+                        <img 
+                          src={result.preview} 
+                          alt={result.fileName}
+                          className="max-h-48 rounded-lg object-contain mx-auto"
+                        />
+                      </div>
+                    )}
+
                     {/* Analysis */}
                     <div>
                       <h4 className="font-medium text-foreground mb-2 flex items-center gap-2">
-                        <Sparkles className="h-4 w-4 text-primary" />
-                        Analysis
+                        {result.isImage ? (
+                          <>
+                            <Palette className="h-4 w-4 text-purple-500" />
+                            Image Analysis
+                          </>
+                        ) : (
+                          <>
+                            <Sparkles className="h-4 w-4 text-primary" />
+                            Analysis
+                          </>
+                        )}
                       </h4>
                       <p className="text-sm text-muted-foreground leading-relaxed">
                         {result.analysis}
@@ -157,7 +196,7 @@ ${result.suggestions.map(s => `• ${s}`).join('\n')}
                       <div>
                         <h4 className="font-medium text-foreground mb-2 flex items-center gap-2">
                           <Lightbulb className="h-4 w-4 text-yellow-500" />
-                          Key Insights
+                          {result.isImage ? "Quality & Technical Insights" : "Key Insights"}
                         </h4>
                         <ul className="space-y-1">
                           {result.insights.map((insight, i) => (
@@ -177,8 +216,8 @@ ${result.suggestions.map(s => `• ${s}`).join('\n')}
                     {result.suggestions.length > 0 && (
                       <div>
                         <h4 className="font-medium text-foreground mb-2 flex items-center gap-2">
-                          <Brain className="h-4 w-4 text-purple-500" />
-                          Suggestions
+                          <Zap className="h-4 w-4 text-orange-500" />
+                          {result.isImage ? "Optimization Suggestions" : "Suggestions"}
                         </h4>
                         <ul className="space-y-1">
                           {result.suggestions.map((suggestion, i) => (
@@ -186,7 +225,7 @@ ${result.suggestions.map(s => `• ${s}`).join('\n')}
                               key={i}
                               className="text-sm text-muted-foreground flex items-start gap-2"
                             >
-                              <span className="text-purple-500 mt-1">→</span>
+                              <span className="text-orange-500 mt-1">→</span>
                               {suggestion}
                             </li>
                           ))}

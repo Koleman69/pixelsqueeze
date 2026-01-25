@@ -21,7 +21,9 @@ export class GeminiService {
       fileSize: request.fileSize,
       analysis: data.analysis || 'No analysis available',
       insights: data.insights || [],
-      suggestions: data.suggestions || []
+      suggestions: data.suggestions || [],
+      isImage: request.isImage,
+      preview: request.imageData
     };
   }
 
@@ -30,23 +32,29 @@ export class GeminiService {
       const reader = new FileReader();
       
       reader.onload = () => {
-        if (file.type.startsWith('image/')) {
-          resolve(`[Image file: ${file.name}]`);
-        } else if (file.type.startsWith('video/')) {
-          resolve(`[Video file: ${file.name}]`);
-        } else {
-          resolve(reader.result as string);
-        }
+        resolve(reader.result as string);
       };
       
       reader.onerror = () => reject(new Error('Failed to read file'));
-      
-      if (file.type.startsWith('image/') || file.type.startsWith('video/')) {
-        resolve(`[${file.type.split('/')[0]} file: ${file.name}]`);
-      } else {
-        reader.readAsText(file);
-      }
+      reader.readAsText(file);
     });
+  }
+
+  static async readImageAsBase64(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      
+      reader.onload = () => {
+        resolve(reader.result as string);
+      };
+      
+      reader.onerror = () => reject(new Error('Failed to read image'));
+      reader.readAsDataURL(file);
+    });
+  }
+
+  static isImageFile(file: File): boolean {
+    return file.type.startsWith('image/');
   }
 
   static getFileTypeCategory(file: File): string {

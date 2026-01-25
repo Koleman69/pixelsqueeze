@@ -85,10 +85,58 @@ export const useImageCompression = () => {
     }
   };
 
+  // Max files per batch to prevent memory issues on edge function
+  const MAX_FILES_PER_BATCH = 5;
+  
   const compressImages = async (
     files: FileList, 
     settings: CompressionSettings = { quality: 80, maxWidth: 1920, maxHeight: 1920, dpi: 72 },
     isBulk: boolean = false
+  ): Promise<string[]> => {
+    const fileArray = Array.from(files);
+    
+    // If more than MAX_FILES_PER_BATCH, process in batches
+    if (fileArray.length > MAX_FILES_PER_BATCH) {
+      toast({
+        title: "Processing in Batches",
+        description: `Large batch detected. Processing ${fileArray.length} files in smaller batches for stability.`,
+      });
+      
+      const allIds: string[] = [];
+      
+      for (let i = 0; i < fileArray.length; i += MAX_FILES_PER_BATCH) {
+        const batch = fileArray.slice(i, i + MAX_FILES_PER_BATCH);
+        const dt = new DataTransfer();
+        batch.forEach(file => dt.items.add(file));
+        
+        try {
+          const batchIds = await processBatch(dt.files, settings, isBulk);
+          allIds.push(...batchIds);
+        } catch (error) {
+          console.error(`Batch ${Math.floor(i / MAX_FILES_PER_BATCH) + 1} failed:`, error);
+        }
+        
+        // Small delay between batches
+        if (i + MAX_FILES_PER_BATCH < fileArray.length) {
+          await new Promise(resolve => setTimeout(resolve, 500));
+        }
+      }
+      
+      toast({
+        title: "Batch Processing Complete",
+        description: `Processed ${allIds.length} of ${fileArray.length} files`,
+      });
+      
+      return allIds;
+    }
+    
+    return processBatch(files, settings, isBulk);
+  };
+  
+  const processBatch = async (
+    files: FileList, 
+    settings: CompressionSettings,
+    isBulk: boolean
   ): Promise<string[]> => {
     const fileArray = Array.from(files);
     const ids: string[] = [];

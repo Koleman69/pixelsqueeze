@@ -6,7 +6,7 @@ import { ImageEditor } from "@/components/ImageEditor";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Upload, Shield, TrendingDown, Zap, BarChart3, Target, LogOut, Image, FileImage, Minimize2, HardDrive, Crown, BookOpen, Loader2, Download, HelpCircle, Sparkles, MessageSquare, Video, Share2, Package, Wand2 } from "lucide-react";
+import { Upload, Shield, TrendingDown, Zap, BarChart3, Target, LogOut, Image, FileImage, Minimize2, HardDrive, Crown, BookOpen, Loader2, Download, HelpCircle, Sparkles, MessageSquare, Video, Share2, Package, Wand2, Brain } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useImageCompression } from "@/hooks/useImageCompression";
@@ -30,6 +30,9 @@ import { BatchOptimizer } from "@/components/BatchOptimizer";
 import { BatchAnalyticsDashboard } from "@/components/BatchAnalyticsDashboard";
 import CompetitorTracker from "@/components/CompetitorTracker";
 import { AIVideoEnhancer } from "@/components/AIVideoEnhancer";
+import { FileProcessor } from "@/components/FileProcessor";
+import { AnalysisBoard } from "@/components/AnalysisBoard";
+import { AnalysisResult } from "@/types/analysis";
 
 const mockCompressions = [
   {
@@ -79,6 +82,17 @@ const Index = () => {
   
   // Track daily usage (in real app, this would come from backend)
   const [dailyUsage, setDailyUsage] = useState({ images: 0, videos: 0 });
+  
+  // AI File Analysis state
+  const [analysisResults, setAnalysisResults] = useState<AnalysisResult[]>([]);
+  
+  const handleAnalysisComplete = (result: AnalysisResult) => {
+    setAnalysisResults(prev => [result, ...prev]);
+  };
+  
+  const clearAnalysisResults = () => {
+    setAnalysisResults([]);
+  };
 
   useEffect(() => {
     if (user) {
@@ -526,6 +540,26 @@ const Index = () => {
             </p>
           </div>
           <BatchOptimizer />
+        </div>
+      </section>
+
+      {/* AI File Analyzer */}
+      <section className="section-padding">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-8">
+            <Badge variant="outline" className="mb-4 px-4 py-2 border-primary text-primary">
+              <Brain className="w-4 h-4 mr-2" />
+              AI Analysis
+            </Badge>
+            <h2 className="text-3xl font-bold mb-2">AI File Analyzer</h2>
+            <p className="text-muted-foreground">
+              Upload any file and get instant AI-powered insights and recommendations
+            </p>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <FileProcessor onAnalysisComplete={handleAnalysisComplete} />
+            <AnalysisBoard results={analysisResults} onClear={clearAnalysisResults} />
+          </div>
         </div>
       </section>
 

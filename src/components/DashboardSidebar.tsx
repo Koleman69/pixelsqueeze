@@ -1,6 +1,6 @@
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
   Image,
@@ -15,9 +15,29 @@ import {
   Brain,
   Target,
   Crown,
+  ChevronLeft,
   ChevronRight,
   Minimize2,
 } from "lucide-react";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+  useSidebar,
+} from "@/components/ui/sidebar";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export type ToolCategory = 
   | "compress-image"
@@ -76,81 +96,175 @@ const toolCategories = [
   },
 ];
 
-export function DashboardSidebar({ activeTool, onToolChange, isSubscribed }: DashboardSidebarProps) {
-  return (
-    <aside className="w-64 bg-card border-r border-border flex flex-col h-full">
-      {/* Logo */}
-      <div className="p-4 border-b border-border">
-        <div className="flex items-center gap-2">
-          <Minimize2 className="w-6 h-6 text-primary" />
-          <span className="text-lg font-bold">Pixelsqueeze</span>
-        </div>
-      </div>
+const SIDEBAR_STATE_KEY = "pixelsqueeze-sidebar-collapsed";
 
-      {/* Navigation */}
-      <ScrollArea className="flex-1 py-4">
-        <nav className="px-3 space-y-6">
-          {toolCategories.map((category) => (
-            <div key={category.label}>
-              <div className="flex items-center gap-2 px-3 mb-2">
-                <category.icon className="w-4 h-4 text-muted-foreground" />
-                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  {category.label}
-                </span>
-              </div>
-              <div className="space-y-1">
+function SidebarCollapseButton() {
+  const { state, toggleSidebar } = useSidebar();
+  const isCollapsed = state === "collapsed";
+
+  return (
+    <Button
+      variant="ghost"
+      size="icon"
+      onClick={toggleSidebar}
+      className="h-8 w-8"
+    >
+      {isCollapsed ? (
+        <ChevronRight className="h-4 w-4" />
+      ) : (
+        <ChevronLeft className="h-4 w-4" />
+      )}
+      <span className="sr-only">Toggle sidebar</span>
+    </Button>
+  );
+}
+
+interface SidebarContentAreaProps {
+  activeTool: ToolCategory;
+  onToolChange: (tool: ToolCategory) => void;
+  isSubscribed?: boolean;
+}
+
+function SidebarContentArea({ activeTool, onToolChange, isSubscribed }: SidebarContentAreaProps) {
+  const { state } = useSidebar();
+  const isCollapsed = state === "collapsed";
+
+  return (
+    <Sidebar collapsible="icon">
+      <SidebarHeader className="border-b border-sidebar-border">
+        <div className="flex items-center justify-between p-2">
+          <div className="flex items-center gap-2">
+            <Minimize2 className="h-5 w-5 text-primary shrink-0" />
+            {!isCollapsed && (
+              <span className="text-lg font-bold">Pixelsqueeze</span>
+            )}
+          </div>
+          {!isCollapsed && <SidebarCollapseButton />}
+        </div>
+        {isCollapsed && (
+          <div className="flex justify-center py-1">
+            <SidebarCollapseButton />
+          </div>
+        )}
+      </SidebarHeader>
+
+      <SidebarContent>
+        {toolCategories.map((category) => (
+          <SidebarGroup key={category.label}>
+            <SidebarGroupLabel>
+              <category.icon className="h-4 w-4 mr-2" />
+              {!isCollapsed && category.label}
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
                 {category.tools.map((tool) => (
-                  <Button
-                    key={tool.id}
-                    variant="ghost"
-                    className={cn(
-                      "w-full justify-start gap-3 h-auto py-2.5 px-3",
-                      activeTool === tool.id && "bg-primary/10 text-primary border-l-2 border-primary rounded-l-none"
-                    )}
-                    onClick={() => onToolChange(tool.id)}
-                  >
-                    <tool.icon className="w-4 h-4 shrink-0" />
-                    <div className="flex-1 text-left">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium">{tool.label}</span>
+                  <SidebarMenuItem key={tool.id}>
+                    {isCollapsed ? (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <SidebarMenuButton
+                            isActive={activeTool === tool.id}
+                            onClick={() => onToolChange(tool.id)}
+                          >
+                            <tool.icon className="h-4 w-4" />
+                          </SidebarMenuButton>
+                        </TooltipTrigger>
+                        <TooltipContent side="right" className="flex items-center gap-2">
+                          {tool.label}
+                          {tool.pro && !isSubscribed && (
+                            <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 border-amber-500 text-amber-600">
+                              PRO
+                            </Badge>
+                          )}
+                        </TooltipContent>
+                      </Tooltip>
+                    ) : (
+                      <SidebarMenuButton
+                        isActive={activeTool === tool.id}
+                        onClick={() => onToolChange(tool.id)}
+                        className="justify-between"
+                      >
+                        <div className="flex items-center gap-2">
+                          <tool.icon className="h-4 w-4 shrink-0" />
+                          <div className="flex flex-col">
+                            <span className="text-sm font-medium">{tool.label}</span>
+                            <span className="text-xs text-muted-foreground">{tool.description}</span>
+                          </div>
+                        </div>
                         {tool.pro && !isSubscribed && (
-                          <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 border-amber-500 text-amber-600">
+                          <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 border-amber-500 text-amber-600 shrink-0">
                             <Crown className="w-2.5 h-2.5 mr-0.5" />
                             PRO
                           </Badge>
                         )}
-                      </div>
-                      <span className="text-xs text-muted-foreground">{tool.description}</span>
-                    </div>
-                    <ChevronRight className={cn(
-                      "w-4 h-4 text-muted-foreground transition-transform",
-                      activeTool === tool.id && "text-primary"
-                    )} />
-                  </Button>
+                      </SidebarMenuButton>
+                    )}
+                  </SidebarMenuItem>
                 ))}
-              </div>
-            </div>
-          ))}
-        </nav>
-      </ScrollArea>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        ))}
+      </SidebarContent>
 
-      {/* Upgrade CTA */}
-      {!isSubscribed && (
-        <div className="p-4 border-t border-border">
-          <div className="bg-gradient-to-br from-primary/10 via-purple-500/10 to-pink-500/10 rounded-lg p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <Crown className="w-5 h-5 text-amber-500" />
-              <span className="font-semibold text-sm">Upgrade to Pro</span>
+      {!isSubscribed && !isCollapsed && (
+        <SidebarFooter className="border-t border-sidebar-border">
+          <div className="p-2">
+            <div className="bg-gradient-to-br from-primary/10 via-purple-500/10 to-pink-500/10 rounded-lg p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Crown className="w-5 h-5 text-amber-500" />
+                <span className="font-semibold text-sm">Upgrade to Pro</span>
+              </div>
+              <p className="text-xs text-muted-foreground mb-3">
+                Unlock unlimited compressions, AI video enhancement, and more.
+              </p>
+              <Button size="sm" className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600">
+                Start Free Trial
+              </Button>
             </div>
-            <p className="text-xs text-muted-foreground mb-3">
-              Unlock unlimited compressions, AI video enhancement, and more.
-            </p>
-            <Button size="sm" className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600">
-              Start Free Trial
-            </Button>
           </div>
-        </div>
+        </SidebarFooter>
       )}
-    </aside>
+
+      {!isSubscribed && isCollapsed && (
+        <SidebarFooter className="border-t border-sidebar-border">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button size="icon" variant="ghost" className="mx-auto my-2 text-amber-500">
+                <Crown className="h-5 w-5" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right">
+              Upgrade to Pro
+            </TooltipContent>
+          </Tooltip>
+        </SidebarFooter>
+      )}
+    </Sidebar>
+  );
+}
+
+export function DashboardSidebar({ activeTool, onToolChange, isSubscribed }: DashboardSidebarProps) {
+  const [defaultOpen, setDefaultOpen] = useState(true);
+
+  useEffect(() => {
+    const stored = localStorage.getItem(SIDEBAR_STATE_KEY);
+    if (stored !== null) {
+      setDefaultOpen(stored !== "true");
+    }
+  }, []);
+
+  const handleOpenChange = (open: boolean) => {
+    localStorage.setItem(SIDEBAR_STATE_KEY, (!open).toString());
+  };
+
+  return (
+    <SidebarProvider defaultOpen={defaultOpen} onOpenChange={handleOpenChange}>
+      <SidebarContentArea
+        activeTool={activeTool}
+        onToolChange={onToolChange}
+        isSubscribed={isSubscribed}
+      />
+    </SidebarProvider>
   );
 }

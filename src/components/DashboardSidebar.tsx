@@ -36,6 +36,7 @@ import {
 import {
   Tooltip,
   TooltipContent,
+  TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
@@ -262,12 +263,14 @@ export function DashboardSidebar({ activeTool, onToolChange, isSubscribed }: Das
   };
 
   return (
-    <SidebarProvider open={isOpen} onOpenChange={handleOpenChange}>
-      <SidebarContentArea
-        activeTool={activeTool}
-        onToolChange={onToolChange}
-        isSubscribed={isSubscribed}
-      />
-    </SidebarProvider>
+    <TooltipProvider delayDuration={0}>
+      <SidebarProvider open={isOpen} onOpenChange={handleOpenChange}>
+        <SidebarContentArea
+          activeTool={activeTool}
+          onToolChange={onToolChange}
+          isSubscribed={isSubscribed}
+        />
+      </SidebarProvider>
+    </TooltipProvider>
   );
 }

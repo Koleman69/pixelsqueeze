@@ -87,11 +87,19 @@ export const useVideoCompression = () => {
       const video = document.createElement('video');
       video.src = originalUrl;
       video.muted = true;
-      video.preload = 'metadata';
+      video.playsInline = true;
+      video.preload = 'auto';
+      video.crossOrigin = 'anonymous';
       
+      // Wait for video to be fully loadable
       await new Promise<void>((resolve, reject) => {
-        video.onloadedmetadata = () => resolve();
+        video.oncanplaythrough = () => resolve();
+        video.onloadedmetadata = () => {
+          // Fallback if canplaythrough doesn't fire
+          setTimeout(() => resolve(), 100);
+        };
         video.onerror = () => reject(new Error('Failed to load video'));
+        video.load();
       });
 
       // Check video duration (max 30 minutes = 1800 seconds)
@@ -211,7 +219,13 @@ export const useVideoCompression = () => {
         mediaRecorder.start(100);
         
         video.currentTime = 0;
-        video.play();
+        
+        // Handle autoplay with proper promise handling
+        video.play().catch((playError) => {
+          console.warn('Autoplay blocked, retrying:', playError);
+          video.muted = true;
+          video.play().catch(reject);
+        });
 
         const duration = video.duration;
         let pausedDuration = 0;

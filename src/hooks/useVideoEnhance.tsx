@@ -70,11 +70,19 @@ export const useVideoEnhance = () => {
     const videoEl = document.createElement('video');
     videoEl.src = sourceUrl;
     videoEl.muted = true;
-    videoEl.preload = 'metadata';
+    videoEl.playsInline = true;
+    videoEl.preload = 'auto';
+    videoEl.crossOrigin = 'anonymous';
 
+    // Wait for video to be fully loadable
     await new Promise<void>((resolve, reject) => {
-      videoEl.onloadedmetadata = () => resolve();
+      videoEl.oncanplaythrough = () => resolve();
+      videoEl.onloadedmetadata = () => {
+        // Fallback if canplaythrough doesn't fire
+        setTimeout(() => resolve(), 100);
+      };
       videoEl.onerror = () => reject(new Error('Failed to load video'));
+      videoEl.load();
     });
 
     const canvas = document.createElement('canvas');
@@ -151,7 +159,15 @@ export const useVideoEnhance = () => {
       }
       
       videoEl.playbackRate = playbackRate;
-      videoEl.play();
+      
+      // Handle autoplay with proper promise handling
+      videoEl.play().catch((playError) => {
+        console.warn('Autoplay blocked, retrying:', playError);
+        videoEl.muted = true;
+        videoEl.play().catch((err) => {
+          reject(new Error('Video playback failed: ' + err.message));
+        });
+      });
 
       let lastFrameTime = 0;
       const frameInterval = 1000 / targetFps;

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -244,22 +244,25 @@ function SidebarContentArea({ activeTool, onToolChange, isSubscribed }: SidebarC
   );
 }
 
-export function DashboardSidebar({ activeTool, onToolChange, isSubscribed }: DashboardSidebarProps) {
-  const [defaultOpen, setDefaultOpen] = useState(true);
+// Read initial state synchronously from localStorage
+function getInitialSidebarState(): boolean {
+  if (typeof window === "undefined") return true;
+  const stored = localStorage.getItem(SIDEBAR_STATE_KEY);
+  // stored === "true" means collapsed, so we return !collapsed for "open"
+  return stored !== "true";
+}
 
-  useEffect(() => {
-    const stored = localStorage.getItem(SIDEBAR_STATE_KEY);
-    if (stored !== null) {
-      setDefaultOpen(stored !== "true");
-    }
-  }, []);
+export function DashboardSidebar({ activeTool, onToolChange, isSubscribed }: DashboardSidebarProps) {
+  // Initialize state synchronously from localStorage
+  const [isOpen, setIsOpen] = useState(getInitialSidebarState);
 
   const handleOpenChange = (open: boolean) => {
+    setIsOpen(open);
     localStorage.setItem(SIDEBAR_STATE_KEY, (!open).toString());
   };
 
   return (
-    <SidebarProvider defaultOpen={defaultOpen} onOpenChange={handleOpenChange}>
+    <SidebarProvider open={isOpen} onOpenChange={handleOpenChange}>
       <SidebarContentArea
         activeTool={activeTool}
         onToolChange={onToolChange}

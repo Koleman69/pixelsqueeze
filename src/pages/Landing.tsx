@@ -162,24 +162,26 @@ const Landing = () => {
               Pixelsqueeze
             </span>
           </div>
-          <div className="flex items-center gap-2 sm:gap-4">
-            <Link to="/promote" className="hidden sm:block">
-              <Button variant="ghost" size="sm">
-                <Gift className="w-4 h-4 mr-2" />
-                Promote
-              </Button>
+          <div className="hidden md:flex items-center gap-6">
+            <a href="#tools" className="text-foreground/80 hover:text-foreground transition-colors text-sm font-medium">
+              Tools
+            </a>
+            <a href="#pricing" className="text-foreground/80 hover:text-foreground transition-colors text-sm font-medium">
+              Pricing
+            </a>
+            <Link to="/blog" className="text-foreground/80 hover:text-foreground transition-colors text-sm font-medium">
+              Blog
             </Link>
-            <Link to="/install" className="hidden sm:block">
+            <Link to="/company" className="text-foreground/80 hover:text-foreground transition-colors text-sm font-medium">
+              Company
+            </Link>
+          </div>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Link to="/install" className="hidden lg:block">
               <Button variant="ghost" size="sm">
                 <Download className="w-4 h-4 mr-2" />
-                Install App
+                Install
               </Button>
-            </Link>
-            <Link to="/blog">
-              <Button variant="ghost" size="sm">Blog</Button>
-            </Link>
-            <Link to="/company" className="hidden sm:block">
-              <Button variant="ghost" size="sm">Company</Button>
             </Link>
             <Link to="/auth">
               <Button variant="outline" size="sm">Sign In</Button>
@@ -280,76 +282,144 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* Features Grid */}
-      <section className="section-padding">
+      {/* Tools Section */}
+      <section className="section-padding" id="tools">
         <div className="max-w-7xl mx-auto">
-          <h2 className="section-title">
-            Everything You Need
-          </h2>
-          <p className="section-subtitle">
-            Professional-grade image compression with powerful features
-          </p>
+          <div className="text-center mb-12">
+            <Badge variant="outline" className="mb-4 px-4 py-2 border-primary text-primary">
+              All-in-One Platform
+            </Badge>
+            <h2 className="section-title">
+              Complete Media Optimization Suite
+            </h2>
+            <p className="section-subtitle">
+              Everything you need for images, videos, and content creation — organized and easy to use
+            </p>
+          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <Card className="p-6 hover:shadow-lg transition-shadow">
-              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                <TrendingDown className="w-6 h-6 text-primary" />
+          {/* Tool Categories */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            {/* Image Tools */}
+            <Card className="p-6 hover:shadow-lg transition-shadow border-t-4 border-t-primary">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                  <Image className="w-5 h-5 text-primary" />
+                </div>
+                <h3 className="text-lg font-semibold">Image Tools</h3>
               </div>
-              <h3 className="text-xl font-semibold mb-2">Smart Compression</h3>
-              <p className="text-muted-foreground">
-                AI analyzes each image to find the optimal compression level without visible quality loss.
-              </p>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li className="flex items-center gap-2">
+                  <TrendingDown className="w-4 h-4 text-primary" />
+                  Smart Compression (up to 80%)
+                </li>
+                <li className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-primary" />
+                  AI Editing & Enhancement
+                </li>
+                <li className="flex items-center gap-2">
+                  <Upload className="w-4 h-4 text-primary" />
+                  Batch Processing (100+ images)
+                </li>
+                <li className="flex items-center gap-2">
+                  <Shield className="w-4 h-4 text-primary" />
+                  Pro Optimizer for Print/Web
+                </li>
+              </ul>
             </Card>
 
-            <Card className="p-6 hover:shadow-lg transition-shadow">
-              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                <Upload className="w-6 h-6 text-primary" />
+            {/* Video Tools */}
+            <Card className="p-6 hover:shadow-lg transition-shadow border-t-4 border-t-purple-500">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-purple-500/10 rounded-lg flex items-center justify-center">
+                  <Zap className="w-5 h-5 text-purple-500" />
+                </div>
+                <h3 className="text-lg font-semibold">Video Tools</h3>
               </div>
-              <h3 className="text-xl font-semibold mb-2">Bulk Processing</h3>
-              <p className="text-muted-foreground">
-                Upload and compress hundreds of images at once. Save hours of manual work.
-              </p>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li className="flex items-center gap-2">
+                  <TrendingDown className="w-4 h-4 text-purple-500" />
+                  Video Compression
+                </li>
+                <li className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-purple-500" />
+                  AI Video Enhancement
+                </li>
+                <li className="flex items-center gap-2">
+                  <Zap className="w-4 h-4 text-purple-500" />
+                  4K/HD Quality Preservation
+                </li>
+                <li className="flex items-center gap-2">
+                  <Shield className="w-4 h-4 text-purple-500" />
+                  Fast Processing (2-4x speed)
+                </li>
+              </ul>
             </Card>
 
-            <Card className="p-6 hover:shadow-lg transition-shadow">
-              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                <Image className="w-6 h-6 text-primary" />
+            {/* AI Tools */}
+            <Card className="p-6 hover:shadow-lg transition-shadow border-t-4 border-t-pink-500">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-pink-500/10 rounded-lg flex items-center justify-center">
+                  <Sparkles className="w-5 h-5 text-pink-500" />
+                </div>
+                <h3 className="text-lg font-semibold">AI Tools</h3>
               </div>
-              <h3 className="text-xl font-semibold mb-2">Format Support</h3>
-              <p className="text-muted-foreground">
-                Works with JPG, PNG, WebP, and more. Convert between formats seamlessly.
-              </p>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-pink-500" />
+                  Social Media Captions
+                </li>
+                <li className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-pink-500" />
+                  File Analysis & Insights
+                </li>
+                <li className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-pink-500" />
+                  Platform-Ready Export
+                </li>
+                <li className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-pink-500" />
+                  Auto-Resize for Social
+                </li>
+              </ul>
             </Card>
 
-            <Card className="p-6 hover:shadow-lg transition-shadow">
-              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                <Shield className="w-6 h-6 text-primary" />
+            {/* Analytics */}
+            <Card className="p-6 hover:shadow-lg transition-shadow border-t-4 border-t-emerald-500">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-emerald-500/10 rounded-lg flex items-center justify-center">
+                  <Star className="w-5 h-5 text-emerald-500" />
+                </div>
+                <h3 className="text-lg font-semibold">Analytics</h3>
               </div>
-              <h3 className="text-xl font-semibold mb-2">Secure Processing</h3>
-              <p className="text-muted-foreground">
-                Your images are encrypted and automatically deleted after processing.
-              </p>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li className="flex items-center gap-2">
+                  <Star className="w-4 h-4 text-emerald-500" />
+                  Usage Dashboard
+                </li>
+                <li className="flex items-center gap-2">
+                  <Star className="w-4 h-4 text-emerald-500" />
+                  Storage Savings Tracker
+                </li>
+                <li className="flex items-center gap-2">
+                  <Star className="w-4 h-4 text-emerald-500" />
+                  Compression History
+                </li>
+                <li className="flex items-center gap-2">
+                  <Star className="w-4 h-4 text-emerald-500" />
+                  Competitor Intelligence
+                </li>
+              </ul>
             </Card>
+          </div>
 
-            <Card className="p-6 hover:shadow-lg transition-shadow">
-              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                <Zap className="w-6 h-6 text-primary" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Lightning Fast</h3>
-              <p className="text-muted-foreground">
-                Process images in seconds, not minutes. Optimized for speed and efficiency.
-              </p>
-            </Card>
-
-            <Card className="p-6 hover:shadow-lg transition-shadow">
-              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                <Sparkles className="w-6 h-6 text-primary" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">AI Enhancement</h3>
-              <p className="text-muted-foreground">
-                Not just compression - enhance, upscale, and transform your images with AI.
-              </p>
-            </Card>
+          <div className="text-center">
+            <Link to="/auth">
+              <Button size="lg" className="bg-gradient-primary text-primary-foreground px-8">
+                <Upload className="w-5 h-5 mr-2" />
+                Try All Tools Free
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
@@ -461,7 +531,7 @@ const Landing = () => {
       </section>
 
       {/* Pricing Section */}
-      <section className="section-padding bg-secondary/20">
+      <section className="section-padding bg-secondary/20" id="pricing">
         <div className="max-w-5xl mx-auto">
           <h2 className="section-title">
             Simple, Transparent Pricing

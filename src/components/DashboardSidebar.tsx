@@ -18,6 +18,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Minimize2,
+  Printer,
 } from "lucide-react";
 import {
   Sidebar,
@@ -45,6 +46,7 @@ export type ToolCategory =
   | "edit-image"
   | "batch-process"
   | "pro-optimize"
+  | "print-prep"
   | "compress-video"
   | "enhance-video"
   | "ai-captions"
@@ -68,6 +70,7 @@ const toolCategories = [
       { id: "edit-image" as ToolCategory, label: "Edit & Transform", icon: Wand2, description: "AI editing" },
       { id: "batch-process" as ToolCategory, label: "Batch Process", icon: Package, description: "Multiple images" },
       { id: "pro-optimize" as ToolCategory, label: "Pro Optimizer", icon: Sparkles, description: "Max quality", pro: true },
+      { id: "print-prep" as ToolCategory, label: "Print Prep", icon: Printer, description: "Print-ready sizes" },
     ],
   },
   {

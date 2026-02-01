@@ -23,12 +23,13 @@ import {
   Download,
   RotateCcw,
   ZoomIn,
-  ZoomOut,
   Maximize2,
   Loader2,
   Sparkles,
   Crop,
   Image as ImageIcon,
+  Frame,
+  Check,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -54,6 +55,21 @@ const DPI_OPTIONS = [
   { value: 150, label: "150 DPI (Draft)" },
   { value: 300, label: "300 DPI (Print)" },
   { value: 600, label: "600 DPI (High Quality)" },
+];
+
+// Frame styles
+const FRAME_STYLES = [
+  { id: "none", name: "No Frame", color: "transparent", width: 0 },
+  { id: "thin-white", name: "Thin White", color: "#FFFFFF", width: 2 },
+  { id: "thin-black", name: "Thin Black", color: "#000000", width: 2 },
+  { id: "medium-white", name: "Medium White", color: "#FFFFFF", width: 5 },
+  { id: "medium-black", name: "Medium Black", color: "#000000", width: 5 },
+  { id: "thick-white", name: "Thick White", color: "#FFFFFF", width: 10 },
+  { id: "thick-black", name: "Thick Black", color: "#000000", width: 10 },
+  { id: "gold", name: "Gold", color: "#D4AF37", width: 5 },
+  { id: "silver", name: "Silver", color: "#C0C0C0", width: 5 },
+  { id: "wood", name: "Wood Brown", color: "#8B4513", width: 8 },
+  { id: "custom", name: "Custom", color: "#000000", width: 5 },
 ];
 
 interface CropArea {
@@ -96,10 +112,16 @@ export function PrintOptimizer() {
   const [aiEnhance, setAiEnhance] = useState<boolean>(false);
   const [aiPrompt, setAiPrompt] = useState<string>("");
 
+  // Frame settings
+  const [frameStyle, setFrameStyle] = useState<string>("none");
+  const [customFrameColor, setCustomFrameColor] = useState<string>("#000000");
+  const [customFrameWidth, setCustomFrameWidth] = useState<number>(5);
+
   // Processing state
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [processedImage, setProcessedImage] = useState<string | null>(null);
   const [outputMode, setOutputMode] = useState<"print" | "web">("print");
+  const [downloadReady, setDownloadReady] = useState<boolean>(false);
 
   // Calculate target dimensions
   const getTargetDimensions = useCallback(() => {
@@ -235,15 +257,32 @@ export function PrintOptimizer() {
     if (!originalImage) return;
 
     setIsProcessing(true);
+    setDownloadReady(false);
 
     try {
       const { pixelWidth, pixelHeight } = getTargetDimensions();
 
-      // Create canvas for processing
+      // Get frame settings
+      const frameConfig = FRAME_STYLES.find(f => f.id === frameStyle) || FRAME_STYLES[0];
+      const frameWidth = frameStyle === "custom" ? customFrameWidth : frameConfig.width;
+      const frameColor = frameStyle === "custom" ? customFrameColor : frameConfig.color;
+      
+      // Calculate frame in pixels (percentage of smaller dimension)
+      const framePixels = frameStyle !== "none" 
+        ? Math.round((frameWidth / 100) * Math.min(pixelWidth, pixelHeight))
+        : 0;
+
+      // Create canvas for processing (add frame space)
       const canvas = document.createElement("canvas");
-      canvas.width = pixelWidth;
-      canvas.height = pixelHeight;
+      canvas.width = pixelWidth + (framePixels * 2);
+      canvas.height = pixelHeight + (framePixels * 2);
       const ctx = canvas.getContext("2d")!;
+
+      // Draw frame background if enabled
+      if (framePixels > 0) {
+        ctx.fillStyle = frameColor;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
 
       // Enable high-quality image scaling
       ctx.imageSmoothingEnabled = true;
@@ -255,26 +294,42 @@ export function PrintOptimizer() {
       const srcWidth = (cropWidth / 100) * originalImage.width;
       const srcHeight = (cropHeight / 100) * originalImage.height;
 
-      // Draw cropped and scaled image
+      // Draw cropped and scaled image (inside frame area)
       ctx.drawImage(
         originalImage,
         srcX,
         srcY,
         srcWidth,
         srcHeight,
-        0,
-        0,
+        framePixels,
+        framePixels,
         pixelWidth,
         pixelHeight
       );
 
-      // Apply enhancements
-      if (enhanceSharpness) {
-        applySharpening(ctx, pixelWidth, pixelHeight, 0.4);
-      }
+      // Apply enhancements to the image area (not the frame)
+      if (enhanceSharpness || enhanceClarity) {
+        // Get just the image data (exclude frame)
+        const imageData = ctx.getImageData(framePixels, framePixels, pixelWidth, pixelHeight);
+        
+        // Create temp canvas for enhancements
+        const tempCanvas = document.createElement("canvas");
+        tempCanvas.width = pixelWidth;
+        tempCanvas.height = pixelHeight;
+        const tempCtx = tempCanvas.getContext("2d")!;
+        tempCtx.putImageData(imageData, 0, 0);
 
-      if (enhanceClarity) {
-        applyClarity(ctx, pixelWidth, pixelHeight);
+        if (enhanceSharpness) {
+          applySharpening(tempCtx, pixelWidth, pixelHeight, 0.4);
+        }
+
+        if (enhanceClarity) {
+          applyClarity(tempCtx, pixelWidth, pixelHeight);
+        }
+
+        // Put enhanced image back
+        const enhancedData = tempCtx.getImageData(0, 0, pixelWidth, pixelHeight);
+        ctx.putImageData(enhancedData, framePixels, framePixels);
       }
 
       let resultDataUrl = canvas.toDataURL("image/png", 1.0);
@@ -315,9 +370,9 @@ export function PrintOptimizer() {
       if (outputMode === "web") {
         const webCanvas = document.createElement("canvas");
         const maxWebSize = 2000;
-        const scale = Math.min(1, maxWebSize / Math.max(pixelWidth, pixelHeight));
-        webCanvas.width = Math.round(pixelWidth * scale);
-        webCanvas.height = Math.round(pixelHeight * scale);
+        const scale = Math.min(1, maxWebSize / Math.max(canvas.width, canvas.height));
+        webCanvas.width = Math.round(canvas.width * scale);
+        webCanvas.height = Math.round(canvas.height * scale);
         const webCtx = webCanvas.getContext("2d")!;
         webCtx.imageSmoothingEnabled = true;
         webCtx.imageSmoothingQuality = "high";
@@ -333,10 +388,11 @@ export function PrintOptimizer() {
       }
 
       setProcessedImage(resultDataUrl);
+      setDownloadReady(true);
 
       toast({
-        title: "Image processed",
-        description: `Ready for ${outputMode === "print" ? "printing" : "web"} at ${getTargetDimensions().inchWidth.toFixed(1)}" × ${getTargetDimensions().inchHeight.toFixed(1)}"`,
+        title: "Image processed successfully!",
+        description: `Ready for ${outputMode === "print" ? "printing" : "web"}. Click Download to save.`,
       });
     } catch (error) {
       console.error("Processing error:", error);
@@ -729,6 +785,74 @@ export function PrintOptimizer() {
               )}
             </div>
 
+            {/* Frame Options */}
+            <div className="space-y-3">
+              <h4 className="font-medium flex items-center gap-2">
+                <Frame className="w-4 h-4" />
+                Frame / Border
+              </h4>
+
+              <Select value={frameStyle} onValueChange={setFrameStyle}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select frame style..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {FRAME_STYLES.map(frame => (
+                    <SelectItem key={frame.id} value={frame.id}>
+                      <div className="flex items-center gap-2">
+                        {frame.id !== "none" && frame.id !== "custom" && (
+                          <div 
+                            className="w-4 h-4 rounded border border-border"
+                            style={{ backgroundColor: frame.color }}
+                          />
+                        )}
+                        {frame.name}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              {frameStyle === "custom" && (
+                <div className="space-y-3 p-3 bg-muted rounded-lg">
+                  <div>
+                    <Label className="text-xs mb-1 block">Frame Color</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        type="color"
+                        value={customFrameColor}
+                        onChange={(e) => setCustomFrameColor(e.target.value)}
+                        className="w-12 h-10 p-1 cursor-pointer"
+                      />
+                      <Input
+                        type="text"
+                        value={customFrameColor}
+                        onChange={(e) => setCustomFrameColor(e.target.value)}
+                        placeholder="#000000"
+                        className="flex-1 text-sm"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <Label className="text-xs mb-1 block">Frame Width: {customFrameWidth}%</Label>
+                    <Slider
+                      value={[customFrameWidth]}
+                      onValueChange={([v]) => setCustomFrameWidth(v)}
+                      min={1}
+                      max={15}
+                      step={1}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {frameStyle !== "none" && frameStyle !== "custom" && (
+                <p className="text-xs text-muted-foreground">
+                  {FRAME_STYLES.find(f => f.id === frameStyle)?.width}% border will be added around the image
+                </p>
+              )}
+            </div>
+
             {/* Output Mode */}
             <div>
               <Label className="text-sm mb-2 block">Optimize For</Label>
@@ -776,11 +900,11 @@ export function PrintOptimizer() {
 
               {processedImage && (
                 <Button
-                  variant="outline"
-                  className="w-full"
+                  className="w-full bg-green-600 hover:bg-green-700 text-white animate-pulse"
                   onClick={downloadImage}
+                  size="lg"
                 >
-                  <Download className="w-4 h-4 mr-2" />
+                  <Download className="w-5 h-5 mr-2" />
                   Download {outputMode === "print" ? "Print-Ready" : "Web-Optimized"}
                 </Button>
               )}
@@ -792,9 +916,32 @@ export function PrintOptimizer() {
               {unit === "cm" && ` (${(inchWidth * 2.54).toFixed(1)} × ${(inchHeight * 2.54).toFixed(1)} cm)`}
               <br />
               <strong>Resolution:</strong> {pixelWidth.toLocaleString()} × {pixelHeight.toLocaleString()} pixels @ {dpi} DPI
+              {frameStyle !== "none" && (
+                <>
+                  <br />
+                  <strong>Frame:</strong> {FRAME_STYLES.find(f => f.id === frameStyle)?.name || "Custom"}
+                </>
+              )}
             </div>
           </Card>
         </div>
+      )}
+
+      {/* Sticky Download Banner when processed */}
+      {processedImage && downloadReady && (
+        <Card className="fixed bottom-4 left-1/2 -translate-x-1/2 p-4 bg-card border-2 border-green-500 shadow-lg z-50 flex items-center gap-4">
+          <div className="flex items-center gap-2 text-green-600">
+            <Check className="w-5 h-5" />
+            <span className="font-medium">Image Ready!</span>
+          </div>
+          <Button
+            className="bg-green-600 hover:bg-green-700 text-white"
+            onClick={downloadImage}
+          >
+            <Download className="w-4 h-4 mr-2" />
+            Download Now
+          </Button>
+        </Card>
       )}
     </div>
   );

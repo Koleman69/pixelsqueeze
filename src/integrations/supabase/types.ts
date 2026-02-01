@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_usage: {
+        Row: {
+          created_at: string
+          feature_type: string
+          id: string
+          used_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          feature_type?: string
+          id?: string
+          used_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          feature_type?: string
+          id?: string
+          used_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       alert_preferences: {
         Row: {
           created_at: string
@@ -602,6 +626,10 @@ export type Database = {
           target_user_id: string
         }
         Returns: boolean
+      }
+      count_daily_ai_usage: {
+        Args: { feature?: string; target_user_id: string }
+        Returns: number
       }
       count_subscriber_access_last_hour: {
         Args: { target_user_id?: string }

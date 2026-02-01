@@ -63,6 +63,29 @@ export const ImageEditor = ({ onComplete }: ImageEditorProps) => {
     }
   };
 
+  // Fetch AI usage count on mount and when subscription changes
+  React.useEffect(() => {
+    const fetchAiUsage = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+        
+        const { data, error } = await supabase.rpc('count_daily_ai_usage', {
+          target_user_id: user.id,
+          feature: 'image_edit'
+        });
+        
+        if (!error && data !== null) {
+          setAiUsageCount(data);
+        }
+      } catch (err) {
+        console.error('Error fetching AI usage:', err);
+      }
+    };
+    
+    fetchAiUsage();
+  }, [subscription.subscribed]);
+
   const handleAiEdit = async () => {
     if (!imageSrc || !aiPrompt.trim()) {
       toast({
@@ -73,11 +96,11 @@ export const ImageEditor = ({ onComplete }: ImageEditorProps) => {
       return;
     }
 
-    // Check if user has exceeded free tier
+    // Check if user has exceeded free tier (frontend check for immediate feedback)
     if (!subscription.subscribed && aiUsageCount >= FREE_AI_EDITS) {
       toast({
         title: "Upgrade Required",
-        description: `You've used your ${FREE_AI_EDITS} free AI edits. Upgrade to Pro for unlimited AI editing!`,
+        description: `You've used your ${FREE_AI_EDITS} free AI edits today. Upgrade to Pro for unlimited AI editing!`,
         variant: "destructive",
       });
       return;
@@ -100,11 +123,19 @@ export const ImageEditor = ({ onComplete }: ImageEditorProps) => {
       if (error) throw error;
 
       if (!data.success) {
+        // Check if it's a limit reached error
+        if (data.limitReached) {
+          setAiUsageCount(data.usage?.used || FREE_AI_EDITS);
+        }
         throw new Error(data.error || 'AI editing failed');
       }
 
       setAiEditedImage(data.editedImage);
-      setAiUsageCount(prev => prev + 1);
+      
+      // Update usage count from server response
+      if (data.usage) {
+        setAiUsageCount(data.usage.used);
+      }
 
       toast({
         title: "AI Edit Complete",

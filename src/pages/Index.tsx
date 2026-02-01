@@ -17,6 +17,7 @@ import { ImageUploader } from "@/components/ImageUploader";
 import { ImageEditor } from "@/components/ImageEditor";
 import { BatchOptimizer } from "@/components/BatchOptimizer";
 import { ProfessionalOptimizer } from "@/components/ProfessionalOptimizer";
+import { PrintOptimizer } from "@/components/PrintOptimizer";
 import { EnhancedVideoProgress } from "@/components/EnhancedVideoProgress";
 import { AIVideoEnhancer } from "@/components/AIVideoEnhancer";
 import { AICaptionGenerator } from "@/components/AICaptionGenerator";
@@ -46,6 +47,10 @@ const toolTitles: Record<ToolCategory, { title: string; description: string }> =
   "pro-optimize": {
     title: "Professional Optimizer",
     description: "Maximum fidelity with minimal file size for web & print",
+  },
+  "print-prep": {
+    title: "Print Preparation",
+    description: "Crop, resize, and upscale images for professional printing",
   },
   "compress-video": {
     title: "Video Compression",
@@ -223,6 +228,9 @@ const Index = () => {
 
       case "pro-optimize":
         return <ProfessionalOptimizer />;
+
+      case "print-prep":
+        return <PrintOptimizer />;
 
       case "compress-video":
         return (

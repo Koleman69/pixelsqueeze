@@ -221,16 +221,16 @@ const VideoCard = ({
               )}
             </div>
 
-            {/* Share Row */}
+            {/* Share/Download Row - Show for enhanced OR ready */}
             {canShare && (
               <div className="flex gap-2">
                 <Button 
-                  variant="outline" 
-                  className="flex-1"
+                  size="lg"
+                  className="flex-1 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg animate-pulse"
                   onClick={() => onShare({ platform: 'download' })}
                 >
-                  <Download className="w-4 h-4 mr-2" />
-                  Download
+                  <Download className="w-5 h-5 mr-2" />
+                  Download Video
                 </Button>
                 <Button 
                   variant="outline"
@@ -448,8 +448,37 @@ export const AIVideoEnhancer = () => {
     e.target.value = '';
   }, [uploadVideo]);
 
+  const readyVideos = videos.filter(v => v.status === 'ready' || v.status === 'enhanced');
+
   return (
     <div className="space-y-6">
+      {/* Sticky Download Banner */}
+      {readyVideos.length > 0 && (
+        <div className="sticky top-20 z-40 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg shadow-lg p-4 animate-in slide-in-from-top duration-300">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-white/20 rounded-full">
+                <CheckCircle2 className="w-6 h-6" />
+              </div>
+              <div>
+                <p className="font-semibold">{readyVideos.length} video(s) ready to download!</p>
+                <p className="text-sm text-white/80">Click Download to save your optimized videos</p>
+              </div>
+            </div>
+            <Button 
+              size="lg"
+              className="bg-white text-green-600 hover:bg-white/90 shadow-md"
+              onClick={() => {
+                readyVideos.forEach(v => shareVideo(v.id, { platform: 'download' }));
+              }}
+            >
+              <Download className="w-5 h-5 mr-2" />
+              Download All ({readyVideos.length})
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="text-center">
         <Badge variant="outline" className="mb-4 px-4 py-2 border-primary text-primary">

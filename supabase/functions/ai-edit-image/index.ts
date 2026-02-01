@@ -95,12 +95,34 @@ serve(async (req) => {
 
     logStep("Subscription status", { isSubscribed });
 
-    // Track usage for free tier
-    // In a production app, you'd store this in a database table
-    // For now, we'll just limit based on subscription status
+    const FREE_AI_LIMIT = 3;
+
+    // Check and enforce usage limits for free tier
     if (!isSubscribed) {
-      // Free users get limited functionality
-      logStep("Free tier user - checking limits");
+      // Count today's AI usage from database
+      const { data: usageData, error: usageError } = await supabaseClient.rpc(
+        'count_daily_ai_usage',
+        { target_user_id: user.id, feature: 'image_edit' }
+      );
+
+      if (usageError) {
+        logStep("Error checking usage", { error: usageError.message });
+      }
+
+      const currentUsage = usageData || 0;
+      logStep("Free tier usage check", { currentUsage, limit: FREE_AI_LIMIT });
+
+      if (currentUsage >= FREE_AI_LIMIT) {
+        return new Response(JSON.stringify({
+          success: false,
+          error: `You've used your ${FREE_AI_LIMIT} free AI edits today. Upgrade to Pro for unlimited AI editing!`,
+          limitReached: true,
+          usage: { used: currentUsage, limit: FREE_AI_LIMIT }
+        }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 403
+        });
+      }
     }
 
     // Call Lovable AI Gateway for image editing
@@ -162,12 +184,33 @@ serve(async (req) => {
       throw new Error("No edited image returned from AI");
     }
 
+    // Record usage for non-subscribed users
+    if (!isSubscribed) {
+      const { error: insertError } = await supabaseClient
+        .from('ai_usage')
+        .insert({ user_id: user.id, feature_type: 'image_edit' });
+      
+      if (insertError) {
+        logStep("Failed to record usage", { error: insertError.message });
+      } else {
+        logStep("Usage recorded successfully");
+      }
+    }
+
     logStep("Image edit successful");
+
+    // Get updated usage count
+    const { data: newUsageData } = await supabaseClient.rpc(
+      'count_daily_ai_usage',
+      { target_user_id: user.id, feature: 'image_edit' }
+    );
 
     return new Response(JSON.stringify({
       success: true,
       editedImage,
-      message: aiData.choices?.[0]?.message?.content || "Image edited successfully"
+      message: aiData.choices?.[0]?.message?.content || "Image edited successfully",
+      usage: { used: newUsageData || 0, limit: 3 },
+      isSubscribed
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200

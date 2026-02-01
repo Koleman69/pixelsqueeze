@@ -754,7 +754,7 @@ const Landing = () => {
               <Link to="/auth" className="hover:text-foreground transition-colors">Sign In</Link>
             </div>
             <p className="text-sm text-muted-foreground">
-              © 2024 Pixelsqueeze. All rights reserved.
+              © {new Date().getFullYear()} Pixelsqueeze. All rights reserved.
             </p>
           </div>
         </div>

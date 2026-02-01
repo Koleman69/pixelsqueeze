@@ -337,6 +337,7 @@ const Auth = () => {
                         value={formData.email}
                         onChange={handleChange}
                         disabled={isLoading}
+                        autoComplete="email"
                       />
                     </div>
                     <div className="space-y-2">
@@ -349,6 +350,7 @@ const Auth = () => {
                         value={formData.password}
                         onChange={handleChange}
                         disabled={isLoading}
+                        autoComplete="current-password"
                       />
                     </div>
                     <Button type="submit" className="w-full" disabled={isLoading}>
@@ -398,6 +400,7 @@ const Auth = () => {
                         value={formData.firstName}
                         onChange={handleChange}
                         disabled={isLoading}
+                        autoComplete="given-name"
                       />
                     </div>
                     <div className="space-y-2">
@@ -410,6 +413,7 @@ const Auth = () => {
                         value={formData.lastName}
                         onChange={handleChange}
                         disabled={isLoading}
+                        autoComplete="family-name"
                       />
                     </div>
                   </div>
@@ -423,6 +427,7 @@ const Auth = () => {
                       value={formData.email}
                       onChange={handleChange}
                       disabled={isLoading}
+                      autoComplete="email"
                     />
                   </div>
                   <div className="space-y-2">
@@ -435,6 +440,7 @@ const Auth = () => {
                       value={formData.password}
                       onChange={handleChange}
                       disabled={isLoading}
+                      autoComplete="new-password"
                     />
                   </div>
                   <div className="space-y-2">
@@ -447,6 +453,7 @@ const Auth = () => {
                       value={formData.confirmPassword}
                       onChange={handleChange}
                       disabled={isLoading}
+                      autoComplete="new-password"
                     />
                   </div>
                   <Button type="submit" className="w-full" disabled={isLoading}>

@@ -1,7 +1,18 @@
+# PixelSqueeze Robots.txt
+# https://pixelsqueeze.lovable.app
+
 User-agent: Googlebot
 Allow: /
+Crawl-delay: 1
 
 User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Slurp
+Allow: /
+
+User-agent: DuckDuckBot
 Allow: /
 
 User-agent: Twitterbot
@@ -10,16 +21,25 @@ Allow: /
 User-agent: facebookexternalhit
 Allow: /
 
+User-agent: LinkedInBot
+Allow: /
+
 User-agent: *
 Allow: /
-Sitemap: https://pixelsqueeze.app/sitemap.xml
 
-# Allow all pages
+# Sitemap location
+Sitemap: https://pixelsqueeze.lovable.app/sitemap.xml
+
+# Disallow private/auth routes
+Disallow: /account
+Disallow: /admin
+Disallow: /auth
+
+# Allow all public pages
+Allow: /
+Allow: /landing
 Allow: /blog
 Allow: /blog/*
-
-# High-value content for SEO
-Allow: /blog/best-image-compression-tools-2025
-Allow: /blog/reduce-photo-size-without-losing-quality
-Allow: /blog/jpeg-vs-png-vs-webp-compression-comparison
-Allow: /blog/optimize-images-page-speed-seo
+Allow: /company
+Allow: /privacy
+Allow: /install

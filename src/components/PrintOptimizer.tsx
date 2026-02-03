@@ -900,11 +900,11 @@ export function PrintOptimizer() {
 
               {processedImage && (
                 <Button
-                  className="w-full bg-green-600 hover:bg-green-700 text-white animate-pulse"
+                  className="w-full h-16 text-lg font-bold bg-profit hover:bg-profit/90 text-profit-foreground animate-pulse shadow-profit"
                   onClick={downloadImage}
                   size="lg"
                 >
-                  <Download className="w-5 h-5 mr-2" />
+                  <Download className="w-6 h-6 mr-3" />
                   Download {outputMode === "print" ? "Print-Ready" : "Web-Optimized"}
                 </Button>
               )}
@@ -929,16 +929,16 @@ export function PrintOptimizer() {
 
       {/* Sticky Download Banner when processed */}
       {processedImage && downloadReady && (
-        <Card className="fixed bottom-4 left-1/2 -translate-x-1/2 p-4 bg-card border-2 border-green-500 shadow-lg z-50 flex items-center gap-4">
-          <div className="flex items-center gap-2 text-green-600">
-            <Check className="w-5 h-5" />
-            <span className="font-medium">Image Ready!</span>
+        <Card className="fixed bottom-4 left-1/2 -translate-x-1/2 p-6 bg-card border-2 border-profit shadow-profit z-50 flex items-center gap-6">
+          <div className="flex items-center gap-2 text-profit">
+            <Check className="w-6 h-6" />
+            <span className="font-bold text-lg">Image Ready!</span>
           </div>
           <Button
-            className="bg-green-600 hover:bg-green-700 text-white"
+            className="h-14 px-8 text-lg font-bold bg-profit hover:bg-profit/90 text-profit-foreground shadow-profit"
             onClick={downloadImage}
           >
-            <Download className="w-4 h-4 mr-2" />
+            <Download className="w-6 h-6 mr-3" />
             Download Now
           </Button>
         </Card>

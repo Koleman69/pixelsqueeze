@@ -127,6 +127,7 @@ export const GoalSelector = ({
             </p>
             <p className="text-xs text-muted-foreground">
               {selectedGoal.outputFormat.toUpperCase()} • {selectedGoal.settings.quality}% quality • {selectedGoal.settings.maxWidth}×{selectedGoal.settings.maxHeight}
+              {selectedGoal.maxFileSizeKB && ` • Max ${selectedGoal.maxFileSizeKB}KB`}
             </p>
           </div>
         </div>

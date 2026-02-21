@@ -555,7 +555,7 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
           </TabsList>
 
           <TabsContent value="image" className="space-y-6 mt-6">
-            {/* Step 0: Goal-based Optimization */}
+            {/* Step 1: Goal-based Optimization */}
             <GoalSelector
               selectedGoal={selectedGoal}
               onSelectGoal={(goal) => {
@@ -563,23 +563,29 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
                 setSettings(goal.settings);
                 setSelectedImagePreset(goal.id);
               }}
-              onClearGoal={() => setSelectedGoal(null)}
+              onClearGoal={() => {
+                setSelectedGoal(null);
+                setSelectedImagePreset('web');
+                setSettings({ quality: 80, maxWidth: 1920, maxHeight: 1920, dpi: 72 });
+              }}
               isSubscribed={subscription.subscribed}
               onUpgrade={createCheckout}
             />
 
-            {/* Step 1: Image Presets - One-Click Selection */}
-            <ImagePresets
-              selectedPreset={selectedImagePreset}
-              onSelectPreset={(key, presetSettings) => {
-                setSelectedImagePreset(key);
-                setSettings(presetSettings);
-              }}
-              isSubscribed={subscription.subscribed}
-            />
+            {/* Step 2: Manual Presets — only when no goal is active */}
+            {!selectedGoal && (
+              <ImagePresets
+                selectedPreset={selectedImagePreset}
+                onSelectPreset={(key, presetSettings) => {
+                  setSelectedImagePreset(key);
+                  setSettings(presetSettings);
+                }}
+                isSubscribed={subscription.subscribed}
+              />
+            )}
 
-            {/* Step 2: Smart AI Analysis */}
-            <SmartImageAnalysis
+            {/* Step 3: Smart AI Analysis — hidden when goal is active */}
+            {!selectedGoal && <SmartImageAnalysis
               imageFile={currentImageFile}
               imagePreview={imagePreview}
               onApplySettings={(newSettings, presetKey) => {
@@ -590,10 +596,10 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
                 setAppliedFilter(filter);
               }}
               isSubscribed={subscription.subscribed}
-            />
+            />}
 
-            {/* Step 3: Quick AI Recommendation (for basic analysis) */}
-            <AIRecommendation
+            {/* Step 4: Quick AI Recommendation — hidden when goal is active */}
+            {!selectedGoal && <AIRecommendation
               selectedFiles={selectedFiles}
               currentSettings={settings}
               onApplyRecommendation={(newSettings, presetKey) => {
@@ -605,9 +611,9 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
                 });
               }}
               isSubscribed={subscription.subscribed}
-            />
+            />}
 
-            {/* Step 3: Fine-tune Settings (Collapsible) */}
+            {/* Step 5: Fine-tune Settings (Collapsible) */}
             <div className="flex items-center gap-4">
               <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
                 <DialogTrigger asChild>
@@ -749,12 +755,20 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
                 <Upload className={`w-8 h-8 ${isUploading ? 'animate-bounce text-primary' : isDragging ? 'text-primary' : 'text-muted-foreground'}`} />
               </div>
               <h3 className="text-lg font-semibold mb-2">
-                {isUploading ? 'Compressing...' : isDragging ? 'Drop Images Here' : 'Upload Your Images'}
+                {isUploading 
+                  ? 'Optimizing...' 
+                  : isDragging 
+                    ? 'Drop Images Here' 
+                    : selectedGoal 
+                      ? `Upload for ${selectedGoal.label}` 
+                      : 'Upload Your Images'}
               </h3>
               <p className="text-muted-foreground mb-4 text-sm">
                 {isUploading 
-                  ? `Processing ${selectedFiles?.length || 0} image(s) with ${selectedImagePreset} preset...` 
-                  : 'Drag & drop or use the buttons below'
+                  ? `Processing ${selectedFiles?.length || 0} image(s) → ${selectedGoal?.outputFormat.toUpperCase() || 'optimized'}` 
+                  : selectedGoal
+                    ? `${selectedGoal.description} • ${selectedGoal.outputFormat.toUpperCase()} output`
+                    : 'Drag & drop or use the buttons below'
                 }
               </p>
               

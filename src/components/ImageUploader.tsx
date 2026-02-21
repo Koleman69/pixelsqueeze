@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Settings, Upload, Crown, Download, Zap, Image, Video, Volume2, VolumeX, Smartphone, Globe, Archive, SlidersHorizontal, Save, Star, Trash2, Plus, FileUp, FileDown, Clock, Camera, Sparkles } from 'lucide-react';
+import { GoalSelector, OptimizationGoal } from '@/components/GoalSelector';
 import { CompressionSettings, useImageCompression } from '@/hooks/useImageCompression';
 import { useVideoCompression, VideoCompressionSettings, VideoOutputFormat } from '@/hooks/useVideoCompression';
 import { VideoCompressionResults } from '@/components/VideoCompressionResults';
@@ -57,7 +58,7 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [currentImageFile, setCurrentImageFile] = useState<File | null>(null);
   const [appliedFilter, setAppliedFilter] = useState<string>('none');
-
+  const [selectedGoal, setSelectedGoal] = useState<OptimizationGoal | null>(null);
   // Load saved presets from localStorage on mount
   useEffect(() => {
     const stored = localStorage.getItem('videoCompressionPresets');
@@ -554,6 +555,19 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
           </TabsList>
 
           <TabsContent value="image" className="space-y-6 mt-6">
+            {/* Step 0: Goal-based Optimization */}
+            <GoalSelector
+              selectedGoal={selectedGoal}
+              onSelectGoal={(goal) => {
+                setSelectedGoal(goal);
+                setSettings(goal.settings);
+                setSelectedImagePreset(goal.id);
+              }}
+              onClearGoal={() => setSelectedGoal(null)}
+              isSubscribed={subscription.subscribed}
+              onUpgrade={createCheckout}
+            />
+
             {/* Step 1: Image Presets - One-Click Selection */}
             <ImagePresets
               selectedPreset={selectedImagePreset}

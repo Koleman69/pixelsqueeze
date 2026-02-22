@@ -27,12 +27,17 @@ import { SocialMediaExporter } from "@/components/SocialMediaExporter";
 import { BatchAnalyticsDashboard } from "@/components/BatchAnalyticsDashboard";
 import CompetitorTracker from "@/components/CompetitorTracker";
 import { AutomationFlow } from "@/components/AutomationFlow";
+import { DashboardOverview } from "@/components/DashboardOverview";
 
 // Navigation
 import { DashboardSidebar, ToolCategory } from "@/components/DashboardSidebar";
 import { MobileDashboardNav } from "@/components/MobileDashboardNav";
 
 const toolTitles: Record<ToolCategory, { title: string; description: string }> = {
+  overview: {
+    title: "Dashboard",
+    description: "Your optimization performance at a glance",
+  },
   "compress-image": {
     title: "Image Compression",
     description: "Reduce file sizes by up to 80% without losing quality",
@@ -96,7 +101,7 @@ const Index = () => {
   const videoInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
-  const [activeTool, setActiveTool] = useState<ToolCategory>("compress-image");
+  const [activeTool, setActiveTool] = useState<ToolCategory>("overview");
   
   // Track daily usage
   const [dailyUsage, setDailyUsage] = useState({ images: 0, videos: 0 });
@@ -191,6 +196,9 @@ const Index = () => {
 
   const renderToolContent = () => {
     switch (activeTool) {
+      case "overview":
+        return <DashboardOverview />;
+
       case "compress-image":
         return (
           <div className="space-y-6">

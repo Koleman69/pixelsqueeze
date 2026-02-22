@@ -1,5 +1,11 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  runOptimizationPipeline,
+  type GoalPreset,
+  type PipelineResult,
+  type ContentType,
+} from '@/services/imageOptimizationPipeline';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -57,6 +63,9 @@ interface BatchImage {
   progress: number;
   seoFileName?: string;
   altText?: string;
+  contentType?: ContentType;
+  detectedFormat?: string;
+  pipelineResult?: PipelineResult;
   result?: {
     blob: Blob;
     url: string;
@@ -672,92 +681,54 @@ export const BatchOptimizer = () => {
     });
   }, [processWithWebGL, settings]);
 
-  const optimizeSingleImage = useCallback(async (batchImage: BatchImage): Promise<BatchImage> => {
-    const startTime = performance.now();
-    
-    return new Promise((resolve) => {
-      const img = new Image();
-      
-      img.onload = async () => {
-        try {
-          const canvas = document.createElement('canvas');
-          const ctx = canvas.getContext('2d', { 
-            willReadFrequently: true,
-            alpha: settings.format === 'png' 
-          });
-          
-          if (!ctx) {
-            resolve({ ...batchImage, status: 'failed', error: 'Canvas error' });
-            return;
-          }
-
-          canvas.width = img.width;
-          canvas.height = img.height;
-
-          let imageData: ImageData | null = null;
-          
-          // Try WebGL first
-          if (webGLAvailable) {
-            try {
-              imageData = await processImageWebGL(img);
-            } catch (e) {
-              console.warn('WebGL failed, using CPU:', e);
-            }
-          }
-
-          // Fallback to CPU
-          if (!imageData) {
-            imageData = processImageCPU(img);
-          }
-
-          ctx.putImageData(imageData, 0, 0);
-
-          const mimeType = `image/${settings.format}`;
-          const quality = settings.quality / 100;
-
-          canvas.toBlob(
-            (blob) => {
-              if (!blob) {
-                resolve({ ...batchImage, status: 'failed', error: 'Blob creation failed' });
-                return;
-              }
-
-              const url = URL.createObjectURL(blob);
-              const processingTime = Math.round(performance.now() - startTime);
-
-              resolve({
-                ...batchImage,
-                status: 'completed',
-                progress: 100,
-                result: {
-                  blob,
-                  url,
-                  originalSize: batchImage.file.size,
-                  optimizedSize: blob.size,
-                  compressionRatio: Math.round((1 - blob.size / batchImage.file.size) * 100),
-                  processingTime,
-                },
-              });
-            },
-            mimeType,
-            settings.format === 'png' ? undefined : quality
-          );
-        } catch (error) {
-          resolve({ 
-            ...batchImage, 
-            status: 'failed', 
-            error: error instanceof Error ? error.message : 'Unknown error' 
-          });
-        }
+  const optimizeSingleImage = useCallback(async (batchImage: BatchImage, index: number): Promise<BatchImage> => {
+    try {
+      // Map batch settings format to pipeline GoalPreset
+      const goalMap: Record<string, GoalPreset> = {
+        fast: 'web',
+        balanced: 'web',
+        quality: 'print',
       };
+      const goal: GoalPreset = goalMap[activePreset] || 'web';
 
-      img.onerror = () => {
-        resolve({ ...batchImage, status: 'failed', error: 'Failed to load image' });
+      const pipelineResult = await runOptimizationPipeline(batchImage.file, {
+        goal,
+        forceFormat: settings.format === 'webp' ? 'webp' : settings.format === 'png' ? 'png' : 'jpeg',
+        quality: settings.quality,
+        stripMetadata: bulkOptions.stripMetadata,
+        seoRename: bulkOptions.seoRename,
+        seoPrefix: bulkOptions.seoPrefix,
+        generateAltText: bulkOptions.generateAltText,
+        storeMetrics: true,
+        userId: user?.id,
+      }, index);
+
+      return {
+        ...batchImage,
+        status: 'completed',
+        progress: 100,
+        seoFileName: pipelineResult.seoFileName.replace(/\.[^/.]+$/, ''),
+        altText: pipelineResult.altText,
+        contentType: pipelineResult.contentType,
+        detectedFormat: pipelineResult.format,
+        pipelineResult,
+        result: {
+          blob: pipelineResult.blob,
+          url: pipelineResult.url,
+          originalSize: pipelineResult.originalSize,
+          optimizedSize: pipelineResult.optimizedSize,
+          compressionRatio: pipelineResult.compressionRatio,
+          processingTime: pipelineResult.processingTimeMs,
+        },
       };
-
-      img.src = batchImage.preview;
-    });
-  }, [settings, webGLAvailable, processImageWebGL, processImageCPU]);
+    } catch (error) {
+      return {
+        ...batchImage,
+        status: 'failed',
+        error: error instanceof Error ? error.message : 'Unknown error',
+      };
+    }
+  }, [settings, activePreset, bulkOptions, user?.id]);
 
   const processBatch = async () => {
     const pendingImages = images.filter(img => img.status === 'pending' || img.status === 'failed');
@@ -772,13 +743,14 @@ export const BatchOptimizer = () => {
     let completed = 0;
     const total = pendingImages.length;
 
-    for (const batchImage of pendingImages) {
+    for (let i = 0; i < pendingImages.length; i++) {
+      const batchImage = pendingImages[i];
       // Update status to processing
       setImages(prev => prev.map(img => 
         img.id === batchImage.id ? { ...img, status: 'processing' as const, progress: 0 } : img
       ));
 
-      const result = await optimizeSingleImage(batchImage);
+      const result = await optimizeSingleImage(batchImage, i);
       
       // Update with result
       setImages(prev => prev.map(img => 
@@ -883,8 +855,9 @@ export const BatchOptimizer = () => {
     }
 
     const getDownloadName = (img: BatchImage) => {
+      if (img.pipelineResult?.seoFileName) return img.pipelineResult.seoFileName;
       const name = img.seoFileName || img.file.name.replace(/\.[^/.]+$/, '');
-      return `${name}.${settings.format}`;
+      return `${name}.${img.detectedFormat || settings.format}`;
     };
 
     if (completedImages.length === 1) {
@@ -900,10 +873,18 @@ export const BatchOptimizer = () => {
     toast.loading('Creating ZIP file...');
     
     const zip = new JSZip();
+
+    // Add manifest CSV with alt text and metadata
+    let manifest = 'filename,alt_text,content_type,format,original_size_bytes,optimized_size_bytes,compression_ratio,dimensions\n';
     
     for (const img of completedImages) {
       zip.file(getDownloadName(img), img.result!.blob);
+      const pr = img.pipelineResult;
+      const alt = (img.altText || '').replace(/"/g, '""');
+      manifest += `"${getDownloadName(img)}","${alt}","${img.contentType || 'unknown'}","${img.detectedFormat || settings.format}",${img.result!.originalSize},${img.result!.optimizedSize},${img.result!.compressionRatio}%,"${pr ? `${pr.outputWidth}x${pr.outputHeight}` : ''}"\n`;
     }
+    
+    zip.file('manifest.csv', manifest);
 
     const zipBlob = await zip.generateAsync({ type: 'blob' });
     const url = URL.createObjectURL(zipBlob);

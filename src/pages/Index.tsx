@@ -102,6 +102,21 @@ const Index = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
   const [activeTool, setActiveTool] = useState<ToolCategory>("overview");
+
+  // Pro-only tools — free users see upgrade prompt
+  const PRO_TOOLS: ToolCategory[] = ["pro-optimize", "enhance-video", "competitor", "automation"];
+
+  const handleToolChange = (tool: ToolCategory) => {
+    if (PRO_TOOLS.includes(tool) && !subscription.subscribed && !subscription.is_trialing) {
+      toast({
+        title: "Upgrade Required",
+        description: "This tool is available on Creator+ plans. Upgrade to unlock automation, scanning, and pro optimization.",
+      });
+      createCheckout();
+      return;
+    }
+    setActiveTool(tool);
+  };
   
   // Track daily usage
   const [dailyUsage, setDailyUsage] = useState({ images: 0, videos: 0 });
@@ -197,7 +212,7 @@ const Index = () => {
   const renderToolContent = () => {
     switch (activeTool) {
       case "overview":
-        return <DashboardOverview />;
+        return <DashboardOverview isSubscribed={subscription.subscribed} />;
 
       case "compress-image":
         return (
@@ -338,7 +353,7 @@ const Index = () => {
       <div className="hidden lg:flex">
         <DashboardSidebar 
           activeTool={activeTool} 
-          onToolChange={setActiveTool}
+          onToolChange={handleToolChange}
           isSubscribed={subscription.subscribed}
         />
       </div>
@@ -348,7 +363,7 @@ const Index = () => {
         {/* Mobile Navigation */}
         <MobileDashboardNav 
           activeTool={activeTool} 
-          onToolChange={setActiveTool}
+          onToolChange={handleToolChange}
           isSubscribed={subscription.subscribed}
         />
 

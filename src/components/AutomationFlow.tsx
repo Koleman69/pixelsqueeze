@@ -334,17 +334,18 @@ export const AutomationFlow = () => {
         }
       }
 
-      const { error } = await supabase.from('automation_connections').upsert({
-        user_id: user.id,
-        provider: connectDialog.id,
-        display_name: connectDialog.name,
-        credentials,
-        config: { output_format: 'webp', ...config },
-        is_active: true,
-        status: 'connected',
-      }, { onConflict: 'user_id,provider' });
+      const { data, error } = await supabase.functions.invoke('manage-credentials', {
+        body: {
+          action: 'save',
+          provider: connectDialog.id,
+          display_name: connectDialog.name,
+          credentials,
+          config: { output_format: 'webp', ...config },
+        },
+      });
 
       if (error) throw error;
+      if (data?.error) throw new Error(data.error);
 
       toast.success(`${connectDialog.name} connected successfully!`);
       setConnectDialog(null);

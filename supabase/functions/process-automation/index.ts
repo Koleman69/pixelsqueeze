@@ -7,6 +7,36 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+const ENCRYPTION_PREFIX = "enc::";
+
+async function getEncryptionKey(): Promise<CryptoKey> {
+  const secret = Deno.env.get("CREDENTIALS_ENCRYPTION_KEY");
+  if (!secret) throw new Error("Encryption key not configured");
+  const keyData = new TextEncoder().encode(secret.padEnd(32, "0").slice(0, 32));
+  return await crypto.subtle.importKey("raw", keyData, "AES-GCM", false, ["decrypt"]);
+}
+
+async function decryptValue(val: string): Promise<string> {
+  if (!val.startsWith(ENCRYPTION_PREFIX)) return val;
+  const key = await getEncryptionKey();
+  const data = Uint8Array.from(
+    atob(val.slice(ENCRYPTION_PREFIX.length)),
+    (c) => c.charCodeAt(0)
+  );
+  const iv = data.slice(0, 12);
+  const ciphertext = data.slice(12);
+  const decrypted = await crypto.subtle.decrypt({ name: "AES-GCM", iv }, key, ciphertext);
+  return new TextDecoder().decode(decrypted);
+}
+
+async function decryptCredentials(creds: Record<string, string>): Promise<Record<string, string>> {
+  const result: Record<string, string> = {};
+  for (const [k, v] of Object.entries(creds)) {
+    result[k] = typeof v === "string" && v ? await decryptValue(v) : v;
+  }
+  return result;
+}
+
 const logStep = (step: string, details?: any) => {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : "";
   console.log(`[PROCESS-AUTOMATION] ${step}${detailsStr}`);
@@ -52,6 +82,12 @@ serve(async (req) => {
     if (connError || !connection) {
       throw new Error("Connection not found");
     }
+
+    // Decrypt credentials before use
+    if (connection.credentials) {
+      connection.credentials = await decryptCredentials(connection.credentials);
+    }
+
     logStep("Connection found", {
       provider: connection.provider,
       status: connection.status,

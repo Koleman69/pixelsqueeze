@@ -29,3 +29,6 @@ verify_jwt = false
 
 [functions.process-automation]
 verify_jwt = false
+
+[functions.manage-credentials]
+verify_jwt = false

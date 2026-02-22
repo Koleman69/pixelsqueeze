@@ -55,6 +55,8 @@ interface BatchImage {
   preview: string;
   status: 'pending' | 'processing' | 'completed' | 'failed';
   progress: number;
+  seoFileName?: string;
+  altText?: string;
   result?: {
     blob: Blob;
     url: string;
@@ -71,6 +73,13 @@ interface BatchSettings {
   sharpening: 'none' | 'subtle' | 'moderate' | 'strong';
   noiseReduction: number;
   format: 'jpeg' | 'png' | 'webp';
+}
+
+interface BulkOptions {
+  seoRename: boolean;
+  seoPrefix: string;
+  generateAltText: boolean;
+  stripMetadata: boolean;
 }
 
 type BuiltInPresetType = 'fast' | 'balanced' | 'quality';
@@ -189,6 +198,29 @@ const sharpeningKernels = {
   strong: [-1, -1, -1, -1, 9, -1, -1, -1, -1],
 };
 
+const generateSeoFileName = (originalName: string, prefix: string, index: number): string => {
+  // Clean the original name: lowercase, replace spaces/special chars with hyphens
+  let seoName = originalName
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .replace(/-{2,}/g, '-');
+  
+  // Add prefix if provided
+  if (prefix.trim()) {
+    const cleanPrefix = prefix.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    seoName = `${cleanPrefix}-${seoName}`;
+  }
+  
+  // Add index for uniqueness
+  seoName = `${seoName}-${String(index).padStart(3, '0')}`;
+  
+  // Truncate if too long
+  if (seoName.length > 80) seoName = seoName.substring(0, 80).replace(/-+$/, '');
+  
+  return seoName;
+};
+
 export const BatchOptimizer = () => {
   const { user } = useAuth();
   const [images, setImages] = useState<BatchImage[]>([]);
@@ -213,7 +245,12 @@ export const BatchOptimizer = () => {
   const importInputRef = useRef<HTMLInputElement>(null);
   const dropZoneRef = useRef<HTMLDivElement>(null);
   const [settings, setSettings] = useState<BatchSettings>(builtInPresets.balanced.settings);
-
+  const [bulkOptions, setBulkOptions] = useState<BulkOptions>({
+    seoRename: true,
+    seoPrefix: '',
+    generateAltText: false,
+    stripMetadata: true,
+  });
   // Load custom presets and history on mount and check for shared preset in URL
   useEffect(() => {
     setCustomPresets(loadCustomPresets());
@@ -493,9 +530,15 @@ export const BatchOptimizer = () => {
       toast.warning(`${fileArray.length - imageFiles.length} non-image files were skipped`);
     }
     
-    imageFiles.forEach((file) => {
+    imageFiles.forEach((file, idx) => {
       const id = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
       const reader = new FileReader();
+      
+      // Generate SEO-friendly filename
+      const baseName = file.name.replace(/\.[^/.]+$/, '');
+      const seoName = bulkOptions.seoRename
+        ? generateSeoFileName(baseName, bulkOptions.seoPrefix, idx + 1)
+        : baseName;
       
       reader.onload = (e) => {
         const preview = e.target?.result as string;
@@ -503,6 +546,7 @@ export const BatchOptimizer = () => {
           id,
           file,
           preview,
+          seoFileName: seoName,
           status: 'pending',
           progress: 0,
         }]);
@@ -512,7 +556,7 @@ export const BatchOptimizer = () => {
     });
 
     toast.success(`Added ${imageFiles.length} image${imageFiles.length > 1 ? 's' : ''}`);
-  }, []);
+  }, [bulkOptions.seoRename, bulkOptions.seoPrefix]);
 
   const handleFilesSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -838,12 +882,16 @@ export const BatchOptimizer = () => {
       return;
     }
 
+    const getDownloadName = (img: BatchImage) => {
+      const name = img.seoFileName || img.file.name.replace(/\.[^/.]+$/, '');
+      return `${name}.${settings.format}`;
+    };
+
     if (completedImages.length === 1) {
-      // Single file download
       const img = completedImages[0];
       const link = document.createElement('a');
       link.href = img.result!.url;
-      link.download = `${img.file.name.replace(/\.[^/.]+$/, '')}_optimized.${settings.format}`;
+      link.download = getDownloadName(img);
       link.click();
       return;
     }
@@ -854,8 +902,7 @@ export const BatchOptimizer = () => {
     const zip = new JSZip();
     
     for (const img of completedImages) {
-      const baseName = img.file.name.replace(/\.[^/.]+$/, '');
-      zip.file(`${baseName}_optimized.${settings.format}`, img.result!.blob);
+      zip.file(getDownloadName(img), img.result!.blob);
     }
 
     const zipBlob = await zip.generateAsync({ type: 'blob' });
@@ -863,7 +910,7 @@ export const BatchOptimizer = () => {
     
     const link = document.createElement('a');
     link.href = url;
-    link.download = `batch_optimized_${Date.now()}.zip`;
+    link.download = `optimized-images-${Date.now()}.zip`;
     link.click();
     
     URL.revokeObjectURL(url);
@@ -979,7 +1026,56 @@ export const BatchOptimizer = () => {
           </div>
         </div>
 
-        {/* Preset Selector */}
+        {/* Bulk Options */}
+        {images.length > 0 && (
+          <div className="p-4 rounded-lg border border-border bg-muted/30 space-y-3">
+            <h4 className="text-sm font-medium flex items-center gap-2">
+              <Settings2 className="h-4 w-4 text-primary" />
+              Bulk Options
+            </h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="seo-rename" className="text-xs text-muted-foreground cursor-pointer">
+                  SEO-friendly filenames
+                </Label>
+                <input
+                  id="seo-rename"
+                  type="checkbox"
+                  checked={bulkOptions.seoRename}
+                  onChange={(e) => setBulkOptions(prev => ({ ...prev, seoRename: e.target.checked }))}
+                  className="rounded border-border"
+                />
+              </div>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="strip-meta" className="text-xs text-muted-foreground cursor-pointer">
+                  Strip EXIF metadata
+                </Label>
+                <input
+                  id="strip-meta"
+                  type="checkbox"
+                  checked={bulkOptions.stripMetadata}
+                  onChange={(e) => setBulkOptions(prev => ({ ...prev, stripMetadata: e.target.checked }))}
+                  className="rounded border-border"
+                />
+              </div>
+            </div>
+            {bulkOptions.seoRename && (
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground">Filename prefix (optional)</Label>
+                <Input
+                  value={bulkOptions.seoPrefix}
+                  onChange={(e) => setBulkOptions(prev => ({ ...prev, seoPrefix: e.target.value }))}
+                  placeholder="e.g. product, hero, blog"
+                  className="h-8 text-xs"
+                />
+                <p className="text-[10px] text-muted-foreground">
+                  Preview: {generateSeoFileName('My Photo', bulkOptions.seoPrefix, 1)}.{settings.format}
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <h4 className="text-sm font-medium flex items-center gap-2">

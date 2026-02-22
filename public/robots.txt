@@ -1,45 +1,21 @@
 # PixelSqueeze Robots.txt
 # https://pixelsqueeze.lovable.app
 
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /account
+Disallow: /admin
+Disallow: /auth
+Disallow: /success
+Disallow: /share/
+
 User-agent: Googlebot
 Allow: /
-Crawl-delay: 1
+Crawl-delay: 0
 
 User-agent: Bingbot
 Allow: /
 Crawl-delay: 1
 
-User-agent: Slurp
-Allow: /
-
-User-agent: DuckDuckBot
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
-
-User-agent: LinkedInBot
-Allow: /
-
-User-agent: *
-Allow: /
-
-# Sitemap location
 Sitemap: https://pixelsqueeze.lovable.app/sitemap.xml
-
-# Disallow private/auth routes
-Disallow: /account
-Disallow: /admin
-Disallow: /auth
-
-# Allow all public pages
-Allow: /
-Allow: /landing
-Allow: /blog
-Allow: /blog/*
-Allow: /company
-Allow: /privacy
-Allow: /install

@@ -19,6 +19,7 @@ import {
   ChevronRight,
   Minimize2,
   Printer,
+  Workflow,
 } from "lucide-react";
 import {
   Sidebar,
@@ -53,7 +54,8 @@ export type ToolCategory =
   | "ai-analyze"
   | "social-export"
   | "analytics"
-  | "competitor";
+  | "competitor"
+  | "automation";
 
 interface DashboardSidebarProps {
   activeTool: ToolCategory;
@@ -96,6 +98,13 @@ const toolCategories = [
     tools: [
       { id: "analytics" as ToolCategory, label: "Dashboard", icon: BarChart3, description: "Usage stats" },
       { id: "competitor" as ToolCategory, label: "Competitor Intel", icon: Target, description: "Market tracking", pro: true },
+    ],
+  },
+  {
+    label: "Automation",
+    icon: Workflow,
+    tools: [
+      { id: "automation" as ToolCategory, label: "Auto Process", icon: Workflow, description: "Cloud sync", pro: true },
     ],
   },
 ];

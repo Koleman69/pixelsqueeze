@@ -26,6 +26,7 @@ import { AnalysisBoard } from "@/components/AnalysisBoard";
 import { SocialMediaExporter } from "@/components/SocialMediaExporter";
 import { BatchAnalyticsDashboard } from "@/components/BatchAnalyticsDashboard";
 import CompetitorTracker from "@/components/CompetitorTracker";
+import { AutomationFlow } from "@/components/AutomationFlow";
 
 // Navigation
 import { DashboardSidebar, ToolCategory } from "@/components/DashboardSidebar";
@@ -79,6 +80,10 @@ const toolTitles: Record<ToolCategory, { title: string; description: string }> =
   "competitor": {
     title: "Competitor Intelligence",
     description: "Monitor competitor websites with AI-powered insights",
+  },
+  "automation": {
+    title: "Automation Flow",
+    description: "Connect cloud services and auto-process images continuously",
   },
 };
 
@@ -294,6 +299,9 @@ const Index = () => {
 
       case "competitor":
         return <CompetitorTracker />;
+
+      case "automation":
+        return <AutomationFlow />;
 
       default:
         return null;

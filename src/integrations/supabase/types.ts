@@ -77,6 +77,113 @@ export type Database = {
         }
         Relationships: []
       }
+      automation_connections: {
+        Row: {
+          config: Json | null
+          created_at: string
+          credentials: Json | null
+          display_name: string
+          error_message: string | null
+          id: string
+          is_active: boolean
+          last_synced_at: string | null
+          provider: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          config?: Json | null
+          created_at?: string
+          credentials?: Json | null
+          display_name?: string
+          error_message?: string | null
+          id?: string
+          is_active?: boolean
+          last_synced_at?: string | null
+          provider: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          config?: Json | null
+          created_at?: string
+          credentials?: Json | null
+          display_name?: string
+          error_message?: string | null
+          id?: string
+          is_active?: boolean
+          last_synced_at?: string | null
+          provider?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      automation_jobs: {
+        Row: {
+          compression_ratio: number | null
+          connection_id: string
+          created_at: string
+          error_message: string | null
+          id: string
+          metadata: Json | null
+          output_format: string | null
+          processed_file_path: string | null
+          processed_file_size: number | null
+          source_file_name: string
+          source_file_path: string | null
+          source_file_size: number | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          compression_ratio?: number | null
+          connection_id: string
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          metadata?: Json | null
+          output_format?: string | null
+          processed_file_path?: string | null
+          processed_file_size?: number | null
+          source_file_name: string
+          source_file_path?: string | null
+          source_file_size?: number | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          compression_ratio?: number | null
+          connection_id?: string
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          metadata?: Json | null
+          output_format?: string | null
+          processed_file_path?: string | null
+          processed_file_size?: number | null
+          source_file_name?: string
+          source_file_path?: string | null
+          source_file_size?: number | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "automation_jobs_connection_id_fkey"
+            columns: ["connection_id"]
+            isOneToOne: false
+            referencedRelation: "automation_connections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       batch_jobs: {
         Row: {
           completed_at: string | null

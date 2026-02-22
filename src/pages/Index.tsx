@@ -28,6 +28,7 @@ import { BatchAnalyticsDashboard } from "@/components/BatchAnalyticsDashboard";
 import CompetitorTracker from "@/components/CompetitorTracker";
 import { AutomationFlow } from "@/components/AutomationFlow";
 import { DashboardOverview } from "@/components/DashboardOverview";
+import { QuickOptimize } from "@/components/QuickOptimize";
 
 // Navigation
 import { DashboardSidebar, ToolCategory } from "@/components/DashboardSidebar";
@@ -37,6 +38,10 @@ const toolTitles: Record<ToolCategory, { title: string; description: string }> =
   overview: {
     title: "Dashboard",
     description: "Your optimization performance at a glance",
+  },
+  "quick-optimize": {
+    title: "Quick Optimize",
+    description: "Upload images, pick a goal, and get optimized files instantly",
   },
   "compress-image": {
     title: "Image Compression",
@@ -101,7 +106,7 @@ const Index = () => {
   const videoInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
-  const [activeTool, setActiveTool] = useState<ToolCategory>("overview");
+  const [activeTool, setActiveTool] = useState<ToolCategory>("quick-optimize");
 
   // Pro-only tools — free users see upgrade prompt
   const PRO_TOOLS: ToolCategory[] = ["pro-optimize", "enhance-video", "competitor", "automation"];
@@ -213,6 +218,9 @@ const Index = () => {
     switch (activeTool) {
       case "overview":
         return <DashboardOverview isSubscribed={subscription.subscribed} />;
+
+      case "quick-optimize":
+        return <QuickOptimize isSubscribed={subscription.subscribed} />;
 
       case "compress-image":
         return (

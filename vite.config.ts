@@ -10,6 +10,19 @@ export default defineConfig(({ mode }) => ({
     host: "::",
     port: 8080,
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ["react", "react-dom", "react-router-dom"],
+          ui: ["@radix-ui/react-dialog", "@radix-ui/react-accordion", "@radix-ui/react-tabs", "@radix-ui/react-tooltip"],
+          charts: ["recharts"],
+        },
+      },
+    },
+    target: "esnext",
+    minify: "esbuild",
+  },
   plugins: [
     react(),
     mode === "development" && componentTagger(),
@@ -17,15 +30,16 @@ export default defineConfig(({ mode }) => ({
       registerType: "autoUpdate",
       includeAssets: ["favicon.ico", "app-icon-192.png", "app-icon-512.png"],
       manifest: {
-        name: "Pixelsqueeze - Professional Image Compression",
-        short_name: "Pixelsqueeze",
-        description: "Compress images with professional quality. Reduce file sizes while maintaining visual excellence.",
-        theme_color: "#0f1419",
-        background_color: "#0f1419",
+        name: "PixelSqueeze - Image Optimization for Speed & SEO",
+        short_name: "PixelSqueeze",
+        description: "Optimize images for website speed, SEO, and platform compatibility. Up to 70% smaller with no quality loss.",
+        theme_color: "#0080FF",
+        background_color: "#ffffff",
         display: "standalone",
         orientation: "portrait",
         scope: "/",
         start_url: "/",
+        categories: ["productivity", "utilities", "photo"],
         icons: [
           {
             src: "app-icon-192.png",
@@ -46,7 +60,7 @@ export default defineConfig(({ mode }) => ({
         ],
       },
       workbox: {
-        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5 MB limit
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
         globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"],
         runtimeCaching: [
           {
@@ -57,6 +71,28 @@ export default defineConfig(({ mode }) => ({
               expiration: {
                 maxEntries: 10,
                 maxAgeSeconds: 60 * 60 * 24 * 365,
+              },
+            },
+          },
+          {
+            urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
+            handler: "CacheFirst",
+            options: {
+              cacheName: "google-fonts-webfonts",
+              expiration: {
+                maxEntries: 20,
+                maxAgeSeconds: 60 * 60 * 24 * 365,
+              },
+            },
+          },
+          {
+            urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp|avif)$/i,
+            handler: "CacheFirst",
+            options: {
+              cacheName: "image-cache",
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 60 * 60 * 24 * 30,
               },
             },
           },

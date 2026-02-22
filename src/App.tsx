@@ -22,6 +22,7 @@ const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 const Install = lazy(() => import("./pages/Install"));
 const Promote = lazy(() => import("./pages/Promote"));
 const Pricing = lazy(() => import("./pages/Pricing"));
+const Scanner = lazy(() => import("./pages/Scanner"));
 
 const queryClient = new QueryClient();
 
@@ -103,6 +104,7 @@ const App = () => (
               <Route path="/install" element={<Install />} />
               <Route path="/promote" element={<Promote />} />
               <Route path="/pricing" element={<Pricing />} />
+              <Route path="/scanner" element={<Scanner />} />
               <Route path="/share/:shareCode" element={<SharedFile />} />
               <Route path="/account" element={
                 <ProtectedRoute>

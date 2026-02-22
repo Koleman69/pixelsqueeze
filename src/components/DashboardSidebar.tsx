@@ -20,6 +20,7 @@ import {
   Minimize2,
   Printer,
   Workflow,
+  LayoutDashboard,
 } from "lucide-react";
 import {
   Sidebar,
@@ -43,6 +44,7 @@ import {
 } from "@/components/ui/tooltip";
 
 export type ToolCategory = 
+  | "overview"
   | "compress-image"
   | "edit-image"
   | "batch-process"
@@ -64,6 +66,13 @@ interface DashboardSidebarProps {
 }
 
 const toolCategories = [
+  {
+    label: "Overview",
+    icon: LayoutDashboard,
+    tools: [
+      { id: "overview" as ToolCategory, label: "Dashboard", icon: LayoutDashboard, description: "Stats & scores" },
+    ],
+  },
   {
     label: "Images",
     icon: Image,

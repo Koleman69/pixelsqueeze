@@ -18,6 +18,7 @@ import { Helmet } from "react-helmet";
 import { useState } from "react";
 import { toast } from "sonner";
 import ReferralCard from "@/components/ReferralCard";
+import MarketingLinksGenerator from "@/components/MarketingLinksGenerator";
 
 const Promote = () => {
   const [copiedText, setCopiedText] = useState<string | null>(null);
@@ -262,6 +263,11 @@ Download now and start compressing for free!`;
               </div>
             </CardContent>
           </Card>
+        </div>
+
+        {/* Marketing Campaign Links */}
+        <div className="mt-8">
+          <MarketingLinksGenerator />
         </div>
       </div>
     </div>

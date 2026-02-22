@@ -35,12 +35,16 @@ import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { BeforeAfterSlider } from "@/components/BeforeAfterSlider";
 import InstallBanner from "@/components/InstallBanner";
+import EmailCapturePopup from "@/components/EmailCapturePopup";
+import { useUtmTracking } from "@/hooks/useUtmTracking";
 import weddingBefore from "@/assets/wedding-before.jpg";
 import weddingAfter from "@/assets/wedding-after.jpg";
 import manBefore from "@/assets/man-before.jpg";
 import manAfter from "@/assets/man-after.jpg";
 
 const Landing = () => {
+  useUtmTracking();
+
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
@@ -663,6 +667,7 @@ const Landing = () => {
       </footer>
 
       <InstallBanner />
+      <EmailCapturePopup />
     </div>
   );
 };

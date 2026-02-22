@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { StatsCard } from "@/components/StatsCard";
+import { OptimizationBadge } from "@/components/OptimizationBadge";
 import {
   ImageIcon,
   Timer,
@@ -8,6 +10,8 @@ import {
   HardDrive,
   TrendingUp,
   Activity,
+  Lock,
+  Clock,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -37,6 +41,7 @@ interface HistoryPoint {
   score: number;
   images: number;
   saved: number;
+  seconds: number;
 }
 
 function formatBytes(bytes: number): string {
@@ -47,9 +52,12 @@ function formatBytes(bytes: number): string {
   return `${(bytes / Math.pow(k, i)).toFixed(1)} ${sizes[i]}`;
 }
 
-function estimateLoadTimeSaved(savedBytes: number): string {
-  // Assume average 3G speed ~1.5 Mbps = 187.5 KB/s
-  const seconds = savedBytes / (187.5 * 1024);
+function estimateLoadTimeSavedSeconds(savedBytes: number): number {
+  // Average 3G speed ~1.5 Mbps = 187.5 KB/s
+  return savedBytes / (187.5 * 1024);
+}
+
+function formatSeconds(seconds: number): string {
   if (seconds < 1) return `${Math.round(seconds * 1000)}ms`;
   if (seconds < 60) return `${seconds.toFixed(1)}s`;
   return `${(seconds / 60).toFixed(1)}min`;
@@ -57,13 +65,16 @@ function estimateLoadTimeSaved(savedBytes: number): string {
 
 function estimateSeoScore(avgRatio: number, totalImages: number): number {
   if (totalImages === 0) return 0;
-  // Base score from compression efficiency + volume bonus
   const compressionScore = Math.min(avgRatio * 1.2, 80);
   const volumeBonus = Math.min(totalImages * 0.5, 20);
   return Math.round(Math.min(compressionScore + volumeBonus, 100));
 }
 
-export function DashboardOverview() {
+interface DashboardOverviewProps {
+  isSubscribed?: boolean;
+}
+
+export function DashboardOverview({ isSubscribed = false }: DashboardOverviewProps) {
   const { user } = useAuth();
   const [stats, setStats] = useState<AggregatedStats>({
     totalImages: 0,
@@ -92,7 +103,6 @@ export function DashboardOverview() {
         return;
       }
 
-      // Aggregate
       let totalImages = 0;
       let totalOriginal = 0;
       let totalOptimized = 0;
@@ -134,7 +144,6 @@ export function DashboardOverview() {
         totalProcessingMs: totalMs,
       });
 
-      // Build history (last 14 entries max)
       const historyPoints: HistoryPoint[] = [];
       let cumulativeImages = 0;
       let cumulativeSaved = 0;
@@ -148,6 +157,7 @@ export function DashboardOverview() {
           score: estimateSeoScore(dayAvgRatio, cumulativeImages),
           images: cumulativeImages,
           saved: Math.round(cumulativeSaved / 1024),
+          seconds: parseFloat(estimateLoadTimeSavedSeconds(cumulativeSaved).toFixed(1)),
         });
       }
 
@@ -158,6 +168,8 @@ export function DashboardOverview() {
     fetchStats();
   }, [user]);
 
+  const loadTimeSavedSec = estimateLoadTimeSavedSeconds(stats.totalSavedBytes);
+  const loadTimeSavedStr = formatSeconds(loadTimeSavedSec);
   const seoScore = estimateSeoScore(stats.avgCompressionRatio, stats.totalImages);
 
   if (loading) {
@@ -177,34 +189,58 @@ export function DashboardOverview() {
 
   return (
     <div className="space-y-6">
-      {/* Stats Cards */}
+      {/* Primary metric: Seconds saved */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatsCard
+          title="Load Time Saved"
+          value={loadTimeSavedStr}
+          change={loadTimeSavedSec >= 1 ? `${stats.avgCompressionRatio}% avg compression` : undefined}
+          subtitle="Primary metric • 3G baseline"
+          icon={<Timer className="w-6 h-6" />}
+        />
+        <StatsCard
+          title="Data Reduced"
+          value={formatBytes(stats.totalSavedBytes)}
+          subtitle={stats.totalOriginalBytes > 0 ? `${formatBytes(stats.totalOriginalBytes)} → ${formatBytes(stats.totalOptimizedBytes)}` : "No data yet"}
+          icon={<HardDrive className="w-6 h-6" />}
+        />
         <StatsCard
           title="Images Optimized"
           value={stats.totalImages.toLocaleString()}
-          subtitle={stats.totalImages > 0 ? `${stats.avgCompressionRatio}% avg reduction` : "Upload images to get started"}
+          subtitle={stats.totalImages > 0 ? `${stats.avgCompressionRatio}% avg reduction` : "Upload images to start"}
           icon={<ImageIcon className="w-6 h-6" />}
-        />
-        <StatsCard
-          title="Load Time Saved"
-          value={estimateLoadTimeSaved(stats.totalSavedBytes)}
-          subtitle="Estimated on 3G connection"
-          icon={<Timer className="w-6 h-6" />}
         />
         <StatsCard
           title="SEO Score"
           value={`${seoScore}/100`}
           change={seoScore >= 70 ? "Good" : seoScore >= 40 ? "Needs work" : undefined}
-          subtitle="Based on compression & volume"
+          subtitle="Compression efficiency + volume"
           icon={<Search className="w-6 h-6" />}
         />
-        <StatsCard
-          title="Storage Saved"
-          value={formatBytes(stats.totalSavedBytes)}
-          subtitle={stats.totalOriginalBytes > 0 ? `${formatBytes(stats.totalOriginalBytes)} → ${formatBytes(stats.totalOptimizedBytes)}` : "No data yet"}
-          icon={<HardDrive className="w-6 h-6" />}
-        />
       </div>
+
+      {/* Storage policy banner */}
+      <Card className="p-4 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Clock className="w-5 h-5 text-muted-foreground" />
+          <div>
+            <p className="text-sm font-medium">
+              {isSubscribed ? "Processed files stored for 30 days" : "No file storage on free plan"}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {isSubscribed
+                ? "Your optimized images are available for re-download for 30 days."
+                : "Upgrade to Creator+ to store processed files for 30 days."}
+            </p>
+          </div>
+        </div>
+        {!isSubscribed && (
+          <Badge variant="outline" className="border-primary/30 text-primary shrink-0">
+            <Lock className="w-3 h-3 mr-1" />
+            Paid
+          </Badge>
+        )}
+      </Card>
 
       {/* Performance Score History Chart */}
       {history.length > 1 && (
@@ -242,8 +278,8 @@ export function DashboardOverview() {
                   }}
                   formatter={(value: number, name: string) => {
                     if (name === "score") return [`${value}/100`, "SEO Score"];
+                    if (name === "seconds") return [`${value}s`, "Load Time Saved"];
                     if (name === "images") return [value, "Total Images"];
-                    if (name === "saved") return [`${value} KB`, "Total Saved"];
                     return [value, name];
                   }}
                 />
@@ -256,7 +292,7 @@ export function DashboardOverview() {
                 />
                 <Line
                   type="monotone"
-                  dataKey="images"
+                  dataKey="seconds"
                   stroke="hsl(var(--muted-foreground))"
                   strokeDasharray="4 4"
                   strokeWidth={1}
@@ -271,11 +307,19 @@ export function DashboardOverview() {
               <span>SEO Score</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <div className="w-3 h-0.5 bg-muted-foreground rounded border-dashed" />
-              <span>Cumulative Images</span>
+              <div className="w-3 h-0.5 bg-muted-foreground rounded" />
+              <span>Load Time Saved (s)</span>
             </div>
           </div>
         </Card>
+      )}
+
+      {/* Shareable Badge */}
+      {stats.totalImages > 0 && (
+        <OptimizationBadge
+          secondsSaved={loadTimeSavedStr}
+          imageCount={stats.totalImages}
+        />
       )}
 
       {/* Empty state */}

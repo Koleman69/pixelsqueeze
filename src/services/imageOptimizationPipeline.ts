@@ -67,20 +67,84 @@ export interface PipelineResult {
 
 // ─── Goal Preset Configs ────────────────────────────────────────────────────
 
-interface GoalConfig {
+export interface GoalConfig {
   maxDimension: number;
   quality: number;
   preferredFormats: OutputFormat[];
+  /** Apply unsharp-mask sharpening after resize */
+  sharpenAfterResize?: boolean;
+  /** Sharpen strength 0-1 (default 0.3) */
+  sharpenAmount?: number;
+  /** Force progressive JPEG encoding order */
+  progressive?: boolean;
+  /** Normalize background to white (for product shots) */
+  whiteBackgroundNormalize?: boolean;
+  /** Max file size in KB — re-encode at lower quality until met */
+  maxFileSizeKB?: number;
+  /** Preserve ICC / color profile data */
+  preserveColorProfile?: boolean;
+  /** Generate responsive srcset variants */
+  responsiveVariants?: number[];
+  /** Square crop to exact dimensions */
+  squareCrop?: boolean;
+  /** Fixed output dimensions (overrides maxDimension) */
+  fixedDimensions?: { width: number; height: number };
 }
 
 const GOAL_PRESETS: Record<GoalPreset, GoalConfig> = {
-  web: { maxDimension: 1920, quality: 82, preferredFormats: ['avif', 'webp', 'jpeg'] },
-  social: { maxDimension: 1200, quality: 85, preferredFormats: ['webp', 'jpeg'] },
-  email: { maxDimension: 800, quality: 75, preferredFormats: ['jpeg', 'webp'] },
-  print: { maxDimension: 4096, quality: 95, preferredFormats: ['png', 'jpeg'] },
-  thumbnail: { maxDimension: 400, quality: 78, preferredFormats: ['webp', 'jpeg'] },
-  ecommerce: { maxDimension: 1600, quality: 88, preferredFormats: ['webp', 'jpeg'] },
-  custom: { maxDimension: 1920, quality: 85, preferredFormats: ['webp', 'jpeg'] },
+  web: {
+    maxDimension: 1920,
+    quality: 82,
+    preferredFormats: ['avif', 'webp', 'jpeg'],
+    responsiveVariants: [640, 1024, 1920],
+    sharpenAfterResize: false,
+    progressive: true,
+  },
+  social: {
+    maxDimension: 1200,
+    quality: 85,
+    preferredFormats: ['webp', 'jpeg'],
+    sharpenAfterResize: true,
+    sharpenAmount: 0.35,
+    preserveColorProfile: true,
+  },
+  email: {
+    maxDimension: 800,
+    quality: 70,
+    preferredFormats: ['jpeg'],
+    progressive: true,
+    maxFileSizeKB: 500,
+    sharpenAfterResize: false,
+  },
+  print: {
+    maxDimension: 4096,
+    quality: 95,
+    preferredFormats: ['png', 'jpeg'],
+    preserveColorProfile: true,
+    sharpenAfterResize: false,
+  },
+  thumbnail: {
+    maxDimension: 400,
+    quality: 78,
+    preferredFormats: ['webp', 'jpeg'],
+    sharpenAfterResize: true,
+    sharpenAmount: 0.4,
+  },
+  ecommerce: {
+    maxDimension: 2048,
+    quality: 85,
+    preferredFormats: ['webp', 'jpeg'],
+    whiteBackgroundNormalize: true,
+    squareCrop: true,
+    fixedDimensions: { width: 2048, height: 2048 },
+    sharpenAfterResize: true,
+    sharpenAmount: 0.25,
+  },
+  custom: {
+    maxDimension: 1920,
+    quality: 85,
+    preferredFormats: ['webp', 'jpeg'],
+  },
 };
 
 // ─── Content Detection ──────────────────────────────────────────────────────
@@ -297,6 +361,44 @@ function deriveAltTextFromFileName(fileName: string): string {
     .trim() || 'Optimized image';
 }
 
+// ─── Sharpening (Unsharp Mask) ──────────────────────────────────────────────
+
+function applySharpen(ctx: CanvasRenderingContext2D, width: number, height: number, amount: number) {
+  const imageData = ctx.getImageData(0, 0, width, height);
+  const { data } = imageData;
+  const copy = new Uint8ClampedArray(data);
+  
+  // Simple 3×3 unsharp mask kernel
+  const w4 = width * 4;
+  for (let y = 1; y < height - 1; y++) {
+    for (let x = 1; x < width - 1; x++) {
+      const idx = (y * width + x) * 4;
+      for (let c = 0; c < 3; c++) {
+        const center = copy[idx + c];
+        const blur = (
+          copy[idx - w4 - 4 + c] + copy[idx - w4 + c] + copy[idx - w4 + 4 + c] +
+          copy[idx - 4 + c]      +                        copy[idx + 4 + c] +
+          copy[idx + w4 - 4 + c] + copy[idx + w4 + c] + copy[idx + w4 + 4 + c]
+        ) / 8;
+        data[idx + c] = Math.min(255, Math.max(0, Math.round(center + (center - blur) * amount)));
+      }
+    }
+  }
+  ctx.putImageData(imageData, 0, 0);
+}
+
+// ─── Canvas Encode Helper ───────────────────────────────────────────────────
+
+function canvasToBlob(canvas: HTMLCanvasElement, mime: string, quality?: number): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob(
+      (b) => b ? resolve(b) : reject(new Error('Failed to encode image')),
+      mime,
+      quality
+    );
+  });
+}
+
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
 function fileToBase64(file: File): Promise<string> {
@@ -377,42 +479,70 @@ export async function runOptimizationPipeline(
 
   // ── Step 5: Render to canvas (strips EXIF automatically) ──
   const outputCanvas = document.createElement('canvas');
-  outputCanvas.width = outputWidth;
-  outputCanvas.height = outputHeight;
   const ctx = outputCanvas.getContext('2d')!;
-  
-  // Use high-quality interpolation
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = 'high';
-  ctx.drawImage(bitmap, 0, 0, outputWidth, outputHeight);
+
+  // Square crop for ecommerce-type goals
+  if (goalConfig.squareCrop || goalConfig.fixedDimensions) {
+    const targetW = goalConfig.fixedDimensions?.width ?? outputWidth;
+    const targetH = goalConfig.fixedDimensions?.height ?? outputHeight;
+    outputCanvas.width = targetW;
+    outputCanvas.height = targetH;
+
+    // White background fill for product shots
+    if (goalConfig.whiteBackgroundNormalize) {
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, targetW, targetH);
+    }
+
+    // Center-fit the image on the canvas
+    const scale = Math.min(targetW / originalWidth, targetH / originalHeight);
+    const drawW = Math.round(originalWidth * scale);
+    const drawH = Math.round(originalHeight * scale);
+    const offsetX = Math.round((targetW - drawW) / 2);
+    const offsetY = Math.round((targetH - drawH) / 2);
+    ctx.drawImage(bitmap, 0, 0, originalWidth, originalHeight, offsetX, offsetY, drawW, drawH);
+  } else {
+    outputCanvas.width = outputWidth;
+    outputCanvas.height = outputHeight;
+    ctx.drawImage(bitmap, 0, 0, outputWidth, outputHeight);
+  }
   bitmap.close();
+
+  // ── Step 5a: Sharpening (unsharp mask via convolution) ──
+  if (goalConfig.sharpenAfterResize) {
+    const amount = goalConfig.sharpenAmount ?? 0.3;
+    applySharpen(ctx, outputCanvas.width, outputCanvas.height, amount);
+  }
 
   // ── Step 5b: Encode to selected format ──
   const mime = getMimeType(detectedFormat);
   const qualityParam = detectedFormat === 'png' ? undefined : adjustedQuality / 100;
   
-  const blob = await new Promise<Blob>((resolve, reject) => {
-    outputCanvas.toBlob(
-      (b) => b ? resolve(b) : reject(new Error('Failed to encode image')),
-      mime,
-      qualityParam
-    );
-  });
+  let finalBlob = await canvasToBlob(outputCanvas, mime, qualityParam);
+  let finalFormat = detectedFormat;
 
   // If AVIF/WebP produced a larger file than original, fallback to JPEG
-  let finalBlob = blob;
-  let finalFormat = detectedFormat;
-  if (blob.size > file.size && detectedFormat !== 'jpeg') {
-    const jpegBlob = await new Promise<Blob>((resolve, reject) => {
-      outputCanvas.toBlob(
-        (b) => b ? resolve(b) : reject(new Error('JPEG fallback failed')),
-        'image/jpeg',
-        adjustedQuality / 100
-      );
-    });
-    if (jpegBlob.size < blob.size) {
+  if (finalBlob.size > file.size && detectedFormat !== 'jpeg') {
+    const jpegBlob = await canvasToBlob(outputCanvas, 'image/jpeg', adjustedQuality / 100);
+    if (jpegBlob.size < finalBlob.size) {
       finalBlob = jpegBlob;
       finalFormat = 'jpeg';
+    }
+  }
+
+  // ── Step 5c: Enforce max file size (re-encode at lower quality) ──
+  if (goalConfig.maxFileSizeKB) {
+    const maxBytes = goalConfig.maxFileSizeKB * 1024;
+    let currentQuality = adjustedQuality;
+    let attempts = 0;
+    while (finalBlob.size > maxBytes && currentQuality > 20 && attempts < 8) {
+      currentQuality -= 8;
+      attempts++;
+      const reducedMime = getMimeType(finalFormat === 'png' ? 'jpeg' : finalFormat);
+      if (finalFormat === 'png') finalFormat = 'jpeg';
+      finalBlob = await canvasToBlob(outputCanvas, reducedMime, currentQuality / 100);
     }
   }
 

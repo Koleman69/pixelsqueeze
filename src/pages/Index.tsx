@@ -30,6 +30,7 @@ import { AutomationFlow } from "@/components/AutomationFlow";
 import { DashboardOverview } from "@/components/DashboardOverview";
 import { QuickOptimize } from "@/components/QuickOptimize";
 import { ContentDistributor } from "@/components/ContentDistributor";
+import { PostingWorkflows } from "@/components/PostingWorkflows";
 
 // Navigation
 import { DashboardSidebar, ToolCategory } from "@/components/DashboardSidebar";
@@ -99,6 +100,10 @@ const toolTitles: Record<ToolCategory, { title: string; description: string }> =
   "distribute": {
     title: "Content Distribution",
     description: "Publish to socials, schedule posts, syndicate blogs & automate distribution",
+  },
+  "workflows": {
+    title: "Posting Workflows",
+    description: "Auto-post 10×/week, recycle top performers & trigger event campaigns",
   },
 };
 
@@ -341,6 +346,9 @@ const Index = () => {
 
       case "distribute":
         return <ContentDistributor />;
+
+      case "workflows":
+        return <PostingWorkflows />;
 
       default:
         return null;

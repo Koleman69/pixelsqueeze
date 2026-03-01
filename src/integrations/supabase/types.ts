@@ -334,6 +334,69 @@ export type Database = {
         }
         Relationships: []
       }
+      campaign_triggers: {
+        Row: {
+          auto_generate: boolean | null
+          content_template: string | null
+          created_at: string
+          days_before: number | null
+          hashtags: string[] | null
+          id: string
+          is_active: boolean
+          last_triggered_at: string | null
+          metadata: Json | null
+          name: string
+          platforms: string[]
+          posts_count: number | null
+          tone: string | null
+          trigger_date: string | null
+          trigger_recurring: boolean | null
+          trigger_type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          auto_generate?: boolean | null
+          content_template?: string | null
+          created_at?: string
+          days_before?: number | null
+          hashtags?: string[] | null
+          id?: string
+          is_active?: boolean
+          last_triggered_at?: string | null
+          metadata?: Json | null
+          name: string
+          platforms?: string[]
+          posts_count?: number | null
+          tone?: string | null
+          trigger_date?: string | null
+          trigger_recurring?: boolean | null
+          trigger_type?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          auto_generate?: boolean | null
+          content_template?: string | null
+          created_at?: string
+          days_before?: number | null
+          hashtags?: string[] | null
+          id?: string
+          is_active?: boolean
+          last_triggered_at?: string | null
+          metadata?: Json | null
+          name?: string
+          platforms?: string[]
+          posts_count?: number | null
+          tone?: string | null
+          trigger_date?: string | null
+          trigger_recurring?: boolean | null
+          trigger_type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       competitor_alerts: {
         Row: {
           alert_type: string
@@ -488,6 +551,66 @@ export type Database = {
           },
         ]
       }
+      posting_workflows: {
+        Row: {
+          content_pool_ids: string[] | null
+          created_at: string
+          id: string
+          is_active: boolean
+          last_run_at: string | null
+          metadata: Json | null
+          name: string
+          next_run_at: string | null
+          platforms: string[]
+          posts_per_week: number
+          preferred_days: string[] | null
+          preferred_times: string[] | null
+          recycle_after_days: number | null
+          recycle_min_engagement: number | null
+          updated_at: string
+          user_id: string
+          workflow_type: string
+        }
+        Insert: {
+          content_pool_ids?: string[] | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          last_run_at?: string | null
+          metadata?: Json | null
+          name: string
+          next_run_at?: string | null
+          platforms?: string[]
+          posts_per_week?: number
+          preferred_days?: string[] | null
+          preferred_times?: string[] | null
+          recycle_after_days?: number | null
+          recycle_min_engagement?: number | null
+          updated_at?: string
+          user_id: string
+          workflow_type?: string
+        }
+        Update: {
+          content_pool_ids?: string[] | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          last_run_at?: string | null
+          metadata?: Json | null
+          name?: string
+          next_run_at?: string | null
+          platforms?: string[]
+          posts_per_week?: number
+          preferred_days?: string[] | null
+          preferred_times?: string[] | null
+          recycle_after_days?: number | null
+          recycle_min_engagement?: number | null
+          updated_at?: string
+          user_id?: string
+          workflow_type?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -529,8 +652,10 @@ export type Database = {
           blog_category: string | null
           blog_excerpt: string | null
           blog_slug: string | null
+          campaign_id: string | null
           content: string
           created_at: string
+          engagement_score: number | null
           hashtags: string[] | null
           id: string
           media_urls: string[] | null
@@ -539,6 +664,7 @@ export type Database = {
           platforms: string[]
           post_type: string
           published_at: string | null
+          recycled_from: string | null
           scheduled_at: string | null
           seo_description: string | null
           seo_title: string | null
@@ -546,13 +672,16 @@ export type Database = {
           title: string
           updated_at: string
           user_id: string
+          workflow_id: string | null
         }
         Insert: {
           blog_category?: string | null
           blog_excerpt?: string | null
           blog_slug?: string | null
+          campaign_id?: string | null
           content: string
           created_at?: string
+          engagement_score?: number | null
           hashtags?: string[] | null
           id?: string
           media_urls?: string[] | null
@@ -561,6 +690,7 @@ export type Database = {
           platforms?: string[]
           post_type?: string
           published_at?: string | null
+          recycled_from?: string | null
           scheduled_at?: string | null
           seo_description?: string | null
           seo_title?: string | null
@@ -568,13 +698,16 @@ export type Database = {
           title: string
           updated_at?: string
           user_id: string
+          workflow_id?: string | null
         }
         Update: {
           blog_category?: string | null
           blog_excerpt?: string | null
           blog_slug?: string | null
+          campaign_id?: string | null
           content?: string
           created_at?: string
+          engagement_score?: number | null
           hashtags?: string[] | null
           id?: string
           media_urls?: string[] | null
@@ -583,6 +716,7 @@ export type Database = {
           platforms?: string[]
           post_type?: string
           published_at?: string | null
+          recycled_from?: string | null
           scheduled_at?: string | null
           seo_description?: string | null
           seo_title?: string | null
@@ -590,8 +724,31 @@ export type Database = {
           title?: string
           updated_at?: string
           user_id?: string
+          workflow_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "scheduled_posts_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaign_triggers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "scheduled_posts_recycled_from_fkey"
+            columns: ["recycled_from"]
+            isOneToOne: false
+            referencedRelation: "scheduled_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "scheduled_posts_workflow_id_fkey"
+            columns: ["workflow_id"]
+            isOneToOne: false
+            referencedRelation: "posting_workflows"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       shared_files: {
         Row: {

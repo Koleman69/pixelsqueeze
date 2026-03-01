@@ -38,3 +38,6 @@ verify_jwt = false
 
 [functions.distribute-content]
 verify_jwt = false
+
+[functions.posting-workflows]
+verify_jwt = false

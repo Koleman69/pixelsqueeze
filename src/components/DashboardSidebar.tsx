@@ -22,6 +22,7 @@ import {
   Workflow,
   LayoutDashboard,
   Send,
+  Zap,
 } from "lucide-react";
 import {
   Sidebar,
@@ -60,7 +61,8 @@ export type ToolCategory =
   | "analytics"
   | "competitor"
   | "automation"
-  | "distribute";
+  | "distribute"
+  | "workflows";
 
 interface DashboardSidebarProps {
   activeTool: ToolCategory;
@@ -119,6 +121,7 @@ const toolCategories = [
     tools: [
       { id: "automation" as ToolCategory, label: "Auto Process", icon: Workflow, description: "Cloud sync", pro: true },
       { id: "distribute" as ToolCategory, label: "Distribute", icon: Send, description: "Publish & schedule" },
+      { id: "workflows" as ToolCategory, label: "Workflows", icon: Zap, description: "Auto-post & campaigns" },
     ],
   },
 ];

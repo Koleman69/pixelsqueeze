@@ -35,3 +35,6 @@ verify_jwt = false
 
 [functions.generate-content]
 verify_jwt = false
+
+[functions.distribute-content]
+verify_jwt = false

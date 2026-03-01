@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Download, ArrowLeft, Users, Shield, ShieldCheck, ShieldOff, Search, X } from "lucide-react";
 import * as XLSX from "xlsx";
+import { AdminContentGenerator } from "@/components/AdminContentGenerator";
 
 interface UserData {
   user_id: string;
@@ -374,6 +375,11 @@ const Admin = () => {
             )}
           </CardContent>
         </Card>
+
+        {/* AI Content Generator */}
+        <div className="mt-8">
+          <AdminContentGenerator />
+        </div>
       </div>
     </div>
   );

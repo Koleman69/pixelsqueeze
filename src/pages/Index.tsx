@@ -29,6 +29,7 @@ import CompetitorTracker from "@/components/CompetitorTracker";
 import { AutomationFlow } from "@/components/AutomationFlow";
 import { DashboardOverview } from "@/components/DashboardOverview";
 import { QuickOptimize } from "@/components/QuickOptimize";
+import { ContentDistributor } from "@/components/ContentDistributor";
 
 // Navigation
 import { DashboardSidebar, ToolCategory } from "@/components/DashboardSidebar";
@@ -94,6 +95,10 @@ const toolTitles: Record<ToolCategory, { title: string; description: string }> =
   "automation": {
     title: "Automation Flow",
     description: "Connect cloud services and auto-process images continuously",
+  },
+  "distribute": {
+    title: "Content Distribution",
+    description: "Publish to socials, schedule posts, syndicate blogs & automate distribution",
   },
 };
 
@@ -333,6 +338,9 @@ const Index = () => {
 
       case "automation":
         return <AutomationFlow />;
+
+      case "distribute":
+        return <ContentDistributor />;
 
       default:
         return null;

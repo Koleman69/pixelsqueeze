@@ -524,6 +524,75 @@ export type Database = {
         }
         Relationships: []
       }
+      scheduled_posts: {
+        Row: {
+          blog_category: string | null
+          blog_excerpt: string | null
+          blog_slug: string | null
+          content: string
+          created_at: string
+          hashtags: string[] | null
+          id: string
+          media_urls: string[] | null
+          metadata: Json | null
+          platform_results: Json | null
+          platforms: string[]
+          post_type: string
+          published_at: string | null
+          scheduled_at: string | null
+          seo_description: string | null
+          seo_title: string | null
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          blog_category?: string | null
+          blog_excerpt?: string | null
+          blog_slug?: string | null
+          content: string
+          created_at?: string
+          hashtags?: string[] | null
+          id?: string
+          media_urls?: string[] | null
+          metadata?: Json | null
+          platform_results?: Json | null
+          platforms?: string[]
+          post_type?: string
+          published_at?: string | null
+          scheduled_at?: string | null
+          seo_description?: string | null
+          seo_title?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          blog_category?: string | null
+          blog_excerpt?: string | null
+          blog_slug?: string | null
+          content?: string
+          created_at?: string
+          hashtags?: string[] | null
+          id?: string
+          media_urls?: string[] | null
+          metadata?: Json | null
+          platform_results?: Json | null
+          platforms?: string[]
+          post_type?: string
+          published_at?: string | null
+          scheduled_at?: string | null
+          seo_description?: string | null
+          seo_title?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       shared_files: {
         Row: {
           created_at: string | null

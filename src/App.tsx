@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 // Lazy load all pages for code-splitting
 const Index = lazy(() => import("./pages/Index"));
@@ -24,12 +25,21 @@ const Promote = lazy(() => import("./pages/Promote"));
 const Pricing = lazy(() => import("./pages/Pricing"));
 const Scanner = lazy(() => import("./pages/Scanner"));
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 // Loading fallback component
 const PageLoader = () => (
-  <div className="min-h-screen bg-background flex items-center justify-center">
-    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+  <div className="min-h-screen bg-background flex items-center justify-center" role="status" aria-label="Loading page">
+    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" aria-hidden="true"></div>
+    <span className="sr-only">Loading...</span>
   </div>
 );
 
@@ -39,8 +49,9 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+      <div className="min-h-screen bg-background flex items-center justify-center" role="status" aria-label="Authenticating">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" aria-hidden="true"></div>
+        <span className="sr-only">Authenticating...</span>
       </div>
     );
   }
@@ -58,8 +69,9 @@ const PublicRoute = ({ children }: { children: React.ReactNode }) => {
   
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+      <div className="min-h-screen bg-background flex items-center justify-center" role="status" aria-label="Loading">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" aria-hidden="true"></div>
+        <span className="sr-only">Loading...</span>
       </div>
     );
   }
@@ -72,63 +84,65 @@ const PublicRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Suspense fallback={<PageLoader />}>
-            <Routes>
-              {/* Public landing page */}
-              <Route path="/" element={
-                <PublicRoute>
-                  <Landing />
-                </PublicRoute>
-              } />
-              {/* Protected dashboard */}
-              <Route path="/dashboard" element={
-                <ProtectedRoute>
-                  <Index />
-                </ProtectedRoute>
-              } />
-              <Route path="/success" element={
-                <ProtectedRoute>
-                  <Success />
-                </ProtectedRoute>
-              } />
-              <Route path="/blog" element={<Blog />} />
-              <Route path="/blog/:articleId" element={<BlogArticle />} />
-              <Route path="/company" element={<Company />} />
-              <Route path="/privacy" element={<PrivacyPolicy />} />
-              <Route path="/install" element={<Install />} />
-              <Route path="/promote" element={<Promote />} />
-              <Route path="/pricing" element={<Pricing />} />
-              <Route path="/scanner" element={<Scanner />} />
-              <Route path="/share/:shareCode" element={<SharedFile />} />
-              <Route path="/account" element={
-                <ProtectedRoute>
-                  <Account />
-                </ProtectedRoute>
-              } />
-              <Route path="/admin" element={
-                <ProtectedRoute>
-                  <Admin />
-                </ProtectedRoute>
-              } />
-              <Route path="/auth" element={
-                <PublicRoute>
-                  <Auth />
-                </PublicRoute>
-              } />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Suspense>
-        </BrowserRouter>
-      </TooltipProvider>
-    </AuthProvider>
-  </QueryClientProvider>
+  <ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Suspense fallback={<PageLoader />}>
+              <Routes>
+                {/* Public landing page */}
+                <Route path="/" element={
+                  <PublicRoute>
+                    <Landing />
+                  </PublicRoute>
+                } />
+                {/* Protected dashboard */}
+                <Route path="/dashboard" element={
+                  <ProtectedRoute>
+                    <Index />
+                  </ProtectedRoute>
+                } />
+                <Route path="/success" element={
+                  <ProtectedRoute>
+                    <Success />
+                  </ProtectedRoute>
+                } />
+                <Route path="/blog" element={<Blog />} />
+                <Route path="/blog/:articleId" element={<BlogArticle />} />
+                <Route path="/company" element={<Company />} />
+                <Route path="/privacy" element={<PrivacyPolicy />} />
+                <Route path="/install" element={<Install />} />
+                <Route path="/promote" element={<Promote />} />
+                <Route path="/pricing" element={<Pricing />} />
+                <Route path="/scanner" element={<Scanner />} />
+                <Route path="/share/:shareCode" element={<SharedFile />} />
+                <Route path="/account" element={
+                  <ProtectedRoute>
+                    <Account />
+                  </ProtectedRoute>
+                } />
+                <Route path="/admin" element={
+                  <ProtectedRoute>
+                    <Admin />
+                  </ProtectedRoute>
+                } />
+                <Route path="/auth" element={
+                  <PublicRoute>
+                    <Auth />
+                  </PublicRoute>
+                } />
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Suspense>
+          </BrowserRouter>
+        </TooltipProvider>
+      </AuthProvider>
+    </QueryClientProvider>
+  </ErrorBoundary>
 );
 
 export default App;

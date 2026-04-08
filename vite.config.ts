@@ -15,13 +15,25 @@ export default defineConfig(({ mode }) => ({
       output: {
         manualChunks: {
           vendor: ["react", "react-dom", "react-router-dom"],
-          ui: ["@radix-ui/react-dialog", "@radix-ui/react-accordion", "@radix-ui/react-tabs", "@radix-ui/react-tooltip"],
+          ui: [
+            "@radix-ui/react-dialog",
+            "@radix-ui/react-accordion",
+            "@radix-ui/react-tabs",
+            "@radix-ui/react-tooltip",
+            "@radix-ui/react-select",
+            "@radix-ui/react-popover",
+          ],
           charts: ["recharts"],
+          query: ["@tanstack/react-query"],
+          motion: ["framer-motion"],
         },
       },
     },
     target: "esnext",
     minify: "esbuild",
+    sourcemap: false,
+    cssMinify: true,
+    chunkSizeWarningLimit: 800,
   },
   plugins: [
     react(),

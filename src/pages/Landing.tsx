@@ -124,7 +124,7 @@ const Landing = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background" role="document">
       <Helmet>
         <title>PixelSqueeze — Make Your Website Load Faster Automatically</title>
         <meta

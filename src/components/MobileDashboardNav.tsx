@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -99,13 +99,16 @@ export function MobileDashboardNav({ activeTool, onToolChange, isSubscribed }: M
               )}
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="w-80 p-0">
-            <div className="p-4 border-b border-border">
-              <div className="flex items-center gap-2">
-                <Minimize2 className="w-6 h-6 text-primary" />
-                <span className="text-lg font-bold">Pixelsqueeze</span>
-              </div>
-            </div>
+           <SheetContent side="left" className="w-80 p-0" aria-label="Navigation menu">
+             <SheetHeader className="sr-only">
+               <SheetTitle>Navigation</SheetTitle>
+             </SheetHeader>
+             <div className="p-4 border-b border-border">
+               <div className="flex items-center gap-2">
+                 <Minimize2 className="w-6 h-6 text-primary" aria-hidden="true" />
+                 <span className="text-lg font-bold">Pixelsqueeze</span>
+               </div>
+             </div>
             <ScrollArea className="h-[calc(100vh-80px)]">
               <nav className="p-4 space-y-6">
                 {toolCategories.map((category) => (

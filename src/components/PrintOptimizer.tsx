@@ -448,7 +448,7 @@ export function PrintOptimizer() {
             accept="image/*"
             className="hidden"
             onChange={handleFileSelect}
-          />
+          aria-label="Upload image files" />
           <div className="max-w-md mx-auto">
             <Upload className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
             <h3 className="text-lg font-semibold mb-2">Upload Image for Print Preparation</h3>
@@ -488,7 +488,7 @@ export function PrintOptimizer() {
                   accept="image/*"
                   className="hidden"
                   onChange={handleFileSelect}
-                />
+                aria-label="Upload image files" />
               </div>
             </div>
 

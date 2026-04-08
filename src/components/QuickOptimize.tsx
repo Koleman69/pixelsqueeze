@@ -342,7 +342,7 @@ export const QuickOptimize = ({ isSubscribed = false }: QuickOptimizeProps) => {
           multiple
           className="hidden"
           onChange={onFileInput}
-        />
+        aria-label="Upload image files" />
         <div className="flex flex-col items-center gap-3 text-center">
           {isProcessing ? (
             <>

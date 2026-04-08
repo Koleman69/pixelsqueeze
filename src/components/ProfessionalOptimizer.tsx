@@ -492,7 +492,7 @@ export const ProfessionalOptimizer = () => {
               accept="image/*"
               className="hidden"
               onChange={handleFileSelect}
-            />
+            aria-label="Upload image files" />
             <Button onClick={() => fileInputRef.current?.click()} className="gap-2">
               <Upload className="w-4 h-4" />
               Upload Image

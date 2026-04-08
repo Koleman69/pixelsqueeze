@@ -967,7 +967,7 @@ export const BatchOptimizer = () => {
             multiple
             className="hidden"
             onChange={handleFilesSelect}
-          />
+          aria-label="Upload image files" />
           
           {/* Drag overlay */}
           {isDragging && (
@@ -1092,7 +1092,7 @@ export const BatchOptimizer = () => {
                 accept=".json"
                 className="hidden"
                 onChange={handleImportFile}
-              />
+              aria-label="Import JSON file" />
               <Button
                 variant="outline"
                 size="sm"

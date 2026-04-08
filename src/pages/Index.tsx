@@ -280,7 +280,7 @@ const Index = () => {
                       <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Processing...</>
                     ) : "Select Video"}
                   </Button>
-                  <input ref={videoInputRef} type="file" accept="video/*" className="hidden" onChange={handleVideoChange} />
+                  <input ref={videoInputRef} type="file" accept="video/*" className="hidden" onChange={handleVideoChange} aria-label="Upload video for compression" />
                 </div>
               </Card>
               {videoCompressions.length > 0 && (
@@ -332,10 +332,11 @@ const Index = () => {
   const currentTool = toolTitles[activeTool];
 
   return (
-    <div className="min-h-screen bg-background flex">
+    <div className="min-h-screen bg-background flex" role="application" aria-label="PixelSqueeze Dashboard">
       <OnboardingFlow onComplete={() => setShowWelcome(true)} />
 
-      <input ref={fileInputRef} type="file" accept="image/*" multiple className="hidden" onChange={handleFileChange} disabled={isUploading} />
+      <label htmlFor="file-upload" className="sr-only">Upload images</label>
+      <input id="file-upload" ref={fileInputRef} type="file" accept="image/*" multiple className="hidden" onChange={handleFileChange} disabled={isUploading} aria-label="Upload images for compression" />
 
       {/* Desktop Sidebar */}
       <div className="hidden lg:flex">
@@ -405,7 +406,7 @@ const Index = () => {
         )}
 
         {/* Tool Content Area */}
-        <main className="flex-1 p-6 overflow-auto">
+        <main id="main-content" className="flex-1 p-6 overflow-auto" aria-label={currentTool.title}>
           <div className="max-w-5xl mx-auto">
             {/* Tool Header with gradient */}
             <AnimatePresence mode="wait">

@@ -124,7 +124,7 @@ const Landing = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background" role="document">
       <Helmet>
         <title>PixelSqueeze — Make Your Website Load Faster Automatically</title>
         <meta
@@ -160,7 +160,7 @@ const Landing = () => {
       </Helmet>
 
       {/* ─── Navigation ─── */}
-      <nav className="bg-background/80 backdrop-blur-sm border-b border-border px-6 py-4 sticky top-0 z-50">
+      <nav className="bg-background/80 backdrop-blur-sm border-b border-border px-6 py-4 sticky top-0 z-50" aria-label="Main navigation">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-2">
             <Minimize2 className="w-8 h-8 text-primary" />
@@ -200,10 +200,11 @@ const Landing = () => {
       </nav>
 
       {/* ─── HERO ─── */}
-      <section className="relative py-24 md:py-32 px-6 overflow-hidden">
+      <main id="main-content">
+      <section className="relative py-24 md:py-32 px-6 overflow-hidden" aria-labelledby="hero-heading">
         <div className="absolute inset-0 bg-gradient-to-b from-secondary/40 via-background to-background" />
         <div className="relative max-w-4xl mx-auto text-center">
-          <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold mb-6 leading-tight text-foreground">
+          <h1 id="hero-heading" className="text-4xl sm:text-5xl md:text-7xl font-bold mb-6 leading-tight text-foreground">
             Make Your Website{" "}
             <span className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
               Load Faster
@@ -621,6 +622,8 @@ const Landing = () => {
           </Link>
         </div>
       </section>
+
+      </main>
 
       {/* ─── FOOTER ─── */}
       <footer className="border-t border-border bg-card">

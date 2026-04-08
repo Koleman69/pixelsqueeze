@@ -280,7 +280,7 @@ const Index = () => {
                       <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Processing...</>
                     ) : "Select Video"}
                   </Button>
-                  <input ref={videoInputRef} type="file" accept="video/*" className="hidden" onChange={handleVideoChange} />
+                  <input ref={videoInputRef} type="file" accept="video/*" className="hidden" onChange={handleVideoChange} aria-label="Upload video for compression" />
                 </div>
               </Card>
               {videoCompressions.length > 0 && (

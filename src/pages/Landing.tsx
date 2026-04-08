@@ -160,7 +160,7 @@ const Landing = () => {
       </Helmet>
 
       {/* ─── Navigation ─── */}
-      <nav className="bg-background/80 backdrop-blur-sm border-b border-border px-6 py-4 sticky top-0 z-50">
+      <nav className="bg-background/80 backdrop-blur-sm border-b border-border px-6 py-4 sticky top-0 z-50" aria-label="Main navigation">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-2">
             <Minimize2 className="w-8 h-8 text-primary" />

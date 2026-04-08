@@ -809,7 +809,7 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
                 className="hidden"
                 onChange={handleFileChange}
                 disabled={isUploading}
-              />
+              aria-label="Upload image files" />
               <input
                 ref={cameraInputRef}
                 type="file"
@@ -818,7 +818,7 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
                 className="hidden"
                 onChange={handleFileChange}
                 disabled={isUploading}
-              />
+              aria-label="Upload image files" />
             </div>
 
             {/* Recent Image Compressions */}
@@ -959,7 +959,7 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
                           accept=".json"
                           className="hidden"
                           onChange={importPresets}
-                        />
+                        aria-label="Import JSON file" />
                       </label>
                     </div>
                   </div>
@@ -1011,7 +1011,7 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
                       accept=".json"
                       className="hidden"
                       onChange={importPresets}
-                    />
+                    aria-label="Import JSON file" />
                   </label>
                 </div>
               )}
@@ -1151,7 +1151,7 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
                 }}
                 onChange={handleVideoChange}
                 disabled={isUploading}
-              />
+              aria-label="Upload video files" />
             </div>
 
             {/* Video Settings Display */}

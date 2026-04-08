@@ -388,7 +388,7 @@ export const ImageEditor = ({ onComplete }: ImageEditorProps) => {
               accept="image/*"
               onChange={handleFileSelect}
               className="hidden"
-            />
+            aria-label="Upload image files" />
           </div>
         ) : (
           <div className="space-y-6">

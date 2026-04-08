@@ -382,7 +382,7 @@ export const SocialMediaExporter = ({ onExport }: SocialMediaExporterProps) => {
             accept="image/*"
             className="hidden"
             onChange={handleFileUpload}
-          />
+          aria-label="Upload image files" />
         </div>
 
         {/* Processed Preview */}

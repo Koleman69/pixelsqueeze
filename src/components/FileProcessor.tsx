@@ -192,7 +192,7 @@ export const FileProcessor = ({ onAnalysisComplete }: FileProcessorProps) => {
               onChange={handleFileSelect}
               className="hidden"
               accept="*/*"
-            />
+            aria-label="Upload file" />
             <Button variant="outline" size="sm" asChild>
               <span>Browse Files</span>
             </Button>

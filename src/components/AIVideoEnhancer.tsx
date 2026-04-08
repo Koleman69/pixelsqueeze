@@ -532,7 +532,7 @@ export const AIVideoEnhancer = () => {
             multiple
             className="hidden"
             onChange={handleFileSelect}
-          />
+          aria-label="Upload video files" />
         </CardContent>
       </Card>
 

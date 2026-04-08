@@ -83,8 +83,11 @@ export const BeforeAfterSlider = ({ beforeImage, afterImage, title, description 
         >
           <img
             src={beforeImage}
-            alt="Before"
+            alt={`${title} - before optimization`}
             className="absolute inset-0 w-full h-full object-cover"
+            width={800}
+            height={450}
+            loading="lazy"
             draggable={false}
           />
         </div>

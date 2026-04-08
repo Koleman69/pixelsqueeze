@@ -160,7 +160,7 @@ function SidebarContentArea({ activeTool, onToolChange, isSubscribed }: SidebarC
   const isCollapsed = state === "collapsed";
 
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar collapsible="icon" aria-label="Dashboard tools">
       <SidebarHeader className="border-b border-sidebar-border">
         <div className="flex items-center justify-between p-2">
           <div className="flex items-center gap-2">

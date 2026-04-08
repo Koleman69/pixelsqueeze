@@ -348,7 +348,7 @@ const Index = () => {
         <MobileDashboardNav activeTool={activeTool} onToolChange={handleToolChange} isSubscribed={subscription.subscribed} />
 
         {/* Desktop Header */}
-        <header className="hidden lg:flex items-center justify-between border-b border-border/50 px-6 py-3 bg-card/80 backdrop-blur-xl">
+        <header className="hidden lg:flex items-center justify-between border-b border-border/50 px-6 py-3 bg-card/80 backdrop-blur-xl" role="banner">
           <div className="flex items-center gap-4">
             <Link to="/blog">
               <Button variant="ghost" size="sm"><BookOpen className="w-4 h-4 mr-2" />Blog</Button>

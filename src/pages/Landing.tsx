@@ -623,6 +623,8 @@ const Landing = () => {
         </div>
       </section>
 
+      </main>
+
       {/* ─── FOOTER ─── */}
       <footer className="border-t border-border bg-card">
         <div className="max-w-7xl mx-auto px-6 py-12">

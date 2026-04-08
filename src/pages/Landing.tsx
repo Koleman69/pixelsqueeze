@@ -200,7 +200,8 @@ const Landing = () => {
       </nav>
 
       {/* ─── HERO ─── */}
-      <section className="relative py-24 md:py-32 px-6 overflow-hidden">
+      <main id="main-content">
+      <section className="relative py-24 md:py-32 px-6 overflow-hidden" aria-labelledby="hero-heading">
         <div className="absolute inset-0 bg-gradient-to-b from-secondary/40 via-background to-background" />
         <div className="relative max-w-4xl mx-auto text-center">
           <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold mb-6 leading-tight text-foreground">

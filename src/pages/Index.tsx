@@ -406,7 +406,7 @@ const Index = () => {
         )}
 
         {/* Tool Content Area */}
-        <main className="flex-1 p-6 overflow-auto">
+        <main id="main-content" className="flex-1 p-6 overflow-auto" aria-label={currentTool.title}>
           <div className="max-w-5xl mx-auto">
             {/* Tool Header with gradient */}
             <AnimatePresence mode="wait">

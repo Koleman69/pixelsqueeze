@@ -47,6 +47,16 @@ export const BeforeAfterSlider = ({ beforeImage, afterImage, title, description 
       
       <div 
         className="relative w-full aspect-video cursor-col-resize select-none touch-none overflow-hidden"
+        role="slider"
+        aria-label={`${title} comparison slider`}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={Math.round(sliderPosition)}
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'ArrowLeft') setSliderPosition(prev => Math.max(0, prev - 5));
+          if (e.key === 'ArrowRight') setSliderPosition(prev => Math.min(100, prev + 5));
+        }}
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
         onMouseMove={handleMouseMove}
@@ -58,8 +68,11 @@ export const BeforeAfterSlider = ({ beforeImage, afterImage, title, description 
         {/* After Image (Background) */}
         <img
           src={afterImage}
-          alt="After"
+          alt={`${title} - after optimization`}
           className="absolute inset-0 w-full h-full object-cover"
+          width={800}
+          height={450}
+          loading="lazy"
           draggable={false}
         />
         

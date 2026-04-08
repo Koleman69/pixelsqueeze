@@ -332,10 +332,11 @@ const Index = () => {
   const currentTool = toolTitles[activeTool];
 
   return (
-    <div className="min-h-screen bg-background flex">
+    <div className="min-h-screen bg-background flex" role="application" aria-label="PixelSqueeze Dashboard">
       <OnboardingFlow onComplete={() => setShowWelcome(true)} />
 
-      <input ref={fileInputRef} type="file" accept="image/*" multiple className="hidden" onChange={handleFileChange} disabled={isUploading} />
+      <label htmlFor="file-upload" className="sr-only">Upload images</label>
+      <input id="file-upload" ref={fileInputRef} type="file" accept="image/*" multiple className="hidden" onChange={handleFileChange} disabled={isUploading} aria-label="Upload images for compression" />
 
       {/* Desktop Sidebar */}
       <div className="hidden lg:flex">

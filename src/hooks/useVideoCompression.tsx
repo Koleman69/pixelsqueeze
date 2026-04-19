@@ -347,11 +347,18 @@ export const useVideoCompression = () => {
       const link = document.createElement('a');
       link.href = url;
       link.download = fileName;
+      link.rel = 'noopener';
       link.style.display = 'none';
       document.body.appendChild(link);
       link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
+      
+      // Delay cleanup so the browser has time to start the download.
+      // Revoking the blob URL immediately can abort the download on
+      // mobile browsers and some desktop builds (Safari/Chrome).
+      setTimeout(() => {
+        if (link.parentNode) document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      }, 60000);
       
       toast({
         title: "Download Started",
@@ -382,13 +389,17 @@ export const useVideoCompression = () => {
 
     try {
       const zipBlob = await zip.generateAsync({ type: 'blob' });
+      const url = URL.createObjectURL(zipBlob);
       const link = document.createElement('a');
-      link.href = URL.createObjectURL(zipBlob);
+      link.href = url;
       link.download = `compressed-videos-${Date.now()}.zip`;
+      link.rel = 'noopener';
       document.body.appendChild(link);
       link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(link.href);
+      setTimeout(() => {
+        if (link.parentNode) document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      }, 60000);
 
       toast({
         title: "Download Complete",
@@ -525,13 +536,17 @@ export const useVideoCompression = () => {
 
     try {
       const zipBlob = await zip.generateAsync({ type: 'blob' });
+      const url = URL.createObjectURL(zipBlob);
       const link = document.createElement('a');
-      link.href = URL.createObjectURL(zipBlob);
+      link.href = url;
       link.download = `compressed-videos-${Date.now()}.zip`;
+      link.rel = 'noopener';
       document.body.appendChild(link);
       link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(link.href);
+      setTimeout(() => {
+        if (link.parentNode) document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      }, 60000);
 
       toast({
         title: "Download Complete",

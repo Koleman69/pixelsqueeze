@@ -311,18 +311,20 @@ const Landing = () => {
             Slide to compare — same visual quality, dramatically smaller files
           </p>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <BeforeAfterSlider
-              beforeImage={weddingBefore}
-              afterImage={weddingAfter}
-              title="Wedding Photo — 70% Smaller"
-              description="Crystal-clear quality preserved"
-            />
-            <BeforeAfterSlider
-              beforeImage={manBefore}
-              afterImage={manAfter}
-              title="Portrait — 65% Smaller"
-              description="Professional detail maintained"
-            />
+            <Suspense fallback={<div className="aspect-video bg-secondary/30 rounded-lg animate-pulse" />}>
+              <BeforeAfterSlider
+                beforeImage={weddingBefore}
+                afterImage={weddingAfter}
+                title="Wedding Photo — 70% Smaller"
+                description="Crystal-clear quality preserved"
+              />
+              <BeforeAfterSlider
+                beforeImage={manBefore}
+                afterImage={manAfter}
+                title="Portrait — 65% Smaller"
+                description="Professional detail maintained"
+              />
+            </Suspense>
           </div>
         </div>
       </section>
@@ -672,8 +674,10 @@ const Landing = () => {
         </div>
       </footer>
 
-      <InstallBanner />
-      <EmailCapturePopup />
+      <Suspense fallback={null}>
+        <InstallBanner />
+        <EmailCapturePopup />
+      </Suspense>
     </div>
   );
 };

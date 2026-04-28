@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -33,9 +34,11 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
-import { BeforeAfterSlider } from "@/components/BeforeAfterSlider";
-import InstallBanner from "@/components/InstallBanner";
-import EmailCapturePopup from "@/components/EmailCapturePopup";
+const BeforeAfterSlider = lazy(() =>
+  import("@/components/BeforeAfterSlider").then((m) => ({ default: m.BeforeAfterSlider }))
+);
+const InstallBanner = lazy(() => import("@/components/InstallBanner"));
+const EmailCapturePopup = lazy(() => import("@/components/EmailCapturePopup"));
 import { useUtmTracking } from "@/hooks/useUtmTracking";
 import weddingBefore from "@/assets/wedding-before.jpg";
 import weddingAfter from "@/assets/wedding-after.jpg";

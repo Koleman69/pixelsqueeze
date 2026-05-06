@@ -301,11 +301,15 @@ export const useImageCompression = () => {
       const link = document.createElement('a');
       link.href = url;
       link.download = `compressed_${compression.fileName}`;
+      link.rel = 'noopener';
       link.style.display = 'none';
       document.body.appendChild(link);
       link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
+      // Delay cleanup so the browser can complete the download
+      setTimeout(() => {
+        if (link.parentNode) document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      }, 60000);
     }
   };
 

@@ -49,81 +49,102 @@ const Landing = () => {
 
   return (
     <div className="min-h-screen bg-background" role="document">
-      {/* ─── Navigation ─── */}
-      <nav className="bg-background/80 backdrop-blur-sm border-b border-border px-6 py-4 sticky top-0 z-50" aria-label="Main navigation">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <Minimize2 className="w-8 h-8 text-primary" />
-            <span className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+      {/* ─── Navigation (Compressor.io-style: minimal) ─── */}
+      <nav className="bg-background border-b border-border/60 px-6 py-4 sticky top-0 z-50" aria-label="Main navigation">
+        <div className="max-w-6xl mx-auto flex justify-between items-center">
+          <Link to="/" className="flex items-center gap-2">
+            <Minimize2 className="w-7 h-7 text-primary" />
+            <span className="text-xl font-bold tracking-tight text-foreground">
               PixelSqueeze
             </span>
-          </div>
-          <div className="hidden md:flex items-center gap-6">
-            <a href="#how-it-works" className="text-muted-foreground hover:text-foreground transition-colors text-sm font-medium">
-              How It Works
+          </Link>
+          <div className="hidden md:flex items-center gap-10">
+            <a href="#features" className="text-foreground/80 hover:text-foreground transition-colors text-base font-medium">
+              Features
             </a>
-            <a href="#use-cases" className="text-muted-foreground hover:text-foreground transition-colors text-sm font-medium">
-              Use Cases
-            </a>
-            <a href="#pricing" className="text-muted-foreground hover:text-foreground transition-colors text-sm font-medium">
-              Pricing
-            </a>
-            <Link to="/blog" className="text-muted-foreground hover:text-foreground transition-colors text-sm font-medium">
-              Blog
-            </Link>
-          </div>
-          <div className="flex items-center gap-2 sm:gap-3">
-            <Link to="/install" className="hidden lg:block">
-              <Button variant="ghost" size="sm">
-                <Download className="w-4 h-4 mr-2" />
-                Install
+            <Link to="/pricing">
+              <Button size="sm" className="bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90 px-5 rounded-full font-semibold">
+                Go Premium
               </Button>
             </Link>
-            <Link to="/auth">
-              <Button variant="outline" size="sm">Sign In</Button>
+            <Link to="/auth" className="text-foreground/80 hover:text-foreground transition-colors text-base font-medium">
+              Login
+            </Link>
+          </div>
+          <div className="flex md:hidden items-center gap-2">
+            <Link to="/pricing">
+              <Button size="sm" className="bg-gradient-primary rounded-full">Go Premium</Button>
             </Link>
             <Link to="/auth">
-              <Button size="sm" className="bg-gradient-primary">Optimize Free</Button>
+              <Button size="sm" variant="ghost">Login</Button>
             </Link>
           </div>
         </div>
       </nav>
 
-      {/* ─── HERO ─── */}
+      {/* ─── HERO (Compressor.io-style: big centered headline + dropzone CTA) ─── */}
       <main id="main-content">
-      <section className="relative py-24 md:py-32 px-6 overflow-hidden" aria-labelledby="hero-heading">
-        <div className="absolute inset-0 bg-gradient-to-b from-secondary/40 via-background to-background" />
-        <div className="relative max-w-4xl mx-auto text-center">
-          <h1 id="hero-heading" className="text-4xl sm:text-5xl md:text-7xl font-bold mb-6 leading-tight text-foreground">
-            Make Your Website{" "}
-            <span className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-              Load Faster
-            </span>{" "}
-            — Automatically
+      <section className="relative px-6 pt-16 md:pt-24 pb-20 overflow-hidden" aria-labelledby="hero-heading">
+        {/* Diagonal brand accents */}
+        <div
+          aria-hidden="true"
+          className="absolute -left-32 top-8 w-[55%] h-[420px] bg-gradient-primary opacity-90 hidden md:block"
+          style={{ clipPath: "polygon(0 0, 100% 35%, 0 70%)" }}
+        />
+        <div
+          aria-hidden="true"
+          className="absolute -right-32 bottom-0 w-[55%] h-[420px] bg-gradient-primary opacity-90 hidden md:block"
+          style={{ clipPath: "polygon(100% 30%, 100% 100%, 0 70%)" }}
+        />
+
+        <div className="relative max-w-3xl mx-auto text-center">
+          <h1
+            id="hero-heading"
+            className="text-5xl sm:text-6xl md:text-7xl font-bold mb-8 leading-[1.05] text-foreground tracking-tight"
+          >
+            Fast &amp; efficient image{" "}
+            <span className="block bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+              compression
+            </span>
           </h1>
-          <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto">
-            PixelSqueeze optimizes your images for SEO, speed, and platform
-            compatibility so your pages pass speed tests and convert more
-            visitors.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
-            <Link to="/auth">
-              <Button size="lg" className="bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90 px-8 py-6 text-lg">
-                <Upload className="w-5 h-5 mr-2" />
-                Optimize Images Free
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </Button>
-            </Link>
-            <Link to="/scanner">
-              <Button size="lg" variant="outline" className="px-8 py-6 text-lg">
-                <Search className="w-5 h-5 mr-2" />
-                Scan My Website
-              </Button>
+
+          <div className="inline-flex items-center justify-center border-2 border-primary/40 text-primary rounded-full px-6 py-2.5 mb-12 text-sm sm:text-base font-semibold">
+            Optimize JPEG, PNG, WebP, AVIF &amp; SVG
+          </div>
+
+          {/* Dropzone-styled CTA card (routes to /auth — no anonymous compression) */}
+          <Link to="/auth" aria-label="Sign up to optimize images" className="block group">
+            <div className="bg-card border-2 border-dashed border-primary/50 rounded-2xl p-10 sm:p-14 shadow-sm hover:shadow-glow hover:border-primary transition-all">
+              <div className="flex flex-col items-center gap-4">
+                <div className="w-20 h-20 rounded-2xl bg-gradient-primary/10 flex items-center justify-center group-hover:scale-105 transition-transform">
+                  <Upload className="w-10 h-10 text-primary" />
+                </div>
+                <p className="text-xl sm:text-2xl font-semibold text-primary">
+                  Drop your images or click to start
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Compress JPG, PNG, WebP, AVIF • Up to 100 images at once
+                </p>
+                <Button size="lg" className="mt-2 bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90 rounded-full px-8 font-semibold">
+                  <Upload className="w-4 h-4 mr-2" />
+                  Select files
+                </Button>
+              </div>
+            </div>
+          </Link>
+
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm text-muted-foreground">
+            <span className="inline-flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-primary" /> No quality loss</span>
+            <span className="inline-flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-primary" /> Free to start</span>
+            <span className="inline-flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-primary" /> Works in seconds</span>
+          </div>
+
+          <div className="mt-8">
+            <Link to="/scanner" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors underline-offset-4 hover:underline">
+              <Search className="w-4 h-4" />
+              Or scan your whole website for slow images
             </Link>
           </div>
-          <p className="text-sm text-muted-foreground">
-            No quality loss • No design skills needed • Works in seconds
-          </p>
         </div>
       </section>
 

@@ -73,6 +73,7 @@ export const BeforeAfterSlider = ({ beforeImage, afterImage, title, description 
           width={800}
           height={450}
           loading="lazy"
+          decoding="async"
           draggable={false}
         />
         
@@ -88,6 +89,7 @@ export const BeforeAfterSlider = ({ beforeImage, afterImage, title, description 
             width={800}
             height={450}
             loading="lazy"
+            decoding="async"
             draggable={false}
           />
         </div>

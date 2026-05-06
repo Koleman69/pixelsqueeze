@@ -348,13 +348,17 @@ export const useImageCompression = () => {
       const zipBlob = await zip.generateAsync({ type: 'blob' });
       
       // Download the ZIP
+      const zipUrl = URL.createObjectURL(zipBlob);
       const link = document.createElement('a');
-      link.href = URL.createObjectURL(zipBlob);
+      link.href = zipUrl;
       link.download = `compressed-images-${Date.now()}.zip`;
+      link.rel = 'noopener';
       document.body.appendChild(link);
       link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(link.href);
+      setTimeout(() => {
+        if (link.parentNode) document.body.removeChild(link);
+        URL.revokeObjectURL(zipUrl);
+      }, 60000);
 
       toast({
         title: "Bulk Download Complete",

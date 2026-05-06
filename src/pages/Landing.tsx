@@ -182,7 +182,7 @@ const Landing = () => {
       </section>
 
       {/* ─── SOLUTION ─── */}
-      <section className="section-padding">
+      <section className="section-padding" id="features">
         <div className="max-w-4xl mx-auto">
           <h2 className="section-title">PixelSqueeze Fixes Images Automatically</h2>
           <p className="section-subtitle">

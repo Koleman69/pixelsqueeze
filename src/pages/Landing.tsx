@@ -33,7 +33,6 @@ import {
   FileCheck,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Helmet } from "react-helmet";
 const BeforeAfterSlider = lazy(() =>
   import("@/components/BeforeAfterSlider").then((m) => ({ default: m.BeforeAfterSlider }))
 );
@@ -48,120 +47,8 @@ import manAfter from "@/assets/man-after.jpg";
 const Landing = () => {
   useUtmTracking();
 
-  const structuredData = {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    name: "PixelSqueeze",
-    applicationCategory: "MultimediaApplication",
-    operatingSystem: "Web",
-    description:
-      "AI-powered image optimization that makes websites load faster, rank higher, and convert more visitors.",
-    offers: {
-      "@type": "Offer",
-      price: "0",
-      priceCurrency: "USD",
-      description: "Free tier with manual tools",
-    },
-    aggregateRating: {
-      "@type": "AggregateRating",
-      ratingValue: "4.9",
-      ratingCount: "2847",
-      bestRating: "5",
-    },
-  };
-
-  const organizationData = {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    name: "PixelSqueeze",
-    url: "https://pixelsqueeze.lovable.app",
-    description:
-      "Image optimization built for real-world results, not technical settings.",
-  };
-
-  const faqData = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: [
-      {
-        "@type": "Question",
-        name: "How does PixelSqueeze optimize images without losing quality?",
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: "PixelSqueeze uses AI to analyze each image and select the best format, size, and compression automatically — removing unnecessary metadata and converting to modern formats while preserving visual fidelity.",
-        },
-      },
-      {
-        "@type": "Question",
-        name: "What formats are supported?",
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: "JPEG, PNG, WebP, GIF, and TIFF. PixelSqueeze auto-converts to the optimal format for your chosen goal (web, social, email, etc.).",
-        },
-      },
-      {
-        "@type": "Question",
-        name: "Are my images stored on your servers?",
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: "Free tier: no storage. Paid plans store processed files for 30 days. All transfers are encrypted with 256-bit SSL.",
-        },
-      },
-      {
-        "@type": "Question",
-        name: "Can I process multiple images at once?",
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: "Yes — batch processing supports 100+ images at once with automatic format selection, resizing, and compression.",
-        },
-      },
-      {
-        "@type": "Question",
-        name: "What results can I expect?",
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: "Typical improvements: up to 70% smaller images, 1–3 second faster page loads, improved PageSpeed scores, and fewer rejected uploads.",
-        },
-      },
-    ],
-  };
-
   return (
     <div className="min-h-screen bg-background" role="document">
-      <Helmet>
-        <title>PixelSqueeze — Make Your Website Load Faster Automatically</title>
-        <meta
-          name="description"
-          content="PixelSqueeze optimizes your images for SEO, speed, and platform compatibility so your pages pass speed tests and convert more visitors. Start free."
-        />
-        <meta
-          name="keywords"
-          content="image optimizer, website speed, page load time, image compression, SEO images, Shopify image optimizer, real estate image compressor, email image resize"
-        />
-        <meta property="og:type" content="website" />
-        <meta property="og:title" content="PixelSqueeze — Make Your Website Load Faster" />
-        <meta
-          property="og:description"
-          content="Optimize images for SEO, speed, and platform compatibility. Fix slow pages in seconds."
-        />
-        <meta property="og:image" content="/og-image.png" />
-        <meta property="og:image:width" content="1200" />
-        <meta property="og:image:height" content="640" />
-        <meta property="og:url" content="https://pixelsqueeze.lovable.app" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="PixelSqueeze — Make Your Website Load Faster" />
-        <meta
-          name="twitter:description"
-          content="Optimize images for SEO, speed, and platform compatibility. Fix slow pages in seconds."
-        />
-        <meta name="twitter:image" content="/og-image.png" />
-        <meta name="robots" content="index, follow" />
-        <link rel="canonical" href="https://pixelsqueeze.lovable.app" />
-        <script type="application/ld+json">{JSON.stringify(structuredData)}</script>
-        <script type="application/ld+json">{JSON.stringify(organizationData)}</script>
-        <script type="application/ld+json">{JSON.stringify(faqData)}</script>
-      </Helmet>
-
       {/* ─── Navigation ─── */}
       <nav className="bg-background/80 backdrop-blur-sm border-b border-border px-6 py-4 sticky top-0 z-50" aria-label="Main navigation">
         <div className="max-w-7xl mx-auto flex justify-between items-center">

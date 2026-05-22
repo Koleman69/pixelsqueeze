@@ -126,11 +126,15 @@ export function useOptimizationPipeline() {
     zip.file('manifest.csv', manifest);
     
     const zipBlob = await zip.generateAsync({ type: 'blob' });
+    const href = URL.createObjectURL(zipBlob);
     const link = document.createElement('a');
-    link.href = URL.createObjectURL(zipBlob);
+    link.href = href;
     link.download = `optimized-images-${Date.now()}.zip`;
+    link.rel = 'noopener';
+    document.body.appendChild(link);
     link.click();
-    URL.revokeObjectURL(link.href);
+    document.body.removeChild(link);
+    setTimeout(() => URL.revokeObjectURL(href), 4000);
   }, []);
 
   const clearJobs = useCallback(() => {

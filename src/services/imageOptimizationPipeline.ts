@@ -20,7 +20,20 @@ export type ContentType = 'photo' | 'graphic' | 'screenshot' | 'icon' | 'text-he
 
 export type OutputFormat = 'avif' | 'webp' | 'jpeg' | 'png';
 
-export type GoalPreset = 'web' | 'social' | 'email' | 'print' | 'thumbnail' | 'ecommerce' | 'custom';
+export type GoalPreset =
+  | 'web'
+  | 'social'
+  | 'email'
+  | 'print'
+  | 'thumbnail'
+  | 'ecommerce'
+  | 'custom'
+  | 'instagram'
+  | 'tiktok'
+  | 'amazon'
+  | 'airbnb'
+  | 'hotel'
+  | 'linkedin';
 
 export interface PipelineOptions {
   /** Target goal preset */

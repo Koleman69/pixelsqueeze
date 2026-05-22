@@ -149,7 +149,7 @@ const Index = () => {
   const videoInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
-  const [activeTool, setActiveTool] = useState<ToolCategory>("quick-optimize");
+  const [activeTool, setActiveTool] = useState<ToolCategory>("magic-optimize");
 
   const PRO_TOOLS: ToolCategory[] = ["pro-optimize", "enhance-video", "competitor", "automation"];
 

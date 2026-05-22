@@ -47,6 +47,7 @@ import {
 
 export type ToolCategory = 
   | "overview"
+  | "magic-optimize"
   | "quick-optimize"
   | "compress-image"
   | "edit-image"

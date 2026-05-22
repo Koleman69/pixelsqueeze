@@ -97,10 +97,17 @@ export function useOptimizationPipeline() {
   }, [user?.id]);
 
   const downloadResult = useCallback((result: PipelineResult) => {
+    // Re-create a fresh object URL from the blob to avoid stale/revoked URLs
+    const href = URL.createObjectURL(result.blob);
     const link = document.createElement('a');
-    link.href = result.url;
+    link.href = href;
     link.download = result.seoFileName;
+    link.rel = 'noopener';
+    link.target = '_self';
+    document.body.appendChild(link);
     link.click();
+    document.body.removeChild(link);
+    setTimeout(() => URL.revokeObjectURL(href), 4000);
   }, []);
 
   const downloadAllAsZip = useCallback(async (results: PipelineResult[]) => {
@@ -119,11 +126,15 @@ export function useOptimizationPipeline() {
     zip.file('manifest.csv', manifest);
     
     const zipBlob = await zip.generateAsync({ type: 'blob' });
+    const href = URL.createObjectURL(zipBlob);
     const link = document.createElement('a');
-    link.href = URL.createObjectURL(zipBlob);
+    link.href = href;
     link.download = `optimized-images-${Date.now()}.zip`;
+    link.rel = 'noopener';
+    document.body.appendChild(link);
     link.click();
-    URL.revokeObjectURL(link.href);
+    document.body.removeChild(link);
+    setTimeout(() => URL.revokeObjectURL(href), 4000);
   }, []);
 
   const clearJobs = useCallback(() => {

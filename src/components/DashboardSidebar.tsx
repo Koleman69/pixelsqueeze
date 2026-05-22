@@ -47,6 +47,7 @@ import {
 
 export type ToolCategory = 
   | "overview"
+  | "magic-optimize"
   | "quick-optimize"
   | "compress-image"
   | "edit-image"
@@ -82,6 +83,7 @@ const toolCategories = [
     label: "Images",
     icon: Image,
     tools: [
+      { id: "magic-optimize" as ToolCategory, label: "Magic Optimize", icon: Sparkles, description: "One-click by destination" },
       { id: "quick-optimize" as ToolCategory, label: "Quick Optimize", icon: Sparkles, description: "Goal-based optimization" },
       { id: "compress-image" as ToolCategory, label: "Compress", icon: Upload, description: "Reduce file size" },
       { id: "edit-image" as ToolCategory, label: "Edit & Transform", icon: Wand2, description: "AI editing" },

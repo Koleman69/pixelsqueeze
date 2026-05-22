@@ -30,6 +30,7 @@ const CompetitorTracker = lazy(() => import("@/components/CompetitorTracker"));
 const AutomationFlow = lazy(() => import("@/components/AutomationFlow").then(m => ({ default: m.AutomationFlow })));
 const DashboardOverview = lazy(() => import("@/components/DashboardOverview").then(m => ({ default: m.DashboardOverview })));
 const QuickOptimize = lazy(() => import("@/components/QuickOptimize").then(m => ({ default: m.QuickOptimize })));
+const MagicOptimize = lazy(() => import("@/components/MagicOptimize").then(m => ({ default: m.MagicOptimize })));
 const ContentDistributor = lazy(() => import("@/components/ContentDistributor").then(m => ({ default: m.ContentDistributor })));
 const PostingWorkflows = lazy(() => import("@/components/PostingWorkflows").then(m => ({ default: m.PostingWorkflows })));
 
@@ -51,6 +52,11 @@ const toolTitles: Record<ToolCategory, { title: string; description: string; gra
     title: "Dashboard",
     description: "Your optimization performance at a glance",
     gradient: "from-blue-500/10 via-cyan-500/5 to-transparent",
+  },
+  "magic-optimize": {
+    title: "Magic Optimize",
+    description: "Pick a destination and we'll optimize automatically — Apple-level simple",
+    gradient: "from-purple-500/10 via-pink-500/5 to-transparent",
   },
   "quick-optimize": {
     title: "Quick Optimize",
@@ -143,7 +149,7 @@ const Index = () => {
   const videoInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
-  const [activeTool, setActiveTool] = useState<ToolCategory>("quick-optimize");
+  const [activeTool, setActiveTool] = useState<ToolCategory>("magic-optimize");
 
   const PRO_TOOLS: ToolCategory[] = ["pro-optimize", "enhance-video", "competitor", "automation"];
 
@@ -227,6 +233,8 @@ const Index = () => {
       switch (activeTool) {
         case "overview":
           return <DashboardOverview isSubscribed={subscription.subscribed} />;
+        case "magic-optimize":
+          return <MagicOptimize isSubscribed={subscription.subscribed} />;
         case "quick-optimize":
           return <QuickOptimize isSubscribed={subscription.subscribed} />;
         case "compress-image":

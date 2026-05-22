@@ -20,7 +20,20 @@ export type ContentType = 'photo' | 'graphic' | 'screenshot' | 'icon' | 'text-he
 
 export type OutputFormat = 'avif' | 'webp' | 'jpeg' | 'png';
 
-export type GoalPreset = 'web' | 'social' | 'email' | 'print' | 'thumbnail' | 'ecommerce' | 'custom';
+export type GoalPreset =
+  | 'web'
+  | 'social'
+  | 'email'
+  | 'print'
+  | 'thumbnail'
+  | 'ecommerce'
+  | 'custom'
+  | 'instagram'
+  | 'tiktok'
+  | 'amazon'
+  | 'airbnb'
+  | 'hotel'
+  | 'linkedin';
 
 export interface PipelineOptions {
   /** Target goal preset */
@@ -144,6 +157,56 @@ const GOAL_PRESETS: Record<GoalPreset, GoalConfig> = {
     maxDimension: 1920,
     quality: 85,
     preferredFormats: ['webp', 'jpeg'],
+  },
+  instagram: {
+    maxDimension: 1080,
+    quality: 88,
+    preferredFormats: ['webp', 'jpeg'],
+    sharpenAfterResize: true,
+    sharpenAmount: 0.3,
+    preserveColorProfile: true,
+  },
+  tiktok: {
+    maxDimension: 1920,
+    quality: 85,
+    preferredFormats: ['webp', 'jpeg'],
+    sharpenAfterResize: true,
+    sharpenAmount: 0.3,
+    maxFileSizeKB: 1500,
+  },
+  amazon: {
+    maxDimension: 2000,
+    quality: 92,
+    preferredFormats: ['jpeg'],
+    whiteBackgroundNormalize: true,
+    squareCrop: true,
+    fixedDimensions: { width: 2000, height: 2000 },
+    sharpenAfterResize: true,
+    sharpenAmount: 0.25,
+  },
+  airbnb: {
+    maxDimension: 1920,
+    quality: 85,
+    preferredFormats: ['jpeg', 'webp'],
+    sharpenAfterResize: true,
+    sharpenAmount: 0.25,
+    preserveColorProfile: true,
+  },
+  hotel: {
+    maxDimension: 2560,
+    quality: 90,
+    preferredFormats: ['jpeg', 'webp'],
+    sharpenAfterResize: true,
+    sharpenAmount: 0.3,
+    preserveColorProfile: true,
+    progressive: true,
+  },
+  linkedin: {
+    maxDimension: 1200,
+    quality: 85,
+    preferredFormats: ['jpeg', 'webp'],
+    sharpenAfterResize: true,
+    sharpenAmount: 0.35,
   },
 };
 

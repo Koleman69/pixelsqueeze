@@ -30,6 +30,7 @@ const CompetitorTracker = lazy(() => import("@/components/CompetitorTracker"));
 const AutomationFlow = lazy(() => import("@/components/AutomationFlow").then(m => ({ default: m.AutomationFlow })));
 const DashboardOverview = lazy(() => import("@/components/DashboardOverview").then(m => ({ default: m.DashboardOverview })));
 const QuickOptimize = lazy(() => import("@/components/QuickOptimize").then(m => ({ default: m.QuickOptimize })));
+const MagicOptimize = lazy(() => import("@/components/MagicOptimize").then(m => ({ default: m.MagicOptimize })));
 const ContentDistributor = lazy(() => import("@/components/ContentDistributor").then(m => ({ default: m.ContentDistributor })));
 const PostingWorkflows = lazy(() => import("@/components/PostingWorkflows").then(m => ({ default: m.PostingWorkflows })));
 

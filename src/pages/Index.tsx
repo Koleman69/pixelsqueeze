@@ -233,6 +233,8 @@ const Index = () => {
       switch (activeTool) {
         case "overview":
           return <DashboardOverview isSubscribed={subscription.subscribed} />;
+        case "magic-optimize":
+          return <MagicOptimize isSubscribed={subscription.subscribed} />;
         case "quick-optimize":
           return <QuickOptimize isSubscribed={subscription.subscribed} />;
         case "compress-image":

@@ -67,8 +67,10 @@ const Landing = () => {
                 Go Premium
               </Button>
             </Link>
-            <Link to="/auth" className="text-foreground/80 hover:text-foreground transition-colors text-base font-medium">
-              Login
+            <Link to="/auth">
+              <Button size="sm" className="bg-purple-600 text-white hover:bg-purple-700 rounded-full px-5 font-semibold">
+                Sign In
+              </Button>
             </Link>
           </div>
           <div className="flex md:hidden items-center gap-2">

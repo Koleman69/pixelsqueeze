@@ -56,7 +56,7 @@ const toolTitles: Record<ToolCategory, { title: string; description: string; gra
   "magic-optimize": {
     title: "Magic Optimize",
     description: "Pick a destination and we'll optimize automatically — Apple-level simple",
-    gradient: "from-primary/18 via-accent/10 to-transparent",
+    gradient: "from-primary/20 via-accent/10 to-transparent",
   },
   "quick-optimize": {
     title: "Quick Optimize",

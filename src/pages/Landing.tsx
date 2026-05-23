@@ -78,7 +78,7 @@ const Landing = () => {
               <Button size="sm" className="bg-gradient-primary rounded-full">Go Premium</Button>
             </Link>
             <Link to="/auth">
-              <Button size="sm" variant="ghost">Login</Button>
+              <Button size="sm" className="bg-purple-600 text-white hover:bg-purple-700 rounded-full font-semibold">Sign In</Button>
             </Link>
           </div>
         </div>

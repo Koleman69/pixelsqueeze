@@ -67,8 +67,10 @@ const Landing = () => {
                 Go Premium
               </Button>
             </Link>
-            <Link to="/auth" className="text-foreground/80 hover:text-foreground transition-colors text-base font-medium">
-              Login
+            <Link to="/auth">
+              <Button size="sm" className="bg-purple-600 text-white hover:bg-purple-700 rounded-full px-5 font-semibold">
+                Sign In
+              </Button>
             </Link>
           </div>
           <div className="flex md:hidden items-center gap-2">
@@ -76,7 +78,7 @@ const Landing = () => {
               <Button size="sm" className="bg-gradient-primary rounded-full">Go Premium</Button>
             </Link>
             <Link to="/auth">
-              <Button size="sm" variant="ghost">Login</Button>
+              <Button size="sm" className="bg-purple-600 text-white hover:bg-purple-700 rounded-full font-semibold">Sign In</Button>
             </Link>
           </div>
         </div>
@@ -108,7 +110,7 @@ const Landing = () => {
             </span>
           </h1>
 
-          <div className="inline-flex items-center justify-center border-2 border-primary/40 text-primary rounded-full px-6 py-2.5 mb-12 text-sm sm:text-base font-semibold">
+          <div className="inline-flex items-center justify-center bg-purple-600 text-black rounded-full px-6 py-2.5 mb-12 text-sm sm:text-base font-semibold shadow-md">
             Optimize JPEG, PNG, WebP, AVIF &amp; SVG
           </div>
 

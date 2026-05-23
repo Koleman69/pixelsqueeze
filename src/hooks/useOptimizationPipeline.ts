@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
 import {
   runOptimizationPipeline,
   runBatchPipeline,
@@ -53,24 +54,29 @@ async function saveBlob(blob: Blob, fileName: string) {
     }
   }
 
-  const href = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = href;
-  link.download = fileName;
-  link.rel = 'noopener';
-  link.target = '_self';
-  link.style.display = 'none';
-  document.body.appendChild(link);
-  link.click();
+  if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+    const href = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = href;
+    link.download = fileName;
+    link.rel = 'noopener';
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
 
-  setTimeout(() => {
-    if (link.parentNode) document.body.removeChild(link);
-    URL.revokeObjectURL(href);
-  }, 60000);
+    setTimeout(() => {
+      if (link.parentNode) document.body.removeChild(link);
+      URL.revokeObjectURL(href);
+    }, 60000);
+    return;
+  }
+
+  throw new Error('Download is not supported in this environment.');
 }
 
 export function useOptimizationPipeline() {
   const { user } = useAuth();
+  const { toast } = useToast();
   const [jobs, setJobs] = useState<PipelineJob[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [overallProgress, setOverallProgress] = useState(0);
@@ -147,8 +153,21 @@ export function useOptimizationPipeline() {
   }, [user?.id]);
 
   const downloadResult = useCallback(async (result: PipelineResult) => {
-    await saveBlob(result.blob, result.seoFileName);
-  }, []);
+    try {
+      await saveBlob(result.blob, result.seoFileName);
+      toast({
+        title: 'Download started',
+        description: `Saving ${result.seoFileName}`,
+      });
+    } catch (error) {
+      console.error('Download failed:', error);
+      window.open(result.url, '_blank', 'noopener,noreferrer');
+      toast({
+        title: 'Opened file preview',
+        description: 'If your device blocks direct downloads, long-press the file and save it.',
+      });
+    }
+  }, [toast]);
 
   const downloadAllAsZip = useCallback(async (results: PipelineResult[]) => {
     const zip = new JSZip();
@@ -165,9 +184,22 @@ export function useOptimizationPipeline() {
     
     zip.file('manifest.csv', manifest);
     
-    const zipBlob = await zip.generateAsync({ type: 'blob' });
-    await saveBlob(zipBlob, `optimized-images-${Date.now()}.zip`);
-  }, []);
+    try {
+      const zipBlob = await zip.generateAsync({ type: 'blob' });
+      await saveBlob(zipBlob, `optimized-images-${Date.now()}.zip`);
+      toast({
+        title: 'ZIP ready',
+        description: `Preparing ${results.length} optimized file${results.length > 1 ? 's' : ''} for download.`,
+      });
+    } catch (error) {
+      console.error('ZIP download failed:', error);
+      toast({
+        title: 'ZIP download failed',
+        description: 'Please download files individually on this device.',
+        variant: 'destructive',
+      });
+    }
+  }, [toast]);
 
   const clearJobs = useCallback(() => {
     // Revoke URLs to free memory

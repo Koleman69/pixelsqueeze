@@ -313,7 +313,7 @@ export const MagicOptimize = ({ isSubscribed = false }: MagicOptimizeProps) => {
               </p>
             </div>
             {destination && (
-              <Badge variant="secondary" className="w-fit border border-primary/15 bg-primary/10 text-foreground text-[11px]">
+              <Badge variant="secondary" className="w-fit border border-primary/20 bg-primary/10 text-foreground text-[11px]">
                 Selected: {destination.label}
               </Badge>
             )}
@@ -589,7 +589,7 @@ export const MagicOptimize = ({ isSubscribed = false }: MagicOptimizeProps) => {
                   )}
 
                   {/* AI Recommendations */}
-                  <div className="rounded-xl border border-primary/15 bg-primary/5 p-3 backdrop-blur-md">
+                  <div className="rounded-xl border border-primary/20 bg-primary/5 p-3 backdrop-blur-md">
                     <div className="flex items-center gap-2 mb-2">
                       <Wand2 className="w-3.5 h-3.5 text-primary" />
                       <span className="text-xs font-semibold">Your image could improve further by:</span>

@@ -224,12 +224,12 @@ export const MagicOptimize = ({ isSubscribed = false }: MagicOptimizeProps) => {
 
   return (
     <div className="space-y-6">
-      <section className="relative overflow-hidden rounded-2xl border border-border/40 bg-card/70 p-5 shadow-[var(--shadow-card)] backdrop-blur-xl md:p-7">
+      <section className="relative overflow-hidden rounded-2xl border border-border/40 bg-card/80 p-5 shadow-[var(--shadow-card)] backdrop-blur-xl md:p-7">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,hsl(var(--primary)/0.18),transparent_35%),radial-gradient(circle_at_top_right,hsl(var(--accent)/0.14),transparent_32%)]" />
         <div className="relative grid gap-6 lg:grid-cols-[1.35fr_0.65fr] lg:items-end">
           <div className="space-y-5">
             <div className="flex flex-wrap items-center gap-2">
-              <Badge className="bg-primary/12 text-foreground border border-primary/20 hover:bg-primary/12">
+              <Badge className="border border-primary/20 bg-primary/10 text-foreground hover:bg-primary/10">
                 <Stars className="h-3.5 w-3.5 text-primary" />
                 Magic Optimize
               </Badge>
@@ -248,19 +248,19 @@ export const MagicOptimize = ({ isSubscribed = false }: MagicOptimizeProps) => {
             </div>
 
             <div className="grid gap-3 sm:grid-cols-3">
-              <div className="rounded-xl border border-border/50 bg-background/45 p-4 backdrop-blur-md">
+              <div className="rounded-xl border border-border/50 bg-background/50 p-4 backdrop-blur-md">
                 <Gauge className="mb-3 h-4 w-4 text-primary" />
                 <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Performance</p>
                 <p className="mt-1 text-xl font-semibold">+{totals.speed}%</p>
                 <p className="mt-1 text-xs text-muted-foreground">Estimated page speed lift</p>
               </div>
-              <div className="rounded-xl border border-border/50 bg-background/45 p-4 backdrop-blur-md">
+              <div className="rounded-xl border border-border/50 bg-background/50 p-4 backdrop-blur-md">
                 <ImageIcon className="mb-3 h-4 w-4 text-primary" />
                 <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Savings</p>
                 <p className="mt-1 text-xl font-semibold">{formatBytes(totals.saved)}</p>
                 <p className="mt-1 text-xs text-muted-foreground">Recovered from processed files</p>
               </div>
-              <div className="rounded-xl border border-border/50 bg-background/45 p-4 backdrop-blur-md">
+              <div className="rounded-xl border border-border/50 bg-background/50 p-4 backdrop-blur-md">
                 <ShieldCheck className="mb-3 h-4 w-4 text-primary" />
                 <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Quality</p>
                 <p className="mt-1 text-xl font-semibold">{results.length ? qualityRetained(totals.avgRatio) : 94}%</p>
@@ -332,7 +332,7 @@ export const MagicOptimize = ({ isSubscribed = false }: MagicOptimizeProps) => {
                   "relative flex min-h-[132px] flex-col items-start gap-2 rounded-xl border p-3 text-left transition-all duration-200",
                   active
                     ? "border-primary/40 bg-primary/10 shadow-[var(--shadow-glow)] ring-1 ring-primary/20"
-                    : "border-border/50 bg-background/35 hover:border-primary/30 hover:bg-background/65",
+                    : "border-border/50 bg-background/40 hover:border-primary/30 hover:bg-background/70",
                   locked && "opacity-80"
                 )}
                 aria-label={`Select ${d.label}`}
@@ -341,7 +341,7 @@ export const MagicOptimize = ({ isSubscribed = false }: MagicOptimizeProps) => {
                 <div
                   className={cn(
                     "rounded-lg p-2.5",
-                    active ? "bg-primary/15 text-primary" : "bg-secondary/80 text-foreground"
+                    active ? "bg-primary/20 text-primary" : "bg-secondary/80 text-foreground"
                   )}
                 >
                   <Icon className="w-4 h-4" />
@@ -361,7 +361,7 @@ export const MagicOptimize = ({ isSubscribed = false }: MagicOptimizeProps) => {
       <Card
         className={cn(
           "glass-card cursor-pointer border-2 border-dashed p-6 transition-colors md:p-8",
-          isDragging ? "border-primary bg-primary/8 shadow-[var(--shadow-glow)]" : "border-border/60 hover:border-primary/30",
+          isDragging ? "border-primary bg-primary/10 shadow-[var(--shadow-glow)]" : "border-border/60 hover:border-primary/30",
           isProcessing && "pointer-events-none opacity-60"
         )}
         onClick={() => !isProcessing && fileInputRef.current?.click()}
@@ -456,7 +456,7 @@ export const MagicOptimize = ({ isSubscribed = false }: MagicOptimizeProps) => {
             size="lg"
             onClick={handleOptimize}
             disabled={isProcessing || files.length === 0}
-            className="glow-btn h-13 w-full rounded-xl bg-primary text-base text-primary-foreground shadow-[var(--shadow-glow)] hover:bg-primary/90"
+            className="glow-btn h-12 w-full rounded-xl bg-primary text-base text-primary-foreground shadow-[var(--shadow-glow)] hover:bg-primary/90"
           >
             {isProcessing ? (
               <>
@@ -500,19 +500,19 @@ export const MagicOptimize = ({ isSubscribed = false }: MagicOptimizeProps) => {
 
           {/* Summary strip */}
           <div className="grid grid-cols-2 gap-px bg-border/40 sm:grid-cols-4">
-            <div className="bg-background/55 p-4 backdrop-blur-md">
+            <div className="bg-background/60 p-4 backdrop-blur-md">
               <p className="text-[11px] uppercase text-muted-foreground">Saved</p>
               <p className="text-lg font-bold text-primary">{formatBytes(totals.saved)}</p>
             </div>
-            <div className="bg-background/55 p-4 backdrop-blur-md">
+            <div className="bg-background/60 p-4 backdrop-blur-md">
               <p className="text-[11px] uppercase text-muted-foreground">Avg compression</p>
               <p className="text-lg font-bold">{totals.avgRatio}%</p>
             </div>
-            <div className="bg-background/55 p-4 backdrop-blur-md">
+            <div className="bg-background/60 p-4 backdrop-blur-md">
               <p className="text-[11px] uppercase text-muted-foreground">Est. speed gain</p>
               <p className="text-lg font-bold text-primary">+{totals.speed}%</p>
             </div>
-            <div className="bg-background/55 p-4 backdrop-blur-md">
+            <div className="bg-background/60 p-4 backdrop-blur-md">
               <p className="text-[11px] uppercase text-muted-foreground">Total optimized</p>
               <p className="text-lg font-bold">{formatBytes(totals.optimized)}</p>
             </div>

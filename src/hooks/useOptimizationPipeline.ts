@@ -19,6 +19,56 @@ export interface PipelineJob {
   error?: string;
 }
 
+function isAppleMobileDevice() {
+  if (typeof navigator === 'undefined') return false;
+
+  return /iPad|iPhone|iPod/i.test(navigator.userAgent)
+    || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+}
+
+function isStandalonePwa() {
+  if (typeof window === 'undefined') return false;
+
+  return window.matchMedia?.('(display-mode: standalone)').matches
+    || (window.navigator as Navigator & { standalone?: boolean }).standalone === true;
+}
+
+async function saveBlob(blob: Blob, fileName: string) {
+  const prefersNativeShare = isAppleMobileDevice() || isStandalonePwa();
+  const shareFile = new File([blob], fileName, { type: blob.type || 'application/octet-stream' });
+
+  if (prefersNativeShare && navigator.share && navigator.canShare) {
+    try {
+      if (navigator.canShare({ files: [shareFile] })) {
+        await navigator.share({
+          files: [shareFile],
+          title: fileName,
+        });
+        return;
+      }
+    } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        return;
+      }
+    }
+  }
+
+  const href = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = href;
+  link.download = fileName;
+  link.rel = 'noopener';
+  link.target = '_self';
+  link.style.display = 'none';
+  document.body.appendChild(link);
+  link.click();
+
+  setTimeout(() => {
+    if (link.parentNode) document.body.removeChild(link);
+    URL.revokeObjectURL(href);
+  }, 60000);
+}
+
 export function useOptimizationPipeline() {
   const { user } = useAuth();
   const [jobs, setJobs] = useState<PipelineJob[]>([]);
@@ -96,18 +146,8 @@ export function useOptimizationPipeline() {
     return results;
   }, [user?.id]);
 
-  const downloadResult = useCallback((result: PipelineResult) => {
-    // Re-create a fresh object URL from the blob to avoid stale/revoked URLs
-    const href = URL.createObjectURL(result.blob);
-    const link = document.createElement('a');
-    link.href = href;
-    link.download = result.seoFileName;
-    link.rel = 'noopener';
-    link.target = '_self';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    setTimeout(() => URL.revokeObjectURL(href), 4000);
+  const downloadResult = useCallback(async (result: PipelineResult) => {
+    await saveBlob(result.blob, result.seoFileName);
   }, []);
 
   const downloadAllAsZip = useCallback(async (results: PipelineResult[]) => {
@@ -126,15 +166,7 @@ export function useOptimizationPipeline() {
     zip.file('manifest.csv', manifest);
     
     const zipBlob = await zip.generateAsync({ type: 'blob' });
-    const href = URL.createObjectURL(zipBlob);
-    const link = document.createElement('a');
-    link.href = href;
-    link.download = `optimized-images-${Date.now()}.zip`;
-    link.rel = 'noopener';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    setTimeout(() => URL.revokeObjectURL(href), 4000);
+    await saveBlob(zipBlob, `optimized-images-${Date.now()}.zip`);
   }, []);
 
   const clearJobs = useCallback(() => {

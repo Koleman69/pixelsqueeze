@@ -163,7 +163,7 @@ function SidebarContentArea({ activeTool, onToolChange, isSubscribed }: SidebarC
 
   return (
     <Sidebar collapsible="icon" aria-label="Dashboard tools">
-      <SidebarHeader className="border-b border-sidebar-border/70 bg-sidebar/80 backdrop-blur-xl">
+      <SidebarHeader className="border-b border-sidebar-border/70 bg-sidebar-background/80 backdrop-blur-xl">
         <div className="flex items-center justify-between p-2">
           <div className="flex items-center gap-2">
             <div className="rounded-lg border border-primary/15 bg-primary/10 p-1.5 shadow-[var(--shadow-glow)]">

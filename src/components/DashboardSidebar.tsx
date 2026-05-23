@@ -163,10 +163,12 @@ function SidebarContentArea({ activeTool, onToolChange, isSubscribed }: SidebarC
 
   return (
     <Sidebar collapsible="icon" aria-label="Dashboard tools">
-      <SidebarHeader className="border-b border-sidebar-border">
+      <SidebarHeader className="border-b border-sidebar-border/70 bg-sidebar-background/80 backdrop-blur-xl">
         <div className="flex items-center justify-between p-2">
           <div className="flex items-center gap-2">
-            <Minimize2 className="h-5 w-5 text-primary shrink-0" />
+            <div className="rounded-lg border border-primary/20 bg-primary/10 p-1.5 shadow-[var(--shadow-glow)]">
+              <Minimize2 className="h-4 w-4 text-primary shrink-0" />
+            </div>
             {!isCollapsed && (
               <span className="text-lg font-bold">Pixelsqueeze</span>
             )}
@@ -201,7 +203,7 @@ function SidebarContentArea({ activeTool, onToolChange, isSubscribed }: SidebarC
                             <tool.icon className="h-4 w-4" />
                           </SidebarMenuButton>
                         </TooltipTrigger>
-                        <TooltipContent side="right" className="flex items-center gap-2">
+                         <TooltipContent side="right" className="flex items-center gap-2 border border-border/50 bg-popover/95 backdrop-blur-xl">
                           {tool.label}
                           {tool.pro && !isSubscribed && (
                             <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 border-amber-500 text-amber-600">
@@ -214,7 +216,7 @@ function SidebarContentArea({ activeTool, onToolChange, isSubscribed }: SidebarC
                       <SidebarMenuButton
                         isActive={activeTool === tool.id}
                         onClick={() => onToolChange(tool.id)}
-                        className="justify-between"
+                         className="justify-between rounded-xl border border-transparent data-[active=true]:border-primary/20 data-[active=true]:bg-primary/10 data-[active=true]:shadow-[var(--shadow-glow)]"
                       >
                         <div className="flex items-center gap-2">
                           <tool.icon className="h-4 w-4 shrink-0" />
@@ -241,8 +243,8 @@ function SidebarContentArea({ activeTool, onToolChange, isSubscribed }: SidebarC
 
       {!isSubscribed && !isCollapsed && (
         <SidebarFooter className="border-t border-sidebar-border">
-          <div className="p-2">
-            <div className="bg-gradient-to-br from-primary/10 via-purple-500/10 to-pink-500/10 rounded-lg p-4">
+            <div className="p-2">
+            <div className="rounded-xl border border-primary/20 bg-gradient-to-br from-primary/10 via-accent/10 to-background/40 p-4 shadow-[var(--shadow-card)] backdrop-blur-xl">
               <div className="flex items-center gap-2 mb-2">
                 <Crown className="w-5 h-5 text-amber-500" />
                 <span className="font-semibold text-sm">Upgrade to Pro</span>

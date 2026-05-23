@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useMemo, useEffect } from "react";
+import { useState, useRef, useCallback, useMemo, useEffect, type ChangeEvent, type DragEvent, type ElementType } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -26,6 +26,11 @@ import {
   CheckCircle2,
   Wand2,
   Film,
+  ArrowRight,
+  ImageIcon,
+  Gauge,
+  ShieldCheck,
+  Stars,
 } from "lucide-react";
 import { useOptimizationPipeline } from "@/hooks/useOptimizationPipeline";
 import { PipelineResult, GoalPreset } from "@/services/imageOptimizationPipeline";
@@ -40,7 +45,7 @@ interface Destination {
   id: string;
   label: string;
   description: string;
-  icon: React.ElementType;
+  icon: ElementType;
   goal: GoalPreset;
   isPaid?: boolean;
   hint: string;
@@ -121,12 +126,12 @@ export const MagicOptimize = ({ isSubscribed = false }: MagicOptimizeProps) => {
     setVideoFiles((prev) => [...prev, ...videos]);
   };
 
-  const onFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onFileInput = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) handleFilesSelected(Array.from(e.target.files));
     e.target.value = "";
   };
 
-  const onDrop = (e: React.DragEvent) => {
+  const onDrop = (e: DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
     if (e.dataTransfer.files.length) handleFilesSelected(Array.from(e.dataTransfer.files));
@@ -219,25 +224,102 @@ export const MagicOptimize = ({ isSubscribed = false }: MagicOptimizeProps) => {
 
   return (
     <div className="space-y-6">
-      {/* Destination grid */}
-      <Card className="p-5">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h3 className="text-sm font-semibold flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-primary" />
-              Choose your destination
-            </h3>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              We'll pick the perfect dimensions, format, and compression automatically.
-            </p>
+      <section className="relative overflow-hidden rounded-2xl border border-border/40 bg-card/80 p-5 shadow-[var(--shadow-card)] backdrop-blur-xl md:p-7">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,hsl(var(--primary)/0.18),transparent_35%),radial-gradient(circle_at_top_right,hsl(var(--accent)/0.14),transparent_32%)]" />
+        <div className="relative grid gap-6 lg:grid-cols-[1.35fr_0.65fr] lg:items-end">
+          <div className="space-y-5">
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge className="border border-primary/20 bg-primary/10 text-foreground hover:bg-primary/10">
+                <Stars className="h-3.5 w-3.5 text-primary" />
+                Magic Optimize
+              </Badge>
+              <Badge variant="outline" className="border-border/60 bg-background/30 text-muted-foreground">
+                {files.length + videoFiles.length || 0} file{files.length + videoFiles.length === 1 ? "" : "s"} in session
+              </Badge>
+            </div>
+
+            <div className="space-y-3">
+              <h2 className="max-w-2xl text-2xl font-semibold tracking-tight md:text-4xl">
+                Premium optimization tuned to where your media will actually live.
+              </h2>
+              <p className="max-w-2xl text-sm leading-6 text-muted-foreground md:text-base">
+                Upload once, choose a destination, and PixelSqueeze handles format, dimensions, compression, and presentation-quality output automatically.
+              </p>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-3">
+              <div className="rounded-xl border border-border/50 bg-background/50 p-4 backdrop-blur-md">
+                <Gauge className="mb-3 h-4 w-4 text-primary" />
+                <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Performance</p>
+                <p className="mt-1 text-xl font-semibold">+{totals.speed}%</p>
+                <p className="mt-1 text-xs text-muted-foreground">Estimated page speed lift</p>
+              </div>
+              <div className="rounded-xl border border-border/50 bg-background/50 p-4 backdrop-blur-md">
+                <ImageIcon className="mb-3 h-4 w-4 text-primary" />
+                <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Savings</p>
+                <p className="mt-1 text-xl font-semibold">{formatBytes(totals.saved)}</p>
+                <p className="mt-1 text-xs text-muted-foreground">Recovered from processed files</p>
+              </div>
+              <div className="rounded-xl border border-border/50 bg-background/50 p-4 backdrop-blur-md">
+                <ShieldCheck className="mb-3 h-4 w-4 text-primary" />
+                <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Quality</p>
+                <p className="mt-1 text-xl font-semibold">{results.length ? qualityRetained(totals.avgRatio) : 94}%</p>
+                <p className="mt-1 text-xs text-muted-foreground">Visual quality retained</p>
+              </div>
+            </div>
           </div>
-          {destination && (
-            <Badge variant="secondary" className="text-[11px]">
-              Selected: {destination.label}
-            </Badge>
-          )}
+
+          <div className="rounded-2xl border border-border/50 bg-background/50 p-4 shadow-[var(--shadow-card)] backdrop-blur-md">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Destination profile</p>
+                <p className="mt-1 text-lg font-semibold">{destination.label}</p>
+              </div>
+              <div className="rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs text-primary">
+                {destination.hint}
+              </div>
+            </div>
+            <div className="mt-4 space-y-3">
+              <div className="rounded-xl border border-border/50 bg-card/70 p-3">
+                <p className="text-xs text-muted-foreground">Auto profile</p>
+                <p className="mt-1 text-sm font-medium">{destination.description}</p>
+              </div>
+              <div className="rounded-xl border border-border/50 bg-card/70 p-3">
+                <p className="text-xs text-muted-foreground">Workflow</p>
+                <div className="mt-2 flex items-center gap-2 text-sm font-medium">
+                  <span>Upload</span>
+                  <ArrowRight className="h-3.5 w-3.5 text-muted-foreground" />
+                  <span>Optimize</span>
+                  <ArrowRight className="h-3.5 w-3.5 text-muted-foreground" />
+                  <span>Download</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5">
+      </section>
+
+      {/* Destination grid */}
+      <Card className="glass-card overflow-hidden border-border/40">
+        <div className="border-b border-border/40 px-5 py-4 md:px-6">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div>
+              <h3 className="text-sm font-semibold flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-primary" />
+                Choose your destination
+              </h3>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                We’ll tune dimensions, format, and compression for the final channel automatically.
+              </p>
+            </div>
+            {destination && (
+              <Badge variant="secondary" className="w-fit border border-primary/20 bg-primary/10 text-foreground text-[11px]">
+                Selected: {destination.label}
+              </Badge>
+            )}
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-2.5 p-4 sm:grid-cols-3 lg:grid-cols-5 md:p-5">
           {DESTINATIONS.map((d) => {
             const Icon = d.icon;
             const active = destination?.id === d.id;
@@ -247,10 +329,10 @@ export const MagicOptimize = ({ isSubscribed = false }: MagicOptimizeProps) => {
                 key={d.id}
                 onClick={() => handleDestinationSelect(d)}
                 className={cn(
-                  "relative flex flex-col items-center text-center gap-1.5 p-3 rounded-xl border transition-all",
+                  "relative flex min-h-[132px] flex-col items-start gap-2 rounded-xl border p-3 text-left transition-all duration-200",
                   active
-                    ? "border-primary bg-primary/10 shadow-sm ring-1 ring-primary/30"
-                    : "border-border hover:border-primary/40 hover:bg-primary/5",
+                    ? "border-primary/40 bg-primary/10 shadow-[var(--shadow-glow)] ring-1 ring-primary/20"
+                    : "border-border/50 bg-background/40 hover:border-primary/30 hover:bg-background/70",
                   locked && "opacity-80"
                 )}
                 aria-label={`Select ${d.label}`}
@@ -258,14 +340,17 @@ export const MagicOptimize = ({ isSubscribed = false }: MagicOptimizeProps) => {
                 {locked && <Lock className="absolute top-1.5 right-1.5 w-3 h-3 text-muted-foreground/60" />}
                 <div
                   className={cn(
-                    "p-2 rounded-lg",
-                    active ? "bg-primary/20 text-primary" : "bg-secondary text-foreground"
+                    "rounded-lg p-2.5",
+                    active ? "bg-primary/20 text-primary" : "bg-secondary/80 text-foreground"
                   )}
                 >
                   <Icon className="w-4 h-4" />
                 </div>
-                <span className="text-xs font-medium leading-tight">{d.label}</span>
-                <span className="text-[10px] text-muted-foreground leading-tight line-clamp-2">{d.description}</span>
+                <div className="space-y-1">
+                  <span className="block text-xs font-medium leading-tight">{d.label}</span>
+                  <span className="block text-[10px] text-muted-foreground leading-tight line-clamp-2">{d.description}</span>
+                </div>
+                <span className="mt-auto text-[10px] uppercase tracking-[0.18em] text-muted-foreground">{d.hint}</span>
               </button>
             );
           })}
@@ -275,8 +360,8 @@ export const MagicOptimize = ({ isSubscribed = false }: MagicOptimizeProps) => {
       {/* Upload area */}
       <Card
         className={cn(
-          "p-6 border-2 border-dashed transition-colors cursor-pointer",
-          isDragging ? "border-primary bg-primary/5" : "border-border hover:border-primary/50",
+          "glass-card cursor-pointer border-2 border-dashed p-6 transition-colors md:p-8",
+          isDragging ? "border-primary bg-primary/10 shadow-[var(--shadow-glow)]" : "border-border/60 hover:border-primary/30",
           isProcessing && "pointer-events-none opacity-60"
         )}
         onClick={() => !isProcessing && fileInputRef.current?.click()}
@@ -296,15 +381,15 @@ export const MagicOptimize = ({ isSubscribed = false }: MagicOptimizeProps) => {
           onChange={onFileInput}
           aria-label="Upload images or videos"
         />
-        <div className="flex flex-col items-center text-center gap-3">
-          <div className="p-3 rounded-full bg-primary/10">
+        <div className="flex flex-col items-center gap-4 text-center">
+          <div className="rounded-2xl border border-primary/20 bg-primary/10 p-4 shadow-[var(--shadow-glow)]">
             <Upload className="w-7 h-7 text-primary" />
           </div>
           <div>
-            <p className="text-sm font-medium">
+            <p className="text-base font-medium">
               Drop files here or <span className="text-primary underline">browse</span>
             </p>
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="mt-1 text-xs text-muted-foreground md:text-sm">
               Images: JPG, PNG, WebP, AVIF • Videos: MP4, MOV, WebM
             </p>
           </div>
@@ -313,7 +398,7 @@ export const MagicOptimize = ({ isSubscribed = false }: MagicOptimizeProps) => {
 
       {/* Selected file list */}
       {(files.length > 0 || videoFiles.length > 0) && (
-        <Card className="p-4 space-y-3">
+        <Card className="glass-card space-y-4 border-border/40 p-4">
           <div className="flex items-center justify-between">
             <span className="text-sm font-semibold">
               {files.length + videoFiles.length} file{files.length + videoFiles.length > 1 ? "s" : ""} ready
@@ -371,7 +456,7 @@ export const MagicOptimize = ({ isSubscribed = false }: MagicOptimizeProps) => {
             size="lg"
             onClick={handleOptimize}
             disabled={isProcessing || files.length === 0}
-            className="w-full bg-gradient-to-r from-primary to-purple-500 hover:opacity-90 text-base h-12 shadow-lg shadow-primary/20"
+            className="glow-btn h-12 w-full rounded-xl bg-primary text-base text-primary-foreground shadow-[var(--shadow-glow)] hover:bg-primary/90"
           >
             {isProcessing ? (
               <>
@@ -385,23 +470,23 @@ export const MagicOptimize = ({ isSubscribed = false }: MagicOptimizeProps) => {
               </>
             )}
           </Button>
-          {isProcessing && <Progress value={overallProgress} className="h-1.5" />}
+          {isProcessing && <Progress value={overallProgress} className="h-1.5 bg-secondary/80" />}
         </Card>
       )}
 
       {/* Results */}
       {results.length > 0 && (
-        <Card className="overflow-hidden">
-          <div className="flex items-center justify-between p-4 border-b border-border bg-muted/30">
+        <Card className="glass-card overflow-hidden border-border/40">
+          <div className="flex flex-col gap-3 border-b border-border/40 bg-background/40 p-4 md:flex-row md:items-center md:justify-between">
             <div className="flex items-center gap-2">
-              <CheckCircle2 className="w-5 h-5 text-green-500" />
+              <CheckCircle2 className="w-5 h-5 text-primary" />
               <h3 className="font-semibold">
                 {results.length} optimized for {destination.label}
               </h3>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               {results.length > 1 && (
-                <Button size="sm" onClick={() => downloadAllAsZip(results)}>
+                <Button size="sm" onClick={() => downloadAllAsZip(results)} className="bg-primary text-primary-foreground shadow-[var(--shadow-glow)] hover:bg-primary/90">
                   <FileArchive className="w-3.5 h-3.5 mr-1" />
                   Download ZIP
                 </Button>
@@ -414,34 +499,34 @@ export const MagicOptimize = ({ isSubscribed = false }: MagicOptimizeProps) => {
           </div>
 
           {/* Summary strip */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-border">
-            <div className="p-4 bg-card">
+          <div className="grid grid-cols-2 gap-px bg-border/40 sm:grid-cols-4">
+            <div className="bg-background/60 p-4 backdrop-blur-md">
               <p className="text-[11px] uppercase text-muted-foreground">Saved</p>
-              <p className="text-lg font-bold text-green-600">{formatBytes(totals.saved)}</p>
+              <p className="text-lg font-bold text-primary">{formatBytes(totals.saved)}</p>
             </div>
-            <div className="p-4 bg-card">
+            <div className="bg-background/60 p-4 backdrop-blur-md">
               <p className="text-[11px] uppercase text-muted-foreground">Avg compression</p>
               <p className="text-lg font-bold">{totals.avgRatio}%</p>
             </div>
-            <div className="p-4 bg-card">
+            <div className="bg-background/60 p-4 backdrop-blur-md">
               <p className="text-[11px] uppercase text-muted-foreground">Est. speed gain</p>
               <p className="text-lg font-bold text-primary">+{totals.speed}%</p>
             </div>
-            <div className="p-4 bg-card">
+            <div className="bg-background/60 p-4 backdrop-blur-md">
               <p className="text-[11px] uppercase text-muted-foreground">Total optimized</p>
               <p className="text-lg font-bold">{formatBytes(totals.optimized)}</p>
             </div>
           </div>
 
-          <div className="divide-y divide-border">
+          <div className="divide-y divide-border/40">
             {results.map((r) => {
               const quality = qualityRetained(r.compressionRatio);
               const speed = estimatePageSpeedGain(r.originalSize / 1024, (r.originalSize - r.optimizedSize) / 1024);
               const isOpen = openSlider === r.seoFileName;
               return (
-                <div key={r.seoFileName} className="p-4 space-y-3">
+                <div key={r.seoFileName} className="space-y-4 p-4 md:p-5">
                   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                    <div className="w-16 h-16 rounded-lg overflow-hidden bg-muted flex-shrink-0">
+                    <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-xl border border-border/40 bg-muted/50 shadow-[var(--shadow-card)]">
                       <img src={r.url} alt={r.altText} className="w-full h-full object-cover" />
                     </div>
 
@@ -460,7 +545,7 @@ export const MagicOptimize = ({ isSubscribed = false }: MagicOptimizeProps) => {
                       </div>
 
                       <div className="flex flex-wrap gap-1.5 pt-0.5">
-                        <Badge variant="outline" className="text-[10px] border-green-500/30 text-green-600">
+                        <Badge variant="outline" className="text-[10px] border-primary/20 bg-primary/5 text-foreground">
                           ✓ {r.compressionRatio}% smaller
                         </Badge>
                         <Badge variant="outline" className="text-[10px] border-primary/30 text-primary">
@@ -487,7 +572,7 @@ export const MagicOptimize = ({ isSubscribed = false }: MagicOptimizeProps) => {
                           </>
                         )}
                       </Button>
-                      <Button size="sm" onClick={() => downloadResult(r)} className="bg-gradient-to-r from-primary to-purple-500">
+                      <Button size="sm" onClick={() => downloadResult(r)} className="bg-primary text-primary-foreground shadow-[var(--shadow-glow)] hover:bg-primary/90">
                         <Download className="w-3.5 h-3.5 mr-1" />
                         Download
                       </Button>
@@ -504,7 +589,7 @@ export const MagicOptimize = ({ isSubscribed = false }: MagicOptimizeProps) => {
                   )}
 
                   {/* AI Recommendations */}
-                  <div className="rounded-lg border border-primary/20 bg-primary/5 p-3">
+                  <div className="rounded-xl border border-primary/20 bg-primary/5 p-3 backdrop-blur-md">
                     <div className="flex items-center gap-2 mb-2">
                       <Wand2 className="w-3.5 h-3.5 text-primary" />
                       <span className="text-xs font-semibold">Your image could improve further by:</span>

@@ -56,7 +56,7 @@ const toolTitles: Record<ToolCategory, { title: string; description: string; gra
   "magic-optimize": {
     title: "Magic Optimize",
     description: "Pick a destination and we'll optimize automatically — Apple-level simple",
-    gradient: "from-purple-500/10 via-pink-500/5 to-transparent",
+    gradient: "from-primary/18 via-accent/10 to-transparent",
   },
   "quick-optimize": {
     title: "Quick Optimize",
@@ -426,10 +426,10 @@ const Index = () => {
                 transition={{ duration: 0.2, ease: "easeOut" }}
                 className="mb-6"
               >
-                <div className={`relative rounded-2xl p-6 mb-2 bg-gradient-to-r ${currentTool.gradient} overflow-hidden`}>
-                  {/* Decorative elements */}
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl" />
-                  <div className="absolute bottom-0 left-1/2 w-24 h-24 bg-accent/5 rounded-full translate-y-1/2 blur-xl" />
+                <div className={`relative mb-2 overflow-hidden rounded-2xl border border-border/40 bg-gradient-to-r ${currentTool.gradient} p-6 backdrop-blur-xl`}>
+                  <div className="absolute inset-0 bg-[linear-gradient(135deg,hsl(var(--background)/0.35),transparent_55%)]" />
+                  <div className="absolute -right-12 top-0 h-36 w-36 rounded-full bg-primary/10 blur-3xl" />
+                  <div className="absolute bottom-0 left-1/3 h-28 w-28 rounded-full bg-accent/10 blur-2xl" />
                   <h1 className="text-2xl font-bold mb-1 relative">{currentTool.title}</h1>
                   <p className="text-muted-foreground relative">{currentTool.description}</p>
                 </div>

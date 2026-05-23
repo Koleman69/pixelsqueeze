@@ -34,7 +34,9 @@ function isStandalonePwa() {
     || (window.navigator as Navigator & { standalone?: boolean }).standalone === true;
 }
 
-async function saveBlob(blob: Blob, fileName: string) {
+type SaveBlobResult = 'shared' | 'downloaded' | 'opened';
+
+async function saveBlob(blob: Blob, fileName: string): Promise<SaveBlobResult> {
   const prefersNativeShare = isAppleMobileDevice() || isStandalonePwa();
   const shareFile = new File([blob], fileName, { type: blob.type || 'application/octet-stream' });
 
@@ -45,13 +47,20 @@ async function saveBlob(blob: Blob, fileName: string) {
           files: [shareFile],
           title: fileName,
         });
-        return;
+        return 'shared';
       }
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {
-        return;
+        return 'shared';
       }
     }
+  }
+
+  if (prefersNativeShare && typeof window !== 'undefined') {
+    const previewUrl = URL.createObjectURL(blob);
+    window.open(previewUrl, '_blank', 'noopener,noreferrer');
+    setTimeout(() => URL.revokeObjectURL(previewUrl), 60000);
+    return 'opened';
   }
 
   if (typeof window !== 'undefined' && typeof document !== 'undefined') {
@@ -68,7 +77,7 @@ async function saveBlob(blob: Blob, fileName: string) {
       if (link.parentNode) document.body.removeChild(link);
       URL.revokeObjectURL(href);
     }, 60000);
-    return;
+    return 'downloaded';
   }
 
   throw new Error('Download is not supported in this environment.');
@@ -154,11 +163,18 @@ export function useOptimizationPipeline() {
 
   const downloadResult = useCallback(async (result: PipelineResult) => {
     try {
-      await saveBlob(result.blob, result.seoFileName);
-      toast({
-        title: 'Download started',
-        description: `Saving ${result.seoFileName}`,
-      });
+      const status = await saveBlob(result.blob, result.seoFileName);
+      toast(
+        status === 'opened'
+          ? {
+              title: 'Opened file preview',
+              description: 'Your device may block direct downloads here, so the file opened in a new tab for saving.',
+            }
+          : {
+              title: 'Download started',
+              description: `Saving ${result.seoFileName}`,
+            }
+      );
     } catch (error) {
       console.error('Download failed:', error);
       window.open(result.url, '_blank', 'noopener,noreferrer');
@@ -186,11 +202,18 @@ export function useOptimizationPipeline() {
     
     try {
       const zipBlob = await zip.generateAsync({ type: 'blob' });
-      await saveBlob(zipBlob, `optimized-images-${Date.now()}.zip`);
-      toast({
-        title: 'ZIP ready',
-        description: `Preparing ${results.length} optimized file${results.length > 1 ? 's' : ''} for download.`,
-      });
+      const status = await saveBlob(zipBlob, `optimized-images-${Date.now()}.zip`);
+      toast(
+        status === 'opened'
+          ? {
+              title: 'ZIP opened in a new tab',
+              description: 'If the file does not save automatically on your device, use Share or Save to Files from the preview.',
+            }
+          : {
+              title: 'ZIP ready',
+              description: `Preparing ${results.length} optimized file${results.length > 1 ? 's' : ''} for download.`,
+            }
+      );
     } catch (error) {
       console.error('ZIP download failed:', error);
       toast({

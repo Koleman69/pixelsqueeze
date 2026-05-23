@@ -166,7 +166,7 @@ function SidebarContentArea({ activeTool, onToolChange, isSubscribed }: SidebarC
       <SidebarHeader className="border-b border-sidebar-border/70 bg-sidebar-background/80 backdrop-blur-xl">
         <div className="flex items-center justify-between p-2">
           <div className="flex items-center gap-2">
-            <div className="rounded-lg border border-primary/15 bg-primary/10 p-1.5 shadow-[var(--shadow-glow)]">
+            <div className="rounded-lg border border-primary/20 bg-primary/10 p-1.5 shadow-[var(--shadow-glow)]">
               <Minimize2 className="h-4 w-4 text-primary shrink-0" />
             </div>
             {!isCollapsed && (
@@ -244,7 +244,7 @@ function SidebarContentArea({ activeTool, onToolChange, isSubscribed }: SidebarC
       {!isSubscribed && !isCollapsed && (
         <SidebarFooter className="border-t border-sidebar-border">
             <div className="p-2">
-            <div className="rounded-xl border border-primary/15 bg-gradient-to-br from-primary/10 via-accent/10 to-background/40 p-4 shadow-[var(--shadow-card)] backdrop-blur-xl">
+            <div className="rounded-xl border border-primary/20 bg-gradient-to-br from-primary/10 via-accent/10 to-background/40 p-4 shadow-[var(--shadow-card)] backdrop-blur-xl">
               <div className="flex items-center gap-2 mb-2">
                 <Crown className="w-5 h-5 text-amber-500" />
                 <span className="font-semibold text-sm">Upgrade to Pro</span>

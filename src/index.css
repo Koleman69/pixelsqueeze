@@ -6,79 +6,77 @@
 
 @layer base {
   :root {
-    /* iOS-friendly clean color palette */
-    --background: 0 0% 100%;
-    --foreground: 222 47% 11%;
+    /* Navy Trust palette — institutional, premium, trustworthy */
+    --background: 214 26% 93%;         /* #e8edf3 */
+    --foreground: 224 61% 15%;         /* #0f1b3d */
 
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card-foreground: 224 61% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover-foreground: 224 61% 15%;
 
-    /* iOS blue primary - system color */
-    --primary: 211 100% 50%;
+    /* Primary accent — mid navy */
+    --primary: 210 46% 43%;            /* #3b6fa0 */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222 47% 11%;
+    --secondary: 213 52% 25%;          /* #1e3a5f */
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
+    --muted: 214 20% 88%;
+    --muted-foreground: 213 30% 35%;
 
-    --accent: 211 100% 50%;
+    /* Deep navy for high-contrast CTAs */
+    --accent: 224 61% 15%;             /* #0f1b3d */
     --accent-foreground: 0 0% 100%;
 
-    /* Status colors - iOS semantic colors */
-    --profit-green: 142 71% 45%;
+    /* Status */
+    --profit-green: 152 55% 38%;
     --profit-green-foreground: 0 0% 100%;
-    
+
     --warning-yellow: 38 92% 50%;
-    --warning-yellow-foreground: 0 0% 100%;
-    
-    --loss-red: 0 84% 60%;
+    --warning-yellow-foreground: 224 61% 15%;
+
+    --loss-red: 0 72% 51%;
     --loss-red-foreground: 0 0% 100%;
 
-    --destructive: 0 84% 60%;
+    --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 211 100% 50%;
+    --border: 213 30% 84%;
+    --input: 213 30% 84%;
+    --ring: 210 46% 43%;
 
-    --radius: 0.875rem;
+    --radius: 1rem;
 
-    /* Mobile-optimized gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(211 100% 50%), hsl(211 100% 60%));
-    --gradient-profit: linear-gradient(135deg, hsl(142 71% 45%), hsl(142 71% 55%));
-    --gradient-loss: linear-gradient(135deg, hsl(0 84% 60%), hsl(0 84% 70%));
-    --gradient-hero: linear-gradient(180deg, hsl(210 40% 98%), hsl(0 0% 100%));
-    
-    /* Subtle iOS shadows */
-    --shadow-glow: 0 4px 20px hsl(211 100% 50% / 0.15);
-    --shadow-profit: 0 4px 16px hsl(142 71% 45% / 0.2);
-    --shadow-loss: 0 4px 16px hsl(0 84% 60% / 0.2);
-    --shadow-card: 0 2px 8px hsl(0 0% 0% / 0.06);
-    
-    /* Smooth iOS animations */
+    --gradient-primary: linear-gradient(135deg, hsl(224 61% 15%), hsl(213 52% 25%));
+    --gradient-profit: linear-gradient(135deg, hsl(152 55% 38%), hsl(152 55% 48%));
+    --gradient-loss: linear-gradient(135deg, hsl(0 72% 51%), hsl(0 72% 61%));
+    --gradient-hero: linear-gradient(180deg, hsl(214 26% 96%), hsl(214 26% 93%));
+
+    --shadow-glow: 0 10px 30px -10px hsl(224 61% 15% / 0.25);
+    --shadow-profit: 0 4px 16px hsl(152 55% 38% / 0.2);
+    --shadow-loss: 0 4px 16px hsl(0 72% 51% / 0.2);
+    --shadow-card: 0 1px 3px hsl(224 61% 15% / 0.04), 0 8px 24px -8px hsl(224 61% 15% / 0.08);
+
     --transition-smooth: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-glow: all 0.3s ease-in-out;
 
-    /* Safe area insets for notched devices */
     --safe-area-top: env(safe-area-inset-top, 0px);
     --safe-area-bottom: env(safe-area-inset-bottom, 0px);
     --safe-area-left: env(safe-area-inset-left, 0px);
     --safe-area-right: env(safe-area-inset-right, 0px);
 
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 211 100% 50%;
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 213 30% 35%;
+    --sidebar-primary: 210 46% 43%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 210 40% 96%;
-    --sidebar-accent-foreground: 222 47% 11%;
-    --sidebar-border: 214 32% 91%;
-    --sidebar-ring: 211 100% 50%;
+    --sidebar-accent: 214 26% 93%;
+    --sidebar-accent-foreground: 224 61% 15%;
+    --sidebar-border: 213 30% 84%;
+    --sidebar-ring: 210 46% 43%;
   }
+
 
   .dark {
     --background: 222 47% 6%;

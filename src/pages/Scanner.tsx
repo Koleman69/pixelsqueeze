@@ -80,20 +80,6 @@ const Scanner = () => {
     e.preventDefault();
     if (!url.trim()) return;
 
-    // Free-trial gate for unauthenticated users (1 free scan)
-    const { data: sessionData } = await supabase.auth.getSession();
-    if (!sessionData.session) {
-      const used = localStorage.getItem("scanner_free_used");
-      if (used) {
-        toast({
-          title: "Free scan used",
-          description: "Sign up free to keep scanning websites.",
-          variant: "destructive",
-        });
-        return;
-      }
-    }
-
     setIsScanning(true);
     setResult(null);
     setScreenshot(null);
@@ -104,14 +90,10 @@ const Scanner = () => {
       });
 
       if (error) throw error;
-      if (!data.success) throw new Error(data.error);
+      if (!data?.success) throw new Error(data?.error || "Scan failed");
 
       setResult(data.data);
       setScreenshot(data.screenshot || null);
-
-      if (!sessionData.session) {
-        localStorage.setItem("scanner_free_used", new Date().toISOString());
-      }
     } catch (error: any) {
       toast({
         title: "Scan Failed",
@@ -122,6 +104,7 @@ const Scanner = () => {
       setIsScanning(false);
     }
   };
+
 
   const totalSavings = result
     ? result.totalCurrentSize - result.totalOptimizedSize

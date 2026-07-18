@@ -16,21 +16,16 @@ import {
   CheckCircle,
   ArrowRight,
   Star,
-  HelpCircle,
-  Download,
   Search,
   ShoppingCart,
   PenTool,
   Home,
   Hotel,
-  FolderSync,
-  Target,
-  AlertTriangle,
-  Gauge,
-  ImageDown,
-  Clock,
-  TrendingUp,
-  FileCheck,
+  Instagram,
+  Globe,
+  Sparkles,
+  Layers,
+  Lock,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 const BeforeAfterSlider = lazy(() =>
@@ -48,537 +43,480 @@ const Landing = () => {
   useUtmTracking();
 
   return (
-    <div className="min-h-screen bg-background" role="document">
-      {/* ─── Navigation (Compressor.io-style: minimal) ─── */}
-      <nav className="bg-background border-b border-border/60 px-6 py-4 sticky top-0 z-50" aria-label="Main navigation">
-        <div className="max-w-6xl mx-auto flex justify-between items-center">
-          <Link to="/" className="flex items-center gap-2">
-            <Minimize2 className="w-7 h-7 text-primary" />
-            <span className="text-xl font-bold tracking-tight text-foreground">
+    <div className="min-h-screen bg-background text-foreground" role="document">
+      {/* ─── Navigation ─── */}
+      <nav className="sticky top-0 z-50 backdrop-blur-xl bg-background/80 border-b border-border/60" aria-label="Main navigation">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+          <Link to="/" className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center">
+              <Minimize2 className="w-4 h-4 text-accent-foreground" />
+            </div>
+            <span className="text-xl font-bold tracking-tight font-display text-foreground">
               PixelSqueeze
             </span>
           </Link>
-          <div className="hidden md:flex items-center gap-10">
-            <a href="#features" className="text-foreground/80 hover:text-foreground transition-colors text-base font-medium">
-              Features
-            </a>
-            <Link to="/pricing">
-              <Button size="sm" className="bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90 px-5 rounded-full font-semibold">
-                Go Premium
-              </Button>
+          <div className="hidden md:flex items-center gap-8">
+            <a href="#features" className="text-sm font-medium text-foreground/70 hover:text-foreground transition-colors">Features</a>
+            <a href="#pricing" className="text-sm font-medium text-foreground/70 hover:text-foreground transition-colors">Pricing</a>
+            <Link to="/scanner" className="text-sm font-medium text-foreground/70 hover:text-foreground transition-colors">Scanner</Link>
+            <Link to="/auth">
+              <Button variant="ghost" size="sm" className="text-foreground font-semibold">Sign in</Button>
             </Link>
             <Link to="/auth">
-              <Button size="sm" className="bg-purple-600 text-white hover:bg-purple-700 rounded-full px-5 font-semibold">
-                Sign In
+              <Button size="sm" className="bg-accent text-accent-foreground hover:bg-secondary rounded-xl px-5 font-semibold shadow-glow">
+                Get started
               </Button>
             </Link>
           </div>
           <div className="flex md:hidden items-center gap-2">
-            <Link to="/pricing">
-              <Button size="sm" className="bg-gradient-primary rounded-full">Go Premium</Button>
-            </Link>
             <Link to="/auth">
-              <Button size="sm" className="bg-purple-600 text-white hover:bg-purple-700 rounded-full font-semibold">Sign In</Button>
+              <Button size="sm" className="bg-accent text-accent-foreground rounded-xl font-semibold">Get started</Button>
             </Link>
           </div>
         </div>
       </nav>
 
-      {/* ─── HERO (Compressor.io-style: big centered headline + dropzone CTA) ─── */}
       <main id="main-content">
-      <section className="relative px-6 pt-16 md:pt-24 pb-20 overflow-hidden" aria-labelledby="hero-heading">
-        {/* Diagonal brand accents */}
-        <div
-          aria-hidden="true"
-          className="absolute -left-32 top-8 w-[55%] h-[420px] bg-gradient-primary opacity-90 hidden md:block"
-          style={{ clipPath: "polygon(0 0, 100% 35%, 0 70%)" }}
-        />
-        <div
-          aria-hidden="true"
-          className="absolute -right-32 bottom-0 w-[55%] h-[420px] bg-gradient-primary opacity-90 hidden md:block"
-          style={{ clipPath: "polygon(100% 30%, 100% 100%, 0 70%)" }}
-        />
+        {/* ─── HERO BENTO ─── */}
+        <section className="px-6 pt-10 md:pt-16 pb-16" aria-labelledby="hero-heading">
+          <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-5">
 
-        <div className="relative max-w-3xl mx-auto text-center">
-          <h1
-            id="hero-heading"
-            className="text-5xl sm:text-6xl md:text-7xl font-bold mb-8 leading-[1.05] text-foreground tracking-tight"
-          >
-            Fast &amp; efficient image{" "}
-            <span className="block bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-              compression
-            </span>
-          </h1>
-
-          <div className="inline-flex items-center justify-center bg-purple-600 text-black rounded-full px-6 py-2.5 mb-12 text-sm sm:text-base font-semibold shadow-md">
-            Optimize JPEG, PNG, WebP, AVIF &amp; SVG
-          </div>
-
-          {/* Dropzone-styled CTA card (routes to /auth — no anonymous compression) */}
-          <Link to="/auth" aria-label="Sign up to optimize images" className="block group">
-            <div className="bg-card border-2 border-dashed border-primary/50 rounded-2xl p-10 sm:p-14 shadow-sm hover:shadow-glow hover:border-primary transition-all">
-              <div className="flex flex-col items-center gap-4">
-                <div className="w-20 h-20 rounded-2xl bg-gradient-primary/10 flex items-center justify-center group-hover:scale-105 transition-transform">
-                  <Upload className="w-10 h-10 text-primary" />
+            {/* Hero Header Card */}
+            <div className="lg:col-span-8 bg-card p-8 md:p-12 rounded-3xl border border-primary/10 shadow-card flex flex-col justify-center space-y-6">
+              <div className="inline-flex items-center gap-2 bg-secondary/5 border border-secondary/10 rounded-full px-4 py-1.5 w-fit">
+                <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse" />
+                <span className="text-[11px] font-bold uppercase tracking-widest text-secondary">Magic Optimize · Live</span>
+              </div>
+              <h1
+                id="hero-heading"
+                className="font-display text-4xl sm:text-5xl md:text-6xl font-bold leading-[1.05] tracking-tight text-foreground"
+              >
+                Upload once.<br />
+                <span className="text-primary">Perfect for everywhere.</span>
+              </h1>
+              <p className="text-lg text-foreground/70 max-w-xl leading-relaxed">
+                Destination-aware image optimization for creators, sellers, and teams who value quality — and their time.
+              </p>
+              <div className="flex flex-wrap items-center gap-4 pt-2">
+                <Link to="/auth">
+                  <Button size="lg" className="bg-accent text-accent-foreground hover:bg-secondary rounded-xl px-7 h-12 font-semibold shadow-glow">
+                    Start optimizing free
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
+                </Link>
+                <div className="flex items-center gap-3">
+                  <div className="flex -space-x-2">
+                    <div className="h-9 w-9 rounded-full border-2 border-card bg-gradient-to-br from-primary to-secondary" />
+                    <div className="h-9 w-9 rounded-full border-2 border-card bg-gradient-to-br from-secondary to-accent" />
+                    <div className="h-9 w-9 rounded-full border-2 border-card bg-gradient-to-br from-accent to-primary" />
+                  </div>
+                  <div className="text-sm">
+                    <div className="flex items-center gap-0.5 text-warning">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} className="w-3.5 h-3.5 fill-current" />
+                      ))}
+                    </div>
+                    <p className="text-xs text-foreground/60 font-medium">Joined by 12,000+ creators</p>
+                  </div>
                 </div>
-                <p className="text-xl sm:text-2xl font-semibold text-primary">
-                  Drop your images or click to start
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  Compress JPG, PNG, WebP, AVIF • Up to 100 images at once
-                </p>
-                <Button size="lg" className="mt-2 bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90 rounded-full px-8 font-semibold">
-                  <Upload className="w-4 h-4 mr-2" />
-                  Select files
-                </Button>
               </div>
             </div>
-          </Link>
 
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm text-muted-foreground">
-            <span className="inline-flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-primary" /> No quality loss</span>
-            <span className="inline-flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-primary" /> Free to start</span>
-            <span className="inline-flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-primary" /> Works in seconds</span>
-          </div>
-
-          <div className="mt-8">
-            <Link to="/scanner" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors underline-offset-4 hover:underline">
-              <Search className="w-4 h-4" />
-              Or scan your whole website for slow images
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ─── PROBLEM ─── */}
-      <section className="section-padding bg-secondary/20">
-        <div className="max-w-3xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 bg-destructive/10 text-destructive rounded-full px-4 py-2 mb-6 text-sm font-medium">
-            <AlertTriangle className="w-4 h-4" />
-            The Hidden Problem
-          </div>
-          <h2 className="section-title">Slow Images Are Costing You Customers</h2>
-          <p className="text-lg text-muted-foreground mb-10">
-            Most websites lose visitors before the page even finishes loading.
-            Large images silently cause:
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-xl mx-auto mb-10 text-left">
-            {[
-              "Lower Google rankings",
-              "Failed PageSpeed scores",
-              "Slow Shopify stores",
-              "Rejected marketplace uploads",
-              "Oversized email attachments",
-            ].map((item) => (
-              <div key={item} className="flex items-center gap-3 p-3 rounded-lg bg-card border border-border">
-                <div className="w-2 h-2 rounded-full bg-destructive shrink-0" />
-                <span className="text-sm text-foreground">{item}</span>
-              </div>
-            ))}
-          </div>
-          <p className="text-lg font-semibold text-foreground">
-            You don't need a new website.{" "}
-            <span className="text-primary">You need optimized images.</span>
-          </p>
-        </div>
-      </section>
-
-      {/* ─── SOLUTION ─── */}
-      <section className="section-padding" id="features">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="section-title">PixelSqueeze Fixes Images Automatically</h2>
-          <p className="section-subtitle">
-            Upload once or scan your website and PixelSqueeze handles everything:
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-            {[
-              { icon: ImageDown, text: "Compress without visible quality loss" },
-              { icon: FileCheck, text: "Convert to modern formats (WebP, AVIF)" },
-              { icon: Target, text: "Resize to correct dimensions" },
-              { icon: TrendingUp, text: "Generate SEO filenames & alt text" },
-              { icon: Shield, text: "Remove unnecessary metadata" },
-              { icon: Zap, text: "Prepare files for any platform" },
-            ].map(({ icon: Icon, text }) => (
-              <div key={text} className="flex items-start gap-3 p-4 rounded-xl bg-card border border-border">
-                <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                  <Icon className="w-5 h-5 text-primary" />
+            {/* Magic Optimize Tool Card */}
+            <div className="lg:col-span-4 bg-accent rounded-3xl p-7 flex flex-col justify-between text-accent-foreground relative overflow-hidden group">
+              <div aria-hidden className="absolute top-0 right-0 w-40 h-40 bg-primary/25 blur-3xl" />
+              <div className="relative z-10">
+                <div className="flex items-center gap-2 mb-5">
+                  <Sparkles className="w-4 h-4 text-primary" />
+                  <h3 className="text-base font-bold font-display tracking-tight">Magic Optimize</h3>
                 </div>
-                <span className="text-sm text-foreground leading-snug pt-1.5">{text}</span>
-              </div>
-            ))}
-          </div>
-          <p className="text-center text-muted-foreground font-medium">
-            No guessing. No settings. Just faster pages.
-          </p>
-        </div>
-      </section>
-
-      {/* ─── BEFORE / AFTER ─── */}
-      <section className="section-padding bg-secondary/20">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="section-title">See the Difference</h2>
-          <p className="section-subtitle !mb-8">
-            Slide to compare — same visual quality, dramatically smaller files
-          </p>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <Suspense fallback={<div className="aspect-video bg-secondary/30 rounded-lg animate-pulse" />}>
-              <BeforeAfterSlider
-                beforeImage={weddingBefore}
-                afterImage={weddingAfter}
-                title="Wedding Photo — 70% Smaller"
-                description="Crystal-clear quality preserved"
-              />
-              <BeforeAfterSlider
-                beforeImage={manBefore}
-                afterImage={manAfter}
-                title="Portrait — 65% Smaller"
-                description="Professional detail maintained"
-              />
-            </Suspense>
-          </div>
-        </div>
-      </section>
-
-      {/* ─── HOW IT WORKS ─── */}
-      <section className="section-padding" id="how-it-works">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="section-title">How It Works</h2>
-          <p className="section-subtitle">Three steps to faster pages</p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              {
-                step: "1",
-                title: "Choose Your Goal",
-                desc: "Website speed, social media, marketplace, email, or listing uploads",
-              },
-              {
-                step: "2",
-                title: "PixelSqueeze Optimizes",
-                desc: "AI selects the best format, size, and compression automatically",
-              },
-              {
-                step: "3",
-                title: "Download or Auto-Replace",
-                desc: "Use optimized files instantly or connect a folder for continuous optimization",
-              },
-            ].map(({ step, title, desc }) => (
-              <Card key={step} className="p-6 text-center relative overflow-hidden">
-                <div className="text-6xl font-black text-primary/10 absolute -top-2 -left-1">
-                  {step}
+                <div className="space-y-2.5">
+                  {[
+                    { icon: Instagram, label: "Instagram Grid", active: true },
+                    { icon: Globe, label: "Web (WebP High)" },
+                    { icon: ShoppingCart, label: "Amazon E-com" },
+                  ].map(({ icon: Icon, label, active }) => (
+                    <div
+                      key={label}
+                      className={`p-3.5 rounded-xl border flex items-center justify-between transition-colors ${
+                        active
+                          ? "bg-white/15 border-white/20"
+                          : "bg-white/5 border-white/10 opacity-70"
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={`p-1.5 rounded-lg ${active ? "bg-primary" : "bg-primary/40"}`}>
+                          <Icon className="w-4 h-4" />
+                        </div>
+                        <span className="font-medium text-sm">{label}</span>
+                      </div>
+                      <div className={`w-4 h-4 rounded-full border-2 ${active ? "border-primary bg-primary" : "border-white/30"}`} />
+                    </div>
+                  ))}
                 </div>
-                <div className="relative pt-6">
-                  <h3 className="text-lg font-semibold mb-2 text-foreground">{title}</h3>
-                  <p className="text-sm text-muted-foreground">{desc}</p>
+              </div>
+              <div className="mt-6 pt-5 border-t border-white/10 relative z-10">
+                <p className="text-[10px] text-white/50 uppercase font-bold tracking-widest mb-1">Status</p>
+                <p className="text-sm text-white/90">Optimizing for 3 destinations…</p>
+              </div>
+            </div>
+
+            {/* Proof Card */}
+            <div className="lg:col-span-3 bg-card border border-primary/10 rounded-3xl p-6 flex flex-col justify-between shadow-card">
+              <div>
+                <p className="text-primary font-bold text-[11px] uppercase tracking-widest mb-3">Efficiency</p>
+                <div className="flex items-end gap-0.5">
+                  <span className="text-5xl font-bold font-display text-foreground leading-none">94</span>
+                  <span className="text-xl font-bold text-foreground mb-1">%</span>
                 </div>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ─── WEBSITE SCANNER ─── */}
-      <section className="section-padding bg-secondary/20">
-        <div className="max-w-3xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary rounded-full px-4 py-2 mb-6 text-sm font-medium">
-            <Gauge className="w-4 h-4" />
-            Free Tool
-          </div>
-          <h2 className="section-title">See Exactly What's Slowing Your Site</h2>
-          <p className="text-lg text-muted-foreground mb-8">
-            Enter your website and get a speed improvement report showing:
-          </p>
-          <div className="grid grid-cols-2 gap-4 max-w-md mx-auto mb-10 text-left">
-            {[
-              "Problem images",
-              "Estimated load time saved",
-              "Downloadable fixed versions",
-              "Performance grade",
-            ].map((item) => (
-              <div key={item} className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-primary shrink-0" />
-                <span className="text-sm text-foreground">{item}</span>
+                <p className="text-sm text-foreground/60 leading-snug mt-2">Average size reduction with no perceptible quality loss.</p>
               </div>
-            ))}
-          </div>
-          <Link to="/scanner">
-            <Button size="lg" className="bg-gradient-primary text-primary-foreground px-8 py-6 text-lg">
-              <Search className="w-5 h-5 mr-2" />
-              Scan My Website Free
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </Button>
-          </Link>
-        </div>
-      </section>
-
-      {/* ─── USE CASES ─── */}
-      <section className="section-padding" id="use-cases">
-        <div className="max-w-5xl mx-auto">
-          <h2 className="section-title">Built for Your Industry</h2>
-          <p className="section-subtitle">
-            Faster pages, better rankings, more conversions — no matter your niche
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              {
-                icon: ShoppingCart,
-                title: "Online Stores",
-                desc: "Faster pages increase conversions and lower bounce rates",
-              },
-              {
-                icon: PenTool,
-                title: "Bloggers & Marketers",
-                desc: "Improve SEO rankings without changing your design",
-              },
-              {
-                icon: Home,
-                title: "Realtors & Listings",
-                desc: "Meet strict upload limits instantly",
-              },
-              {
-                icon: Hotel,
-                title: "Hotels & Travel",
-                desc: "Make booking pages load faster for mobile guests",
-              },
-            ].map(({ icon: Icon, title, desc }) => (
-              <Card key={title} className="p-6 border-t-4 border-t-primary">
-                <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                  <Icon className="w-5 h-5 text-primary" />
+              <div className="mt-5 bg-background rounded-2xl h-24 relative overflow-hidden">
+                <div className="absolute inset-0 flex">
+                  <div className="w-1/2 bg-muted h-full flex items-center justify-center text-[9px] text-foreground/60 font-bold tracking-widest">BEFORE</div>
+                  <div className="w-1/2 bg-primary h-full flex items-center justify-center text-[9px] text-primary-foreground font-bold tracking-widest">AFTER</div>
                 </div>
-                <h3 className="font-semibold mb-2 text-foreground">{title}</h3>
-                <p className="text-sm text-muted-foreground">{desc}</p>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ─── AUTOMATION ─── */}
-      <section className="section-padding bg-secondary/20">
-        <div className="max-w-3xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary rounded-full px-4 py-2 mb-6 text-sm font-medium">
-            <FolderSync className="w-4 h-4" />
-            Pro Feature
-          </div>
-          <h2 className="section-title">Stop Manually Fixing Images</h2>
-          <p className="text-lg text-muted-foreground mb-6">
-            Connect a folder or platform and PixelSqueeze works in the
-            background. New images become optimized automatically.
-          </p>
-          <div className="flex flex-wrap justify-center gap-3 mb-8">
-            {["Google Drive", "Dropbox", "Shopify", "Local Folders"].map((s) => (
-              <span key={s} className="px-4 py-2 rounded-full bg-card border border-border text-sm font-medium text-foreground">
-                {s}
-              </span>
-            ))}
-          </div>
-          <Link to="/auth">
-            <Button size="lg" variant="outline" className="px-8 py-6 text-lg">
-              <Crown className="w-5 h-5 mr-2 text-primary" />
-              Unlock Automation
-            </Button>
-          </Link>
-        </div>
-      </section>
-
-      {/* ─── RESULTS ─── */}
-      <section className="section-padding">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="section-title">Typical Improvements</h2>
-          <p className="section-subtitle">Real results measured across thousands of websites</p>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-            {[
-              { value: "70%", label: "Smaller images" },
-              { value: "1–3s", label: "Faster page loads" },
-              { value: "90+", label: "PageSpeed scores" },
-              { value: "0", label: "Rejected uploads" },
-            ].map(({ value, label }) => (
-              <div key={label} className="p-6 rounded-xl bg-card border border-border">
-                <p className="text-3xl md:text-4xl font-bold text-primary mb-1">{value}</p>
-                <p className="text-sm text-muted-foreground">{label}</p>
+                <div className="absolute top-0 bottom-0 left-1/2 w-0.5 bg-card shadow" />
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
+            </div>
 
-      {/* ─── PRICING ─── */}
-      <section className="section-padding bg-secondary/20" id="pricing">
-        <div className="max-w-5xl mx-auto">
-          <h2 className="section-title">Start Free — Upgrade Only If You Want Automation</h2>
-          <p className="section-subtitle">No credit card required</p>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            {/* Free */}
-            <Card className="p-8">
-              <h3 className="text-2xl font-bold mb-2 text-foreground">Free</h3>
-              <p className="text-muted-foreground mb-6">Manual tools, no storage</p>
-              <div className="text-4xl font-bold mb-6 text-foreground">
-                $0<span className="text-lg text-muted-foreground">/month</span>
+            {/* Testimonial Card */}
+            <div className="lg:col-span-5 bg-primary rounded-3xl p-8 text-primary-foreground flex flex-col justify-between">
+              <div className="flex justify-between items-start">
+                <div className="bg-white/20 p-3 rounded-2xl">
+                  <Sparkles className="w-6 h-6" />
+                </div>
+                <div className="text-right">
+                  <p className="text-2xl font-bold font-display leading-none">4.9</p>
+                  <p className="text-[10px] uppercase font-bold text-white/70 tracking-widest mt-1">User rating</p>
+                </div>
               </div>
-              <ul className="space-y-3 mb-8">
-                {[
-                  "Compress, resize & convert",
-                  "AI format selection",
-                  "Social media export",
-                  "Website scanner",
-                  "No file storage",
-                ].map((f) => (
-                  <li key={f} className="flex items-center gap-2 text-sm">
+              <blockquote className="text-lg md:text-xl font-medium leading-snug py-5">
+                "The Amazon preset alone saved our team 12 hours a week. It's the standard for our e-com workflow now."
+              </blockquote>
+              <div className="flex items-center gap-3">
+                <div className="h-9 w-9 rounded-full bg-white/25" />
+                <div className="text-xs">
+                  <p className="font-bold">Sarah Jenkins</p>
+                  <p className="opacity-70">E-com Director, Nordvick</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Pricing Hook Card */}
+            <div className="lg:col-span-4 bg-card border border-primary/10 rounded-3xl p-8 flex flex-col justify-center items-center text-center gap-4 shadow-card">
+              <p className="text-[11px] font-bold uppercase tracking-widest text-primary">Pro Subscription</p>
+              <div className="flex items-baseline">
+                <span className="text-sm font-bold text-secondary mr-1">$</span>
+                <span className="text-6xl font-bold font-display text-foreground leading-none">12</span>
+                <span className="text-sm font-medium text-foreground/60 ml-1">/mo</span>
+              </div>
+              <ul className="text-sm text-foreground/80 space-y-2 pb-2 w-full max-w-[240px]">
+                {["Unlimited Magic exports", "Every destination preset", "30-day cloud storage", "Priority processing"].map((f) => (
+                  <li key={f} className="flex items-center gap-2 justify-start">
                     <CheckCircle className="w-4 h-4 text-primary shrink-0" />
-                    <span className="text-foreground">{f}</span>
+                    <span>{f}</span>
                   </li>
                 ))}
               </ul>
-              <Link to="/auth">
-                <Button variant="outline" className="w-full">Get Started Free</Button>
+              <Link to="/pricing" className="w-full">
+                <Button className="w-full h-12 rounded-xl border-2 border-accent bg-transparent text-accent hover:bg-accent hover:text-accent-foreground transition-all font-semibold">
+                  Upgrade to Pro
+                </Button>
               </Link>
-            </Card>
+            </div>
+          </div>
 
-            {/* Pro */}
-            <Card className="p-8 border-primary relative overflow-hidden">
-              <div className="absolute top-0 right-0 bg-gradient-primary text-primary-foreground px-4 py-1 text-sm font-medium">
-                Popular
+          {/* Trust bar */}
+          <div className="max-w-7xl mx-auto mt-14 pt-8 border-t border-border">
+            <p className="text-center text-[11px] uppercase tracking-[0.2em] font-bold text-foreground/40 mb-6">
+              Trusted by teams shipping on
+            </p>
+            <div className="flex flex-wrap justify-center items-center gap-10 md:gap-16 opacity-50">
+              {["SHOPIFY", "ETSY", "SQUARESPACE", "AMAZON", "WOO"].map((b) => (
+                <span key={b} className="text-sm md:text-base font-display font-bold tracking-[0.2em] text-foreground">{b}</span>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ─── FEATURES ─── */}
+        <section id="features" className="px-6 py-20 md:py-28">
+          <div className="max-w-7xl mx-auto">
+            <div className="max-w-2xl mb-14">
+              <p className="text-[11px] font-bold uppercase tracking-widest text-primary mb-4">Features</p>
+              <h2 className="font-display text-3xl md:text-5xl font-bold text-foreground leading-tight">
+                Everything you'd expect from a $50/mo tool. Nothing you don't.
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              {[
+                {
+                  icon: Sparkles,
+                  title: "Magic Optimize",
+                  desc: "Pick a destination — Instagram, Amazon, Print, Web — and we auto-select the format, dimensions, and compression.",
+                  featured: true,
+                },
+                {
+                  icon: Layers,
+                  title: "Batch processing",
+                  desc: "Drop up to 100 files, download a single zip. Perfect for product catalogs and photo shoots.",
+                },
+                {
+                  icon: Globe,
+                  title: "Website scanner",
+                  desc: "Paste any URL — get a full image audit with performance grade, SEO score, and one-click fixes.",
+                },
+                {
+                  icon: Zap,
+                  title: "Modern formats",
+                  desc: "WebP and AVIF conversion for up to 80% smaller files that Google actually rewards.",
+                },
+                {
+                  icon: Lock,
+                  title: "Metadata cleanup",
+                  desc: "Strip GPS, camera data, and personal info from every file — automatically.",
+                },
+                {
+                  icon: Shield,
+                  title: "Private by default",
+                  desc: "Free tier processes locally. Paid tiers use encrypted storage that auto-deletes after 30 days.",
+                },
+              ].map(({ icon: Icon, title, desc, featured }) => (
+                <div
+                  key={title}
+                  className={`p-7 rounded-3xl border transition-all hover:-translate-y-0.5 ${
+                    featured
+                      ? "bg-accent border-accent text-accent-foreground shadow-glow"
+                      : "bg-card border-primary/10 text-foreground shadow-card hover:border-primary/30"
+                  }`}
+                >
+                  <div className={`w-11 h-11 rounded-xl mb-5 flex items-center justify-center ${featured ? "bg-primary" : "bg-primary/10"}`}>
+                    <Icon className={`w-5 h-5 ${featured ? "text-primary-foreground" : "text-primary"}`} />
+                  </div>
+                  <h3 className={`font-display text-lg font-bold mb-2 ${featured ? "text-accent-foreground" : "text-foreground"}`}>{title}</h3>
+                  <p className={`text-sm leading-relaxed ${featured ? "text-white/70" : "text-foreground/60"}`}>{desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ─── BEFORE / AFTER PROOF ─── */}
+        <section className="px-6 py-20 md:py-28 bg-card">
+          <div className="max-w-7xl mx-auto">
+            <div className="max-w-2xl mb-12">
+              <p className="text-[11px] font-bold uppercase tracking-widest text-primary mb-4">Proof</p>
+              <h2 className="font-display text-3xl md:text-5xl font-bold text-foreground leading-tight">
+                Same photo. Same eyes. A fraction of the file.
+              </h2>
+              <p className="text-lg text-foreground/60 mt-4">Slide to compare originals with Magic-optimized output.</p>
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Suspense fallback={<div className="aspect-video bg-muted rounded-2xl animate-pulse" />}>
+                <BeforeAfterSlider
+                  beforeImage={weddingBefore}
+                  afterImage={weddingAfter}
+                  title="Wedding photo — 70% smaller"
+                  description="Crystal-clear quality preserved"
+                />
+                <BeforeAfterSlider
+                  beforeImage={manBefore}
+                  afterImage={manAfter}
+                  title="Portrait — 65% smaller"
+                  description="Professional detail maintained"
+                />
+              </Suspense>
+            </div>
+          </div>
+        </section>
+
+        {/* ─── WHO IT'S FOR ─── */}
+        <section className="px-6 py-20 md:py-28">
+          <div className="max-w-7xl mx-auto">
+            <div className="max-w-2xl mb-12">
+              <p className="text-[11px] font-bold uppercase tracking-widest text-primary mb-4">Built for</p>
+              <h2 className="font-display text-3xl md:text-5xl font-bold text-foreground leading-tight">
+                Everyone who publishes images.
+              </h2>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {[
+                { icon: ShoppingCart, title: "Ecom sellers", desc: "Amazon, Shopify, Etsy — every marketplace has different specs." },
+                { icon: PenTool, title: "Creators", desc: "Instagram, TikTok, LinkedIn — perfect crops in one click." },
+                { icon: Home, title: "Realtors", desc: "Listing photos that hit MLS specs, instantly." },
+                { icon: Hotel, title: "Hospitality", desc: "Faster booking pages that convert mobile guests." },
+              ].map(({ icon: Icon, title, desc }) => (
+                <div key={title} className="p-6 rounded-2xl bg-card border border-primary/10 shadow-card">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                    <Icon className="w-5 h-5 text-primary" />
+                  </div>
+                  <h3 className="font-display font-bold text-foreground mb-1.5">{title}</h3>
+                  <p className="text-sm text-foreground/60 leading-snug">{desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ─── PRICING ─── */}
+        <section id="pricing" className="px-6 py-20 md:py-28 bg-card">
+          <div className="max-w-5xl mx-auto">
+            <div className="text-center mb-14">
+              <p className="text-[11px] font-bold uppercase tracking-widest text-primary mb-4">Pricing</p>
+              <h2 className="font-display text-3xl md:text-5xl font-bold text-foreground leading-tight">
+                Simple pricing. Cancel anytime.
+              </h2>
+              <p className="text-lg text-foreground/60 mt-4">Start free. Upgrade only when you need more.</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-4xl mx-auto">
+              <div className="bg-background rounded-3xl border border-border p-8">
+                <p className="text-[11px] font-bold uppercase tracking-widest text-foreground/60 mb-2">Free</p>
+                <div className="flex items-baseline mb-2">
+                  <span className="text-5xl font-bold font-display text-foreground">$0</span>
+                  <span className="text-sm text-foreground/60 ml-2">/forever</span>
+                </div>
+                <p className="text-sm text-foreground/60 mb-6">Every core tool, no card required.</p>
+                <ul className="space-y-3 mb-8">
+                  {["Magic Optimize (3/day)", "All destination presets", "Batch up to 5 files", "Website scanner", "WebP & AVIF export"].map((f) => (
+                    <li key={f} className="flex items-center gap-2.5 text-sm text-foreground/80">
+                      <CheckCircle className="w-4 h-4 text-primary shrink-0" />{f}
+                    </li>
+                  ))}
+                </ul>
+                <Link to="/auth">
+                  <Button variant="outline" className="w-full h-11 rounded-xl border-2 border-border text-foreground hover:bg-muted font-semibold">
+                    Start free
+                  </Button>
+                </Link>
               </div>
-              <div className="flex items-center gap-2 mb-2">
-                <Crown className="w-6 h-6 text-primary" />
-                <h3 className="text-2xl font-bold text-foreground">Pro</h3>
+
+              <div className="bg-accent rounded-3xl p-8 text-accent-foreground relative overflow-hidden shadow-glow">
+                <div aria-hidden className="absolute -top-10 -right-10 w-40 h-40 bg-primary/30 blur-3xl" />
+                <div className="relative">
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-[11px] font-bold uppercase tracking-widest text-primary">Pro</p>
+                    <span className="text-[10px] font-bold uppercase tracking-widest bg-primary text-primary-foreground rounded-full px-2.5 py-1">Most popular</span>
+                  </div>
+                  <div className="flex items-baseline mb-2">
+                    <span className="text-5xl font-bold font-display">$12</span>
+                    <span className="text-sm opacity-70 ml-2">/month</span>
+                  </div>
+                  <p className="text-sm opacity-70 mb-6">For serious sellers and busy creators.</p>
+                  <ul className="space-y-3 mb-8">
+                    {[
+                      "Unlimited Magic Optimize",
+                      "Batch up to 100 files",
+                      "AI edits & background removal",
+                      "30-day cloud storage",
+                      "Folder & platform automation",
+                      "Priority processing",
+                    ].map((f) => (
+                      <li key={f} className="flex items-center gap-2.5 text-sm">
+                        <CheckCircle className="w-4 h-4 text-primary shrink-0" />{f}
+                      </li>
+                    ))}
+                  </ul>
+                  <Link to="/auth">
+                    <Button className="w-full h-11 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-semibold">
+                      Start 7-day free trial
+                    </Button>
+                  </Link>
+                </div>
               </div>
-              <p className="text-muted-foreground mb-6">Automation + scanner + 30-day storage</p>
-              <div className="text-4xl font-bold mb-6 text-foreground">
-                $6.95<span className="text-lg text-muted-foreground">/month</span>
-              </div>
-              <ul className="space-y-3 mb-8">
-                {[
-                  "Everything in Free",
-                  "Unlimited compressions",
-                  "Folder & platform automation",
-                  "Competitor intelligence",
-                  "Pro optimizer (print & web)",
-                  "AI video enhancement",
-                  "30-day file storage",
-                  "Priority support",
-                ].map((f) => (
-                  <li key={f} className="flex items-center gap-2 text-sm">
-                    <CheckCircle className="w-4 h-4 text-primary shrink-0" />
-                    <span className="text-foreground font-medium">{f}</span>
-                  </li>
-                ))}
-              </ul>
+            </div>
+          </div>
+        </section>
+
+        {/* ─── FAQ ─── */}
+        <section className="px-6 py-20 md:py-28">
+          <div className="max-w-3xl mx-auto">
+            <div className="text-center mb-10">
+              <p className="text-[11px] font-bold uppercase tracking-widest text-primary mb-4">FAQ</p>
+              <h2 className="font-display text-3xl md:text-5xl font-bold text-foreground leading-tight">Questions, answered.</h2>
+            </div>
+            <Accordion type="single" collapsible className="w-full space-y-3">
+              {[
+                { q: "How is Magic Optimize different from a normal compressor?", a: "Regular tools ask you to pick format, quality, and dimensions. Magic Optimize picks all of that for you based on where the image is going — Instagram, Amazon, Print, Web — so you never guess and never over-compress." },
+                { q: "Can I really use it for free?", a: "Yes. The free plan includes every core destination preset and the website scanner. Pro removes the daily cap and unlocks batch, automation, and cloud storage." },
+                { q: "Where are my images processed?", a: "Free plan processes in-browser. Paid plans use encrypted storage that auto-deletes after 30 days. Files are never shared, sold, or used for training." },
+                { q: "What formats are supported?", a: "JPEG, PNG, WebP, AVIF, and GIF in — WebP or AVIF out, sized correctly for your chosen destination." },
+                { q: "Can I cancel anytime?", a: "One click in your account. You keep Pro access until the end of your billing period." },
+              ].map(({ q, a }, i) => (
+                <AccordionItem key={i} value={`item-${i}`} className="bg-card rounded-2xl border border-primary/10 px-6 shadow-card">
+                  <AccordionTrigger className="text-left text-base font-semibold hover:no-underline font-display">{q}</AccordionTrigger>
+                  <AccordionContent className="text-foreground/70 pb-5 leading-relaxed">{a}</AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </div>
+        </section>
+
+        {/* ─── FINAL CTA ─── */}
+        <section className="px-6 py-20 md:py-28">
+          <div className="max-w-5xl mx-auto bg-accent rounded-[2rem] p-10 md:p-16 text-accent-foreground text-center relative overflow-hidden shadow-glow">
+            <div aria-hidden className="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-96 bg-primary/25 blur-3xl" />
+            <div className="relative">
+              <h2 className="font-display text-3xl md:text-5xl font-bold mb-4 leading-tight">
+                Your images deserve better tools.
+              </h2>
+              <p className="text-lg opacity-70 mb-8 max-w-xl mx-auto">
+                Try Magic Optimize free. No card, no watermarks, no fine print.
+              </p>
               <Link to="/auth">
-                <Button className="w-full bg-gradient-primary">Start Pro Trial</Button>
+                <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl px-8 h-12 font-semibold">
+                  <Upload className="w-4 h-4 mr-2" />
+                  Start optimizing free
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
               </Link>
-            </Card>
+            </div>
           </div>
-        </div>
-      </section>
-
-      {/* ─── FAQ ─── */}
-      <section className="section-padding">
-        <div className="max-w-3xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="section-title">Frequently Asked Questions</h2>
-          </div>
-          <Accordion type="single" collapsible className="w-full space-y-4">
-            {[
-              {
-                q: "How does PixelSqueeze optimize without losing quality?",
-                a: "AI analyzes each image and selects the best format, compression level, and dimensions — removing unnecessary metadata and converting to modern formats while preserving visual fidelity.",
-              },
-              {
-                q: "What formats are supported?",
-                a: "JPEG, PNG, WebP, GIF, and TIFF. PixelSqueeze auto-converts to the optimal format for your chosen goal.",
-              },
-              {
-                q: "Are my images stored on your servers?",
-                a: "Free tier has no storage. Paid plans store processed files for 30 days. All transfers are encrypted with 256-bit SSL.",
-              },
-              {
-                q: "Can I process multiple images at once?",
-                a: "Yes — batch processing supports 100+ images with automatic format selection, resizing, and compression.",
-              },
-              {
-                q: "What results can I expect?",
-                a: "Typical improvements: up to 70% smaller images, 1–3 second faster page loads, improved PageSpeed scores, and zero rejected uploads.",
-              },
-              {
-                q: "What's the difference between Free and Pro?",
-                a: "Free gives you all manual optimization tools. Pro adds folder automation, competitor scanning, pro optimizer, 30-day storage, and unlimited compressions.",
-              },
-              {
-                q: "Can I cancel anytime?",
-                a: "Absolutely. Cancel from your account settings and keep access until the end of your billing period.",
-              },
-            ].map(({ q, a }, i) => (
-              <AccordionItem key={i} value={`item-${i}`} className="bg-card rounded-lg border px-6">
-                <AccordionTrigger className="text-left text-base font-medium hover:no-underline">
-                  {q}
-                </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground pb-4">{a}</AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
-        </div>
-      </section>
-
-      {/* ─── FINAL CTA ─── */}
-      <section className="section-padding bg-secondary/20">
-        <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-3xl md:text-5xl font-bold mb-4 text-foreground">
-            Your Website Isn't Slow.{" "}
-            <span className="text-primary">Your Images Are.</span>
-          </h2>
-          <p className="text-lg text-muted-foreground mb-8">Fix them in seconds.</p>
-          <Link to="/auth">
-            <Button size="lg" className="bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90 px-10 py-6 text-lg">
-              <Upload className="w-5 h-5 mr-2" />
-              Optimize Images Free
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </Button>
-          </Link>
-        </div>
-      </section>
-
+        </section>
       </main>
 
       {/* ─── FOOTER ─── */}
       <footer className="border-t border-border bg-card">
-        <div className="max-w-7xl mx-auto px-6 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="max-w-7xl mx-auto px-6 py-14">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <Minimize2 className="w-6 h-6 text-primary" />
-                <span className="text-lg font-bold text-foreground">PixelSqueeze</span>
+                <div className="w-7 h-7 rounded-lg bg-accent flex items-center justify-center">
+                  <Minimize2 className="w-3.5 h-3.5 text-accent-foreground" />
+                </div>
+                <span className="text-base font-bold font-display text-foreground">PixelSqueeze</span>
               </div>
-              <p className="text-sm text-muted-foreground">
-                Image optimization built for real-world results, not technical
-                settings.
+              <p className="text-sm text-foreground/60 leading-relaxed">
+                Destination-aware image optimization. Built for creators who value quality and time.
               </p>
             </div>
             <div>
-              <h4 className="font-semibold mb-3 text-foreground">Product</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link to="/auth" className="hover:text-foreground transition-colors">Image Optimizer</Link></li>
+              <h4 className="font-display font-semibold mb-3 text-foreground text-sm">Product</h4>
+              <ul className="space-y-2 text-sm text-foreground/60">
+                <li><Link to="/auth" className="hover:text-foreground transition-colors">Magic Optimize</Link></li>
                 <li><Link to="/scanner" className="hover:text-foreground transition-colors">Website Scanner</Link></li>
                 <li><a href="#pricing" className="hover:text-foreground transition-colors">Pricing</a></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-3 text-foreground">Company</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
+              <h4 className="font-display font-semibold mb-3 text-foreground text-sm">Company</h4>
+              <ul className="space-y-2 text-sm text-foreground/60">
                 <li><Link to="/company" className="hover:text-foreground transition-colors">About</Link></li>
                 <li><Link to="/blog" className="hover:text-foreground transition-colors">Blog</Link></li>
-                <li><Link to="/privacy-policy" className="hover:text-foreground transition-colors">Privacy Policy</Link></li>
+                <li><Link to="/privacy" className="hover:text-foreground transition-colors">Privacy</Link></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-3 text-foreground">Resources</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
+              <h4 className="font-display font-semibold mb-3 text-foreground text-sm">Resources</h4>
+              <ul className="space-y-2 text-sm text-foreground/60">
                 <li><Link to="/install" className="hover:text-foreground transition-colors">Install App</Link></li>
-                <li><Link to="/promote" className="hover:text-foreground transition-colors">Affiliate Program</Link></li>
+                <li><Link to="/promote" className="hover:text-foreground transition-colors">Affiliate</Link></li>
               </ul>
             </div>
           </div>
-          <div className="mt-12 pt-8 border-t border-border text-center text-sm text-muted-foreground">
+          <div className="mt-12 pt-8 border-t border-border text-center text-xs text-foreground/50">
             © {new Date().getFullYear()} PixelSqueeze. All rights reserved.
           </div>
         </div>

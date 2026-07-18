@@ -18,9 +18,12 @@ export default {
     },
     extend: {
       fontFamily: {
-        'brand': ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'Segoe UI', 'Roboto', 'sans-serif'],
-        'body': ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Text', 'Segoe UI', 'Roboto', 'sans-serif'],
+        'display': ['"Space Grotesk"', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        'sans': ['"DM Sans"', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        'brand': ['"Space Grotesk"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        'body': ['"DM Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
       },
+
       spacing: {
         'safe-top': 'var(--safe-area-top)',
         'safe-bottom': 'var(--safe-area-bottom)',

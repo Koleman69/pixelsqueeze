@@ -24,6 +24,11 @@ const Install = lazy(() => import("./pages/Install"));
 const Promote = lazy(() => import("./pages/Promote"));
 const Pricing = lazy(() => import("./pages/Pricing"));
 const Scanner = lazy(() => import("./pages/Scanner"));
+const AIImageUpscaler = lazy(() => import("./pages/tools/AIImageUpscaler"));
+const ImageEnhancer = lazy(() => import("./pages/tools/ImageEnhancer"));
+const PhotoOptimizer = lazy(() => import("./pages/tools/PhotoOptimizer"));
+const WebsiteImageCompression = lazy(() => import("./pages/tools/WebsiteImageCompression"));
+const PrintReadyImages = lazy(() => import("./pages/tools/PrintReadyImages"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -118,6 +123,11 @@ const App = () => (
                 <Route path="/promote" element={<Promote />} />
                 <Route path="/pricing" element={<Pricing />} />
                 <Route path="/scanner" element={<Scanner />} />
+                <Route path="/tools/ai-image-upscaler" element={<AIImageUpscaler />} />
+                <Route path="/tools/image-enhancer" element={<ImageEnhancer />} />
+                <Route path="/tools/photo-optimizer" element={<PhotoOptimizer />} />
+                <Route path="/tools/website-image-compression" element={<WebsiteImageCompression />} />
+                <Route path="/tools/print-ready-images" element={<PrintReadyImages />} />
                 <Route path="/share/:shareCode" element={<SharedFile />} />
                 <Route path="/account" element={
                   <ProtectedRoute>

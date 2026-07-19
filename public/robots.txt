@@ -1,5 +1,5 @@
 # PixelSqueeze Robots.txt
-# https://pixelsqueeze.lovable.app
+# https://pixelsqueeze.app
 
 User-agent: *
 Allow: /
@@ -18,4 +18,4 @@ User-agent: Bingbot
 Allow: /
 Crawl-delay: 1
 
-Sitemap: https://pixelsqueeze.lovable.app/sitemap.xml
+Sitemap: https://pixelsqueeze.app/sitemap.xml

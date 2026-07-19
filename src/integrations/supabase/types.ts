@@ -498,6 +498,51 @@ export type Database = {
           },
         ]
       }
+      email_subscribers: {
+        Row: {
+          consent: boolean
+          consent_at: string | null
+          created_at: string
+          email: string
+          first_name: string | null
+          id: string
+          profession: string | null
+          source: string | null
+          tags: string[]
+          unsubscribe_token: string
+          unsubscribed_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          consent?: boolean
+          consent_at?: string | null
+          created_at?: string
+          email: string
+          first_name?: string | null
+          id?: string
+          profession?: string | null
+          source?: string | null
+          tags?: string[]
+          unsubscribe_token?: string
+          unsubscribed_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          consent?: boolean
+          consent_at?: string | null
+          created_at?: string
+          email?: string
+          first_name?: string | null
+          id?: string
+          profession?: string | null
+          source?: string | null
+          tags?: string[]
+          unsubscribe_token?: string
+          unsubscribed_at?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       file_jobs: {
         Row: {
           batch_job_id: string

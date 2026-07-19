@@ -90,18 +90,16 @@ Deno.serve(async (req) => {
 
 Rules:
 - Output ONLY valid JSON matching the requested schema, no markdown fences.
-- Article body MUST exceed 1,500 words of substantive HTML.
-- Use semantic HTML: <h2>, <h3>, <p>, <ul>, <ol>, <li>, <blockquote>, <strong>, <table>.
-- Open with a concise 40-55 word direct-answer paragraph (for featured snippets), then a short TL;DR bullet list.
-- Include at least one comparison <table>, one numbered how-to list, and one <blockquote>.
-- Weave 3-5 internal links to PixelSqueeze pages naturally in body text. Available URLs:
+- Article body MUST be 1,700-2,200 words of substantive HTML (this is a hard requirement — count as you write and expand if short).
+- Structure the article as: (1) 40-55 word direct-answer paragraph for featured snippets, (2) short TL;DR bullet list, (3) 7-10 <h2> sections each 180-260 words with supporting <h3> subheadings where useful, (4) one comparison <table>, (5) one numbered <ol> how-to list, (6) one <blockquote> tip, (7) closing CTA paragraph.
+- Use semantic HTML: <h2>, <h3>, <p>, <ul>, <ol>, <li>, <blockquote>, <strong>, <table>, <thead>, <tbody>, <tr>, <th>, <td>.
+- Weave 4-6 internal links to PixelSqueeze pages naturally in body text. Available URLs:
   /  /enhance  /pricing  /scanner  /for  /for/ecommerce  /for/real-estate  /for/social-media-creators
   /enhance/ai-image-upscaler  /enhance/image-enhancer  /enhance/sharpen-blurry-photos
   /enhance/increase-image-resolution  /enhance/background-removal  /tools/photo-optimizer
-- Add one inline image using this exact placeholder tag on its own line inside the article: [INLINE_IMAGE]
-- End with a strong call-to-action paragraph inviting the reader to try PixelSqueeze free.
-- FAQ answers must be 40-60 words each (featured-snippet length).
-- Tone: expert, practical, concrete numbers, no filler.`;
+- Add exactly one inline image using this exact placeholder tag on its own line inside the article: [INLINE_IMAGE]
+- FAQ answers must be 40-60 words each (featured-snippet length). Include 6 FAQs.
+- Tone: expert, practical, concrete numbers and file-size percentages, no filler, no "in today's fast-paced world" openings.`;
 
     const userPrompt = `Write a fresh 2026 SEO article about: "${topic}" — specifically how it relates to image quality, optimization, and PixelSqueeze's use cases. Angle it so it uniquely serves marketers, creators, or store owners.`;
 

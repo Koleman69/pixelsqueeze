@@ -295,7 +295,7 @@ export function DashboardOverview({ isSubscribed = false, onQuickAction }: Dashb
 
   // ─── Render ──────────────────────────────────────────────────────────────
   return (
-    <div className="rounded-3xl bg-slate-950 p-4 md:p-6 text-slate-100 shadow-[0_30px_80px_-40px_rgba(15,23,42,0.6)] ring-1 ring-slate-800/60">
+    <div className="rounded-2xl md:rounded-3xl bg-slate-950 p-3 sm:p-4 md:p-6 text-slate-100 shadow-[0_30px_80px_-40px_rgba(15,23,42,0.6)] ring-1 ring-slate-800/60 overflow-hidden">
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
         {/* ═════════════ FEED ═════════════ */}
         <div className="space-y-5 min-w-0">

@@ -380,9 +380,16 @@ const Index = () => {
       }
     })();
 
+    // Overview isn't a "tool" — skip the gate so the dashboard is always accessible.
+    if (activeTool === "overview") {
+      return <Suspense fallback={<ToolLoader />}>{content}</Suspense>;
+    }
+
     return (
       <Suspense fallback={<ToolLoader />}>
-        {content}
+        <FreeToolGate toolId={activeTool} isSubscribed={subscription.subscribed || !!subscription.is_trialing}>
+          {content}
+        </FreeToolGate>
       </Suspense>
     );
   };

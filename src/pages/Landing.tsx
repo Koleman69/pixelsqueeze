@@ -32,6 +32,7 @@ import weddingAfter from "@/assets/wedding-after.jpg";
 import manBefore from "@/assets/man-before.jpg";
 import manAfter from "@/assets/man-after.jpg";
 import SEO from "@/components/SEO";
+import AIAnswerBlock from "@/components/AIAnswerBlock";
 
 const Landing = () => {
   useUtmTracking();
@@ -437,8 +438,12 @@ const Landing = () => {
           </div>
         </section>
 
+        {/* AI ANSWER BLOCK — semantic Q&A + full schema stack for AI overviews */}
+        <AIAnswerBlock path="/" pageLabel="Overview" />
+
         {/* FINAL CTA */}
         <section className="px-6 pb-24">
+
           <div className="max-w-5xl mx-auto rounded-[2.5rem] p-10 md:p-16 text-center relative overflow-hidden shadow-glow bg-gradient-to-br from-primary via-secondary to-accent text-white">
             <div aria-hidden className="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-96 bg-white/20 blur-3xl" />
             <div className="relative">

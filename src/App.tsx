@@ -24,6 +24,11 @@ const Install = lazy(() => import("./pages/Install"));
 const Promote = lazy(() => import("./pages/Promote"));
 const Pricing = lazy(() => import("./pages/Pricing"));
 const Scanner = lazy(() => import("./pages/Scanner"));
+const AIImageUpscaler = lazy(() => import("./pages/tools/AIImageUpscaler"));
+const ImageEnhancer = lazy(() => import("./pages/tools/ImageEnhancer"));
+const PhotoOptimizer = lazy(() => import("./pages/tools/PhotoOptimizer"));
+const WebsiteImageCompression = lazy(() => import("./pages/tools/WebsiteImageCompression"));
+const PrintReadyImages = lazy(() => import("./pages/tools/PrintReadyImages"));
 
 const queryClient = new QueryClient({
   defaultOptions: {

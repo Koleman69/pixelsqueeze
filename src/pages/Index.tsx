@@ -25,6 +25,7 @@ const AICaptionGenerator = lazy(() => import("@/components/AICaptionGenerator").
 const FileProcessor = lazy(() => import("@/components/FileProcessor").then(m => ({ default: m.FileProcessor })));
 const AnalysisBoard = lazy(() => import("@/components/AnalysisBoard").then(m => ({ default: m.AnalysisBoard })));
 const SocialMediaExporter = lazy(() => import("@/components/SocialMediaExporter").then(m => ({ default: m.SocialMediaExporter })));
+const SocialStudio = lazy(() => import("@/components/SocialStudio").then(m => ({ default: m.SocialStudio })));
 const BatchAnalyticsDashboard = lazy(() => import("@/components/BatchAnalyticsDashboard").then(m => ({ default: m.BatchAnalyticsDashboard })));
 const CompetitorTracker = lazy(() => import("@/components/CompetitorTracker"));
 const AutomationFlow = lazy(() => import("@/components/AutomationFlow").then(m => ({ default: m.AutomationFlow })));

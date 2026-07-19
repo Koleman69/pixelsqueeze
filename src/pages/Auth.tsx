@@ -10,6 +10,7 @@ import { Loader2, Minimize2, ArrowLeft, Apple } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Separator } from "@/components/ui/separator";
 import { z } from "zod";
+import SEO from "@/components/SEO";
 
 const emailSchema = z.string().trim().email("Please enter a valid email address").max(255);
 

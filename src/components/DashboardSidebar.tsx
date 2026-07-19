@@ -23,6 +23,7 @@ import {
   LayoutDashboard,
   Send,
   Zap,
+  Gauge,
 } from "lucide-react";
 import {
   Sidebar,
@@ -65,7 +66,8 @@ export type ToolCategory =
   | "automation"
   | "distribute"
   | "workflows"
-  | "ai-enhance";
+  | "ai-enhance"
+  | "image-score";
 
 interface DashboardSidebarProps {
   activeTool: ToolCategory;
@@ -87,6 +89,7 @@ const toolCategories = [
     tools: [
       { id: "magic-optimize" as ToolCategory, label: "Magic Optimize", icon: Sparkles, description: "One-click by destination" },
       { id: "ai-enhance" as ToolCategory, label: "AI Enhance", icon: Zap, description: "Upscale, sharpen, denoise & more" },
+      { id: "image-score" as ToolCategory, label: "AI Image Score", icon: Gauge, description: "Grade & one-click fixes" },
       { id: "quick-optimize" as ToolCategory, label: "Quick Optimize", icon: Sparkles, description: "Goal-based optimization" },
       { id: "compress-image" as ToolCategory, label: "Compress", icon: Upload, description: "Reduce file size" },
       { id: "edit-image" as ToolCategory, label: "Edit & Transform", icon: Wand2, description: "AI editing" },

@@ -59,6 +59,7 @@ export type ToolCategory =
   | "ai-captions"
   | "ai-analyze"
   | "social-export"
+  | "social-studio"
   | "analytics"
   | "competitor"
   | "automation"

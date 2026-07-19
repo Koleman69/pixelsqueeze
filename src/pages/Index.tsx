@@ -216,33 +216,42 @@ const Index = () => {
 
   const handleFileUpload = () => { fileInputRef.current?.click(); };
 
+  const checkFreeQuota = async (toolId: string, amount: number): Promise<boolean> => {
+    if (subscription.subscribed || subscription.is_trialing) return true;
+    let email = user?.email as string | undefined;
+    if (!email) email = localStorage.getItem("pixelsqueeze_free_email") || undefined;
+    if (!email) {
+      toast({ title: "Enter your email to unlock free credits", description: "Open the tool page to enter your email and get 4 free credits.", variant: "destructive" });
+      return false;
+    }
+    const { data: current } = await supabase.rpc("get_free_tool_usage", { _email: email, _tool_id: toolId });
+    const usedNow = typeof current === "number" ? current : 0;
+    if (usedNow + amount > FREE_TOOL_LIMIT) {
+      toast({ title: "Free limit reached", description: `You've used your ${FREE_TOOL_LIMIT} free credits for this tool. Upgrade for unlimited access.`, variant: "destructive" });
+      return false;
+    }
+    const { error } = await supabase.rpc("consume_free_tool_usage", { _email: email, _tool_id: toolId, _amount: amount });
+    if (error) {
+      toast({ title: "Could not update usage", description: error.message, variant: "destructive" });
+      return false;
+    }
+    return true;
+  };
+
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files && files.length > 0) {
-      if (!subscription.subscribed && !subscription.is_trialing) {
-        if (dailyUsage.images >= FREE_LIMITS.images) {
-          toast({ title: "Daily Limit Reached", description: "Upgrade to Pro for unlimited compressions", variant: "destructive" });
-          return;
-        }
-      }
+      const ok = await checkFreeQuota("compress-image", files.length);
+      if (!ok) { event.target.value = ""; return; }
       setIsUploading(true);
       toast({ title: "Processing images", description: `Processing ${files.length} image(s)...` });
       try {
         await compressImages(files);
-        if (!subscription.subscribed && !subscription.is_trialing) {
-          setDailyUsage(prev => ({ ...prev, images: prev.images + files.length }));
-        }
       } finally { setIsUploading(false); }
     }
   };
 
   const handleVideoUpload = () => {
-    if (!subscription.subscribed && !subscription.is_trialing) {
-      if (dailyUsage.videos >= FREE_LIMITS.videos) {
-        toast({ title: "Daily Limit Reached", description: "Upgrade to Pro for unlimited video compressions", variant: "destructive" });
-        return;
-      }
-    }
     videoInputRef.current?.click();
   };
 
@@ -250,12 +259,11 @@ const Index = () => {
     const files = event.target.files;
     if (files && files.length > 0) {
       const file = files[0];
+      const ok = await checkFreeQuota("compress-video", 1);
+      if (!ok) { event.target.value = ""; return; }
       toast({ title: "Processing video", description: `Compressing ${file.name}...` });
       try {
         await compressVideo(file);
-        if (!subscription.subscribed && !subscription.is_trialing) {
-          setDailyUsage(prev => ({ ...prev, videos: prev.videos + 1 }));
-        }
       } catch (error) { console.error('Video compression error:', error); }
     }
   };

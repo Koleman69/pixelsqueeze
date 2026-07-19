@@ -25,6 +25,7 @@ import {
   Zap,
   Gauge,
   Layers,
+  Folder,
 } from "lucide-react";
 
 

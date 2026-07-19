@@ -63,7 +63,8 @@ export type ToolCategory =
   | "competitor"
   | "automation"
   | "distribute"
-  | "workflows";
+  | "workflows"
+  | "ai-enhance";
 
 interface DashboardSidebarProps {
   activeTool: ToolCategory;

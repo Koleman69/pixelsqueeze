@@ -29,14 +29,8 @@ export const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
   const [hasSeenOnboarding, setHasSeenOnboarding] = useState(false);
 
   useEffect(() => {
-    const seen = localStorage.getItem('pixelsqueeze_onboarding_complete');
-    if (!seen) {
-      // Delay showing onboarding to let the page load
-      const timer = setTimeout(() => setIsOpen(true), 1000);
-      return () => clearTimeout(timer);
-    } else {
-      setHasSeenOnboarding(true);
-    }
+    // Auto-open onboarding disabled — users can trigger it manually via the help button.
+    setHasSeenOnboarding(true);
   }, []);
 
   const handleComplete = () => {

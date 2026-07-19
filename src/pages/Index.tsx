@@ -296,6 +296,8 @@ const Index = () => {
           return <ImageEditor />;
         case "batch-process":
           return <BatchOptimizer />;
+        case "batch-studio":
+          return <BatchProcessingStudio />;
         case "pro-optimize":
           return <ProfessionalOptimizer />;
         case "print-prep":

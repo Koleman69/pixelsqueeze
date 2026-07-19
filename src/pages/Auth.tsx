@@ -10,6 +10,7 @@ import { Loader2, Minimize2, ArrowLeft, Apple } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Separator } from "@/components/ui/separator";
 import { z } from "zod";
+import SEO from "@/components/SEO";
 
 const emailSchema = z.string().trim().email("Please enter a valid email address").max(255);
 
@@ -248,7 +249,15 @@ const Auth = () => {
   };
 
   return (
+    <>
+      <SEO
+        title="Sign in or Sign up — PixelSqueeze"
+        description="Sign in to PixelSqueeze or create a free account to optimize, upscale, and enhance images with AI."
+        path="/auth"
+        noindex
+      />
     <div className="min-h-screen bg-background flex items-center justify-center p-6">
+
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="flex items-center justify-center mb-6">
@@ -486,7 +495,9 @@ const Auth = () => {
         )}
       </div>
     </div>
+    </>
   );
 };
+
 
 export default Auth;

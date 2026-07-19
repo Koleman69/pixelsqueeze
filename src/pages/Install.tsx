@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Download, Smartphone, Share, Plus, CheckCircle, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
+import SEO from "@/components/SEO";
+
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -77,7 +79,14 @@ const Install = () => {
   }
 
   return (
+    <>
+      <SEO
+        title="Install PixelSqueeze — iOS, Android & Desktop PWA"
+        description="Install the PixelSqueeze app on iPhone, Android, or desktop. One-tap image optimization from your home screen — free and offline-ready."
+        path="/install"
+      />
     <div className="min-h-screen bg-background">
+
       <div className="container mx-auto px-4 py-8 max-w-2xl">
         {/* Header */}
         <div className="flex items-center gap-2 mb-8">
@@ -231,7 +240,9 @@ const Install = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
+
 
 export default Install;

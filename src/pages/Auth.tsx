@@ -248,7 +248,15 @@ const Auth = () => {
   };
 
   return (
+    <>
+      <SEO
+        title="Sign in or Sign up — PixelSqueeze"
+        description="Sign in to PixelSqueeze or create a free account to optimize, upscale, and enhance images with AI."
+        path="/auth"
+        noindex
+      />
     <div className="min-h-screen bg-background flex items-center justify-center p-6">
+
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="flex items-center justify-center mb-6">

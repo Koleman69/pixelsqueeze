@@ -211,9 +211,8 @@ async function runEnhancement(id: EnhancementId, sourceFile: File): Promise<{ bl
         break;
       }
       case "bg-remove": {
-        // Dynamic import — model download can be large
-        const mod = await import("@imgly/background-removal");
-        const bgBlob = await mod.default(sourceFile, { output: { format: "image/png" } });
+        const { removeBackground } = await import("@imgly/background-removal");
+        const bgBlob = await removeBackground(sourceFile, { output: { format: "image/png" } });
         return { blob: bgBlob, filename: `${sourceFile.name.replace(/\.[^.]+$/, "")}-nobg.png`, mime: "image/png" };
       }
       case "face": {

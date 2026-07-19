@@ -618,16 +618,26 @@ const Landing = () => {
               <h2 id="faq-heading" className="font-display text-4xl md:text-5xl font-bold leading-tight">Questions, answered.</h2>
             </div>
             <Accordion type="single" collapsible className="w-full space-y-3">
-              {[
-                { q: "How is PixelSqueeze different from a normal compressor?", a: "PixelSqueeze uses AI to enhance, upscale, and optimize — not just shrink. Pick a destination and we auto-select format, dimensions, and compression." },
-                { q: "Can I really use it for free?", a: "Yes. The free plan includes every core AI tool. Pro removes the daily cap and unlocks batch, cloud storage, and priority processing." },
-                { q: "Where are my images processed?", a: "Free plan processes in-browser. Paid plans use encrypted storage that auto-deletes after 30 days. Files are never shared, sold, or used for training." },
-                { q: "What formats are supported?", a: "JPEG, PNG, WebP, AVIF, GIF and SVG in — WebP or AVIF out, sized correctly for your chosen destination." },
-                { q: "Can I cancel anytime?", a: "One click in your account. You keep Pro access until the end of your billing period." },
-              ].map(({ q, a }, i) => (
-                <AccordionItem key={i} value={`item-${i}`} className="bg-white rounded-2xl border border-border px-6 shadow-soft">
-                  <AccordionTrigger className="text-left text-base font-semibold hover:no-underline font-display">{q}</AccordionTrigger>
-                  <AccordionContent className="text-foreground/70 pb-5 leading-relaxed">{a}</AccordionContent>
+              {FAQS.map(({ q, a }, i) => (
+                <AccordionItem
+                  key={i}
+                  value={`item-${i}`}
+                  className="bg-white rounded-2xl border border-border px-6 shadow-soft"
+                  itemScope
+                  itemProp="mainEntity"
+                  itemType="https://schema.org/Question"
+                >
+                  <AccordionTrigger className="text-left text-base font-semibold hover:no-underline font-display">
+                    <span itemProp="name">{q}</span>
+                  </AccordionTrigger>
+                  <AccordionContent
+                    className="text-foreground/70 pb-5 leading-relaxed"
+                    itemScope
+                    itemProp="acceptedAnswer"
+                    itemType="https://schema.org/Answer"
+                  >
+                    <span itemProp="text">{a}</span>
+                  </AccordionContent>
                 </AccordionItem>
               ))}
             </Accordion>

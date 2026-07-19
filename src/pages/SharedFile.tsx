@@ -55,34 +55,30 @@ export default function SharedFile() {
       }
 
       try {
-        // Fetch file data by share code
-        const { data, error: fetchError } = await supabase
-          .from('shared_files')
-          .select('*')
-          .eq('share_code', shareCode)
-          .single();
+        const { data, error: invokeError } = await supabase.functions.invoke(
+          'get-shared-file',
+          { body: { code: shareCode } },
+        );
 
-        if (fetchError || !data) {
-          setError('File not found or has been removed');
+        if (invokeError || !data?.file || !data?.signed_url) {
+          const msg = (invokeError as any)?.message || '';
+          if (msg.toLowerCase().includes('expired')) {
+            setIsExpired(true);
+          } else {
+            setError('File not found or has been removed');
+          }
           setLoading(false);
           return;
         }
 
-        // Check if expired
-        if (new Date(data.expires_at) < new Date()) {
+        if (data.file.expires_at && new Date(data.file.expires_at) < new Date()) {
           setIsExpired(true);
           setLoading(false);
           return;
         }
 
-        setFileData(data);
-
-        // Get public URL
-        const { data: { publicUrl: url } } = supabase.storage
-          .from('shared-files')
-          .getPublicUrl(data.file_path);
-
-        setPublicUrl(url);
+        setFileData({ ...data.file, share_code: shareCode, file_path: '' });
+        setPublicUrl(data.signed_url);
       } catch (err) {
         console.error('Error fetching shared file:', err);
         setError('Failed to load file');
@@ -101,20 +97,17 @@ export default function SharedFile() {
       const response = await fetch(publicUrl);
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
-      
+
       const link = document.createElement('a');
       link.href = url;
       link.download = fileData.file_name;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      URL.revokeObjectURL(url);
+      setTimeout(() => URL.revokeObjectURL(url), 60_000);
 
-      // Update download count (optional - this may fail without auth)
-      await supabase
-        .from('shared_files')
-        .update({ download_count: (fileData.download_count || 0) + 1 })
-        .eq('id', fileData.id);
+      // Increment download count via secure RPC
+      await supabase.rpc('increment_shared_file_download', { _code: fileData.share_code });
 
       toast({
         title: 'Download Started',

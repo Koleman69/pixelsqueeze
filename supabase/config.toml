@@ -41,3 +41,9 @@ verify_jwt = false
 
 [functions.posting-workflows]
 verify_jwt = false
+
+[functions.get-shared-file]
+verify_jwt = false
+
+[functions.generate-blog-post]
+verify_jwt = true

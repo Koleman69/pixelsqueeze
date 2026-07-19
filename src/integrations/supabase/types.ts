@@ -1175,6 +1175,19 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_shared_file_by_code: {
+        Args: { _code: string }
+        Returns: {
+          created_at: string
+          download_count: number
+          expires_at: string
+          file_name: string
+          file_path: string
+          file_size: number
+          file_type: string
+          id: string
+        }[]
+      }
       get_subscriber_data_for_service: {
         Args: { user_uuid: string }
         Returns: Json
@@ -1186,6 +1199,10 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      increment_shared_file_download: {
+        Args: { _code: string }
+        Returns: undefined
       }
       log_service_access: {
         Args: { operation: string; table_name: string; target_user_id?: string }

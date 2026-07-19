@@ -12,8 +12,25 @@ const ENCRYPTION_PREFIX = "enc::";
 async function getEncryptionKey(): Promise<CryptoKey> {
   const secret = Deno.env.get("CREDENTIALS_ENCRYPTION_KEY");
   if (!secret) throw new Error("Encryption key not configured");
-  const keyData = new TextEncoder().encode(secret.padEnd(32, "0").slice(0, 32));
-  return await crypto.subtle.importKey("raw", keyData, "AES-GCM", false, ["decrypt"]);
+  const material = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(secret),
+    "HKDF",
+    false,
+    ["deriveKey"],
+  );
+  return await crypto.subtle.deriveKey(
+    {
+      name: "HKDF",
+      hash: "SHA-256",
+      salt: new TextEncoder().encode("pixelsqueeze.automation.v1"),
+      info: new TextEncoder().encode("aes-gcm-credentials-key"),
+    },
+    material,
+    { name: "AES-GCM", length: 256 },
+    false,
+    ["encrypt", "decrypt"],
+  );
 }
 
 async function decryptValue(val: string): Promise<string> {
@@ -332,6 +349,10 @@ async function syncShopify(
     throw new Error("Missing Shopify credentials (store URL and access token)");
 
   const cleanUrl = store_url.replace(/^https?:\/\//, "").replace(/\/$/, "");
+  // Only allow real Shopify-hosted stores
+  if (!/^[a-z0-9][a-z0-9-]*\.myshopify\.com$/i.test(cleanUrl)) {
+    throw new Error("Invalid Shopify store URL — must be *.myshopify.com");
+  }
   logStep("Syncing Shopify", { store: cleanUrl });
 
   // Fetch products with images
@@ -346,8 +367,10 @@ async function syncShopify(
   );
 
   if (!productsRes.ok) {
-    const err = await productsRes.text();
-    throw new Error(`Shopify API error: ${err}`);
+    // Log details server-side only; return generic error to client
+    const errText = await productsRes.text().catch(() => "");
+    logStep("Shopify API error", { status: productsRes.status, body: errText.slice(0, 500) });
+    throw new Error(`Shopify API request failed (${productsRes.status})`);
   }
 
   const productsData = await productsRes.json();

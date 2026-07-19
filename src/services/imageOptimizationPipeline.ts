@@ -33,7 +33,12 @@ export type GoalPreset =
   | 'amazon'
   | 'airbnb'
   | 'hotel'
-  | 'linkedin';
+  | 'linkedin'
+  | 'facebook'
+  | 'pinterest'
+  | 'shopify'
+  | 'personal';
+
 
 export interface PipelineOptions {
   /** Target goal preset */

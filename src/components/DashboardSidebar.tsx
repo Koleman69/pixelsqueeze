@@ -59,6 +59,7 @@ export type ToolCategory =
   | "ai-captions"
   | "ai-analyze"
   | "social-export"
+  | "social-studio"
   | "analytics"
   | "competitor"
   | "automation"
@@ -109,6 +110,7 @@ const toolCategories = [
       { id: "ai-captions" as ToolCategory, label: "Social Captions", icon: MessageSquare, description: "Generate captions" },
       { id: "ai-analyze" as ToolCategory, label: "File Analyzer", icon: Brain, description: "AI insights" },
       { id: "social-export" as ToolCategory, label: "Platform Export", icon: Share2, description: "Auto-resize" },
+      { id: "social-studio" as ToolCategory, label: "Social Studio", icon: Sparkles, description: "One image → every platform" },
     ],
   },
   {

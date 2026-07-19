@@ -25,6 +25,7 @@ const AICaptionGenerator = lazy(() => import("@/components/AICaptionGenerator").
 const FileProcessor = lazy(() => import("@/components/FileProcessor").then(m => ({ default: m.FileProcessor })));
 const AnalysisBoard = lazy(() => import("@/components/AnalysisBoard").then(m => ({ default: m.AnalysisBoard })));
 const SocialMediaExporter = lazy(() => import("@/components/SocialMediaExporter").then(m => ({ default: m.SocialMediaExporter })));
+const SocialStudio = lazy(() => import("@/components/SocialStudio").then(m => ({ default: m.SocialStudio })));
 const BatchAnalyticsDashboard = lazy(() => import("@/components/BatchAnalyticsDashboard").then(m => ({ default: m.BatchAnalyticsDashboard })));
 const CompetitorTracker = lazy(() => import("@/components/CompetitorTracker"));
 const AutomationFlow = lazy(() => import("@/components/AutomationFlow").then(m => ({ default: m.AutomationFlow })));
@@ -118,6 +119,11 @@ const toolTitles: Record<ToolCategory, { title: string; description: string; gra
     title: "Platform Export",
     description: "Auto-resize images for Instagram, YouTube, Twitter & more",
     gradient: "from-teal-500/10 via-emerald-500/5 to-transparent",
+  },
+  "social-studio": {
+    title: "Social Studio",
+    description: "One image, every platform — instant social pack",
+    gradient: "from-fuchsia-500/10 via-pink-500/5 to-transparent",
   },
   "analytics": {
     title: "Analytics Dashboard",
@@ -323,6 +329,8 @@ const Index = () => {
           );
         case "social-export":
           return <SocialMediaExporter />;
+        case "social-studio":
+          return <SocialStudio />;
         case "analytics":
           return <BatchAnalyticsDashboard />;
         case "competitor":

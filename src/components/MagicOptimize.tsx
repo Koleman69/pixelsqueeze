@@ -106,6 +106,7 @@ interface MagicOptimizeProps {
 
 export const MagicOptimize = ({ isSubscribed = false }: MagicOptimizeProps) => {
   const { toast } = useToast();
+  const quota = useToolQuota();
   const { createCheckout } = useImageCompression();
   const { isProcessing, overallProgress, processFiles, downloadResult, downloadAllAsZip, clearJobs } =
     useOptimizationPipeline();

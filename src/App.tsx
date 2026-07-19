@@ -29,6 +29,7 @@ const ImageEnhancer = lazy(() => import("./pages/tools/ImageEnhancer"));
 const PhotoOptimizer = lazy(() => import("./pages/tools/PhotoOptimizer"));
 const WebsiteImageCompression = lazy(() => import("./pages/tools/WebsiteImageCompression"));
 const PrintReadyImages = lazy(() => import("./pages/tools/PrintReadyImages"));
+const SeoImageOptimizer = lazy(() => import("./pages/tools/SeoImageOptimizer"));
 const SolutionsIndex = lazy(() => import("./pages/SolutionsIndex"));
 const IndustryLanding = lazy(() => import("./pages/IndustryLanding"));
 const EnhanceIndex = lazy(() => import("./pages/EnhanceIndex"));
@@ -152,6 +153,7 @@ const App = () => (
                 <Route path="/tools/photo-optimizer" element={<PhotoOptimizer />} />
                 <Route path="/tools/website-image-compression" element={<WebsiteImageCompression />} />
                 <Route path="/tools/print-ready-images" element={<PrintReadyImages />} />
+                <Route path="/tools/seo-image-optimizer" element={<SeoImageOptimizer />} />
                 <Route path="/for" element={<SolutionsIndex />} />
                 <Route path="/for/:slug" element={<IndustryLanding />} />
                 <Route path="/enhance" element={<EnhanceIndex />} />

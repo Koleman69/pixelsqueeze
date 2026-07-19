@@ -31,6 +31,8 @@ const WebsiteImageCompression = lazy(() => import("./pages/tools/WebsiteImageCom
 const PrintReadyImages = lazy(() => import("./pages/tools/PrintReadyImages"));
 const SolutionsIndex = lazy(() => import("./pages/SolutionsIndex"));
 const IndustryLanding = lazy(() => import("./pages/IndustryLanding"));
+const EnhanceIndex = lazy(() => import("./pages/EnhanceIndex"));
+const EnhanceTopic = lazy(() => import("./pages/EnhanceTopic"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -132,6 +134,8 @@ const App = () => (
                 <Route path="/tools/print-ready-images" element={<PrintReadyImages />} />
                 <Route path="/for" element={<SolutionsIndex />} />
                 <Route path="/for/:slug" element={<IndustryLanding />} />
+                <Route path="/enhance" element={<EnhanceIndex />} />
+                <Route path="/enhance/:slug" element={<EnhanceTopic />} />
                 <Route path="/share/:shareCode" element={<SharedFile />} />
                 <Route path="/account" element={
                   <ProtectedRoute>

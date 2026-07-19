@@ -1,6 +1,5 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import {
   Accordion,
   AccordionContent,
@@ -8,24 +7,18 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import {
-  Minimize2,
-  Zap,
-  Shield,
+  Sparkles,
   Upload,
-  Crown,
-  CheckCircle,
   ArrowRight,
   Star,
-  Search,
-  ShoppingCart,
-  PenTool,
-  Home,
-  Hotel,
-  Instagram,
-  Globe,
-  Sparkles,
-  Layers,
-  Lock,
+  CheckCircle,
+  Wand2,
+  Maximize2,
+  Minimize2,
+  Crop,
+  Palette,
+  Zap,
+  Shield,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 const BeforeAfterSlider = lazy(() =>
@@ -41,386 +34,306 @@ import manAfter from "@/assets/man-after.jpg";
 
 const Landing = () => {
   useUtmTracking();
+  const beforeAfterRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBeforeAfter = () => {
+    beforeAfterRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   return (
-    <div className="min-h-screen bg-background text-foreground" role="document">
-      {/* ─── Navigation ─── */}
-      <nav className="sticky top-0 z-50 backdrop-blur-xl bg-background/80 border-b border-border/60" aria-label="Main navigation">
+    <div className="min-h-screen bg-background text-foreground">
+      {/* Navigation */}
+      <nav className="sticky top-0 z-50 backdrop-blur-xl bg-background/70 border-b border-border/50" aria-label="Main navigation">
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           <Link to="/" className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center">
-              <Minimize2 className="w-4 h-4 text-accent-foreground" />
+            <div className="w-9 h-9 rounded-2xl bg-gradient-to-br from-primary via-secondary to-accent flex items-center justify-center shadow-glow">
+              <Sparkles className="w-4 h-4 text-white" />
             </div>
-            <span className="text-xl font-bold tracking-tight font-display text-foreground">
-              PixelSqueeze
-            </span>
+            <span className="text-xl font-bold tracking-tight font-display">PixelSqueeze</span>
           </Link>
           <div className="hidden md:flex items-center gap-8">
             <a href="#features" className="text-sm font-medium text-foreground/70 hover:text-foreground transition-colors">Features</a>
+            <a href="#reviews" className="text-sm font-medium text-foreground/70 hover:text-foreground transition-colors">Reviews</a>
             <a href="#pricing" className="text-sm font-medium text-foreground/70 hover:text-foreground transition-colors">Pricing</a>
-            <Link to="/scanner" className="text-sm font-medium text-foreground/70 hover:text-foreground transition-colors">Scanner</Link>
+            <a href="#faq" className="text-sm font-medium text-foreground/70 hover:text-foreground transition-colors">FAQ</a>
             <Link to="/auth">
-              <Button variant="ghost" size="sm" className="text-foreground font-semibold">Sign in</Button>
+              <Button variant="ghost" size="sm" className="font-semibold">Sign in</Button>
             </Link>
             <Link to="/auth">
-              <Button size="sm" className="bg-accent text-accent-foreground hover:bg-secondary rounded-xl px-5 font-semibold shadow-glow">
+              <Button size="sm" className="rounded-2xl px-5 font-semibold bg-gradient-to-r from-primary to-secondary text-white hover:opacity-95 shadow-glow border-0">
                 Get started
               </Button>
             </Link>
           </div>
-          <div className="flex md:hidden items-center gap-2">
+          <div className="flex md:hidden">
             <Link to="/auth">
-              <Button size="sm" className="bg-accent text-accent-foreground rounded-xl font-semibold">Get started</Button>
+              <Button size="sm" className="rounded-2xl font-semibold bg-gradient-to-r from-primary to-secondary text-white border-0">
+                Sign in
+              </Button>
             </Link>
           </div>
         </div>
       </nav>
 
       <main id="main-content">
-        {/* ─── HERO BENTO ─── */}
-        <section className="px-6 pt-10 md:pt-16 pb-16" aria-labelledby="hero-heading">
-          <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-5">
-
-            {/* Hero Header Card */}
-            <div className="lg:col-span-8 bg-card p-8 md:p-12 rounded-3xl border border-primary/10 shadow-card flex flex-col justify-center space-y-6">
-              <div className="inline-flex items-center gap-2 bg-secondary/5 border border-secondary/10 rounded-full px-4 py-1.5 w-fit">
-                <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse" />
-                <span className="text-[11px] font-bold uppercase tracking-widest text-secondary">Magic Optimize · Live</span>
-              </div>
-              <h1
-                id="hero-heading"
-                className="font-display text-4xl sm:text-5xl md:text-6xl font-bold leading-[1.05] tracking-tight text-foreground"
-              >
-                Upload once.<br />
-                <span className="text-primary">Perfect for everywhere.</span>
-              </h1>
-              <p className="text-lg text-foreground/70 max-w-xl leading-relaxed">
-                Destination-aware image optimization for creators, sellers, and teams who value quality — and their time.
-              </p>
-              <div className="flex flex-wrap items-center gap-4 pt-2">
-                <Link to="/auth">
-                  <Button size="lg" className="bg-accent text-accent-foreground hover:bg-secondary rounded-xl px-7 h-12 font-semibold shadow-glow">
-                    Start optimizing free
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                  </Button>
-                </Link>
-                <div className="flex items-center gap-3">
-                  <div className="flex -space-x-2">
-                    <div className="h-9 w-9 rounded-full border-2 border-card bg-gradient-to-br from-primary to-secondary" />
-                    <div className="h-9 w-9 rounded-full border-2 border-card bg-gradient-to-br from-secondary to-accent" />
-                    <div className="h-9 w-9 rounded-full border-2 border-card bg-gradient-to-br from-accent to-primary" />
-                  </div>
-                  <div className="text-sm">
-                    <div className="flex items-center gap-0.5 text-warning">
-                      {[...Array(5)].map((_, i) => (
-                        <Star key={i} className="w-3.5 h-3.5 fill-current" />
-                      ))}
-                    </div>
-                    <p className="text-xs text-foreground/60 font-medium">Joined by 12,000+ creators</p>
-                  </div>
-                </div>
-              </div>
+        {/* HERO */}
+        <section
+          className="relative px-6 pt-16 md:pt-24 pb-20 md:pb-28 overflow-hidden"
+          aria-labelledby="hero-heading"
+          style={{ backgroundImage: "var(--gradient-mesh)" }}
+        >
+          <div className="max-w-5xl mx-auto text-center relative">
+            <div className="inline-flex items-center gap-2 bg-white border border-border rounded-full px-4 py-1.5 mb-8 shadow-soft">
+              <Sparkles className="w-3.5 h-3.5 text-secondary" />
+              <span className="text-xs font-semibold text-foreground/80">AI-powered image studio</span>
             </div>
-
-            {/* Magic Optimize Tool Card */}
-            <div className="lg:col-span-4 bg-accent rounded-3xl p-7 flex flex-col justify-between text-accent-foreground relative overflow-hidden group">
-              <div aria-hidden className="absolute top-0 right-0 w-40 h-40 bg-primary/25 blur-3xl" />
-              <div className="relative z-10">
-                <div className="flex items-center gap-2 mb-5">
-                  <Sparkles className="w-4 h-4 text-primary" />
-                  <h3 className="text-base font-bold font-display tracking-tight">Magic Optimize</h3>
-                </div>
-                <div className="space-y-2.5">
-                  {[
-                    { icon: Instagram, label: "Instagram Grid", active: true },
-                    { icon: Globe, label: "Web (WebP High)" },
-                    { icon: ShoppingCart, label: "Amazon E-com" },
-                  ].map(({ icon: Icon, label, active }) => (
-                    <div
-                      key={label}
-                      className={`p-3.5 rounded-xl border flex items-center justify-between transition-colors ${
-                        active
-                          ? "bg-white/15 border-white/20"
-                          : "bg-white/5 border-white/10 opacity-70"
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className={`p-1.5 rounded-lg ${active ? "bg-primary" : "bg-primary/40"}`}>
-                          <Icon className="w-4 h-4" />
-                        </div>
-                        <span className="font-medium text-sm">{label}</span>
-                      </div>
-                      <div className={`w-4 h-4 rounded-full border-2 ${active ? "border-primary bg-primary" : "border-white/30"}`} />
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div className="mt-6 pt-5 border-t border-white/10 relative z-10">
-                <p className="text-[10px] text-white/50 uppercase font-bold tracking-widest mb-1">Status</p>
-                <p className="text-sm text-white/90">Optimizing for 3 destinations…</p>
-              </div>
-            </div>
-
-            {/* Proof Card */}
-            <div className="lg:col-span-3 bg-card border border-primary/10 rounded-3xl p-6 flex flex-col justify-between shadow-card">
-              <div>
-                <p className="text-primary font-bold text-[11px] uppercase tracking-widest mb-3">Efficiency</p>
-                <div className="flex items-end gap-0.5">
-                  <span className="text-5xl font-bold font-display text-foreground leading-none">94</span>
-                  <span className="text-xl font-bold text-foreground mb-1">%</span>
-                </div>
-                <p className="text-sm text-foreground/60 leading-snug mt-2">Average size reduction with no perceptible quality loss.</p>
-              </div>
-              <div className="mt-5 bg-background rounded-2xl h-24 relative overflow-hidden">
-                <div className="absolute inset-0 flex">
-                  <div className="w-1/2 bg-muted h-full flex items-center justify-center text-[9px] text-foreground/60 font-bold tracking-widest">BEFORE</div>
-                  <div className="w-1/2 bg-primary h-full flex items-center justify-center text-[9px] text-primary-foreground font-bold tracking-widest">AFTER</div>
-                </div>
-                <div className="absolute top-0 bottom-0 left-1/2 w-0.5 bg-card shadow" />
-              </div>
-            </div>
-
-            {/* Testimonial Card */}
-            <div className="lg:col-span-5 bg-primary rounded-3xl p-8 text-primary-foreground flex flex-col justify-between">
-              <div className="flex justify-between items-start">
-                <div className="bg-white/20 p-3 rounded-2xl">
-                  <Sparkles className="w-6 h-6" />
-                </div>
-                <div className="text-right">
-                  <p className="text-2xl font-bold font-display leading-none">4.9</p>
-                  <p className="text-[10px] uppercase font-bold text-white/70 tracking-widest mt-1">User rating</p>
-                </div>
-              </div>
-              <blockquote className="text-lg md:text-xl font-medium leading-snug py-5">
-                "The Amazon preset alone saved our team 12 hours a week. It's the standard for our e-com workflow now."
-              </blockquote>
-              <div className="flex items-center gap-3">
-                <div className="h-9 w-9 rounded-full bg-white/25" />
-                <div className="text-xs">
-                  <p className="font-bold">Sarah Jenkins</p>
-                  <p className="opacity-70">E-com Director, Nordvick</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Pricing Hook Card */}
-            <div className="lg:col-span-4 bg-card border border-primary/10 rounded-3xl p-8 flex flex-col justify-center items-center text-center gap-4 shadow-card">
-              <p className="text-[11px] font-bold uppercase tracking-widest text-primary">Pro Subscription</p>
-              <div className="flex items-baseline">
-                <span className="text-sm font-bold text-secondary mr-1">$</span>
-                <span className="text-6xl font-bold font-display text-foreground leading-none">12</span>
-                <span className="text-sm font-medium text-foreground/60 ml-1">/mo</span>
-              </div>
-              <ul className="text-sm text-foreground/80 space-y-2 pb-2 w-full max-w-[240px]">
-                {["Unlimited Magic exports", "Every destination preset", "30-day cloud storage", "Priority processing"].map((f) => (
-                  <li key={f} className="flex items-center gap-2 justify-start">
-                    <CheckCircle className="w-4 h-4 text-primary shrink-0" />
-                    <span>{f}</span>
-                  </li>
-                ))}
-              </ul>
-              <Link to="/pricing" className="w-full">
-                <Button className="w-full h-12 rounded-xl border-2 border-accent bg-transparent text-accent hover:bg-accent hover:text-accent-foreground transition-all font-semibold">
-                  Upgrade to Pro
+            <h1
+              id="hero-heading"
+              className="font-display text-5xl sm:text-6xl md:text-7xl font-extrabold leading-[1.02] tracking-tight text-foreground"
+            >
+              Make Every Photo Look{" "}
+              <span className="bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
+                Professional.
+              </span>
+            </h1>
+            <p className="mt-6 text-lg md:text-xl text-foreground/60 max-w-2xl mx-auto leading-relaxed">
+              Enhance, upscale, compress, resize and optimize every image with AI in one click.
+            </p>
+            <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3">
+              <Link to="/auth">
+                <Button
+                  size="lg"
+                  className="rounded-2xl h-14 px-8 text-base font-semibold bg-gradient-to-r from-primary to-secondary text-white hover:opacity-95 shadow-glow border-0 min-w-[220px]"
+                >
+                  <Upload className="w-5 h-5 mr-2" />
+                  Upload Image
                 </Button>
               </Link>
+              <Button
+                size="lg"
+                variant="outline"
+                onClick={scrollToBeforeAfter}
+                className="rounded-2xl h-14 px-8 text-base font-semibold border-2 min-w-[220px] bg-white/60 backdrop-blur"
+              >
+                See Before & After
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
             </div>
-          </div>
-
-          {/* Trust bar */}
-          <div className="max-w-7xl mx-auto mt-14 pt-8 border-t border-border">
-            <p className="text-center text-[11px] uppercase tracking-[0.2em] font-bold text-foreground/40 mb-6">
-              Trusted by teams shipping on
+            <p className="mt-6 text-xs text-foreground/50 font-medium">
+              No credit card required · Free forever plan · Cancel anytime
             </p>
-            <div className="flex flex-wrap justify-center items-center gap-10 md:gap-16 opacity-50">
-              {["SHOPIFY", "ETSY", "SQUARESPACE", "AMAZON", "WOO"].map((b) => (
-                <span key={b} className="text-sm md:text-base font-display font-bold tracking-[0.2em] text-foreground">{b}</span>
-              ))}
-            </div>
           </div>
-        </section>
 
-        {/* ─── FEATURES ─── */}
-        <section id="features" className="px-6 py-20 md:py-28">
-          <div className="max-w-7xl mx-auto">
-            <div className="max-w-2xl mb-14">
-              <p className="text-[11px] font-bold uppercase tracking-widest text-primary mb-4">Features</p>
-              <h2 className="font-display text-3xl md:text-5xl font-bold text-foreground leading-tight">
-                Everything you'd expect from a $50/mo tool. Nothing you don't.
-              </h2>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-              {[
-                {
-                  icon: Sparkles,
-                  title: "Magic Optimize",
-                  desc: "Pick a destination — Instagram, Amazon, Print, Web — and we auto-select the format, dimensions, and compression.",
-                  featured: true,
-                },
-                {
-                  icon: Layers,
-                  title: "Batch processing",
-                  desc: "Drop up to 100 files, download a single zip. Perfect for product catalogs and photo shoots.",
-                },
-                {
-                  icon: Globe,
-                  title: "Website scanner",
-                  desc: "Paste any URL — get a full image audit with performance grade, SEO score, and one-click fixes.",
-                },
-                {
-                  icon: Zap,
-                  title: "Modern formats",
-                  desc: "WebP and AVIF conversion for up to 80% smaller files that Google actually rewards.",
-                },
-                {
-                  icon: Lock,
-                  title: "Metadata cleanup",
-                  desc: "Strip GPS, camera data, and personal info from every file — automatically.",
-                },
-                {
-                  icon: Shield,
-                  title: "Private by default",
-                  desc: "Free tier processes locally. Paid tiers use encrypted storage that auto-deletes after 30 days.",
-                },
-              ].map(({ icon: Icon, title, desc, featured }) => (
-                <div
-                  key={title}
-                  className={`p-7 rounded-3xl border transition-all hover:-translate-y-0.5 ${
-                    featured
-                      ? "bg-accent border-accent text-accent-foreground shadow-glow"
-                      : "bg-card border-primary/10 text-foreground shadow-card hover:border-primary/30"
-                  }`}
-                >
-                  <div className={`w-11 h-11 rounded-xl mb-5 flex items-center justify-center ${featured ? "bg-primary" : "bg-primary/10"}`}>
-                    <Icon className={`w-5 h-5 ${featured ? "text-primary-foreground" : "text-primary"}`} />
-                  </div>
-                  <h3 className={`font-display text-lg font-bold mb-2 ${featured ? "text-accent-foreground" : "text-foreground"}`}>{title}</h3>
-                  <p className={`text-sm leading-relaxed ${featured ? "text-white/70" : "text-foreground/60"}`}>{desc}</p>
+          {/* Hero showcase mockup */}
+          <div className="max-w-5xl mx-auto mt-16 relative">
+            <div className="absolute -inset-4 bg-gradient-to-r from-primary/20 via-secondary/20 to-accent/20 blur-3xl rounded-[3rem]" aria-hidden />
+            <div className="relative rounded-3xl bg-white shadow-card border border-border overflow-hidden">
+              <div className="flex items-center gap-2 px-5 py-3 border-b border-border bg-muted/40">
+                <div className="flex gap-1.5">
+                  <span className="w-3 h-3 rounded-full bg-loss/70" />
+                  <span className="w-3 h-3 rounded-full bg-warning/70" />
+                  <span className="w-3 h-3 rounded-full bg-profit/70" />
                 </div>
+                <div className="mx-auto text-xs font-medium text-foreground/50">pixelsqueeze.app / studio</div>
+              </div>
+              <div className="aspect-[16/9] bg-muted/40">
+                <Suspense fallback={<div className="w-full h-full animate-pulse bg-muted" />}>
+                  <BeforeAfterSlider
+                    beforeImage={weddingBefore}
+                    afterImage={weddingAfter}
+                    title=""
+                    description=""
+                  />
+                </Suspense>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* TRUSTED BY CREATORS */}
+        <section className="px-6 py-14 border-y border-border bg-white" aria-label="Trusted by creators">
+          <div className="max-w-6xl mx-auto text-center">
+            <p className="text-[11px] uppercase tracking-[0.25em] font-bold text-foreground/40 mb-8">
+              Trusted by 12,000+ creators & teams
+            </p>
+            <div className="flex flex-wrap justify-center items-center gap-x-12 gap-y-6 opacity-60">
+              {["Shopify", "Etsy", "Squarespace", "Amazon", "Airbnb", "Webflow"].map((b) => (
+                <span key={b} className="text-lg md:text-xl font-display font-bold tracking-tight text-foreground/70">
+                  {b}
+                </span>
               ))}
             </div>
           </div>
         </section>
 
-        {/* ─── BEFORE / AFTER PROOF ─── */}
-        <section className="px-6 py-20 md:py-28 bg-card">
-          <div className="max-w-7xl mx-auto">
-            <div className="max-w-2xl mb-12">
-              <p className="text-[11px] font-bold uppercase tracking-widest text-primary mb-4">Proof</p>
-              <h2 className="font-display text-3xl md:text-5xl font-bold text-foreground leading-tight">
-                Same photo. Same eyes. A fraction of the file.
+        {/* BEFORE & AFTER SLIDER */}
+        <section ref={beforeAfterRef} className="px-6 py-20 md:py-28" aria-labelledby="before-after-heading">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center max-w-2xl mx-auto mb-14">
+              <p className="text-xs font-bold uppercase tracking-widest text-primary mb-3">Before & After</p>
+              <h2 id="before-after-heading" className="font-display text-4xl md:text-5xl font-bold leading-tight">
+                See the difference AI makes.
               </h2>
-              <p className="text-lg text-foreground/60 mt-4">Slide to compare originals with Magic-optimized output.</p>
+              <p className="text-lg text-foreground/60 mt-4">Drag the slider. Same photo, dramatically better.</p>
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Suspense fallback={<div className="aspect-video bg-muted rounded-2xl animate-pulse" />}>
+              <Suspense fallback={<div className="aspect-video bg-muted rounded-3xl animate-pulse" />}>
                 <BeforeAfterSlider
                   beforeImage={weddingBefore}
                   afterImage={weddingAfter}
-                  title="Wedding photo — 70% smaller"
-                  description="Crystal-clear quality preserved"
+                  title="Wedding photo enhanced"
+                  description="Sharper detail, richer color, 70% smaller file"
                 />
                 <BeforeAfterSlider
                   beforeImage={manBefore}
                   afterImage={manAfter}
-                  title="Portrait — 65% smaller"
-                  description="Professional detail maintained"
+                  title="Portrait upscaled"
+                  description="AI enhancement + smart compression"
                 />
               </Suspense>
             </div>
           </div>
         </section>
 
-        {/* ─── WHO IT'S FOR ─── */}
-        <section className="px-6 py-20 md:py-28">
-          <div className="max-w-7xl mx-auto">
-            <div className="max-w-2xl mb-12">
-              <p className="text-[11px] font-bold uppercase tracking-widest text-primary mb-4">Built for</p>
-              <h2 className="font-display text-3xl md:text-5xl font-bold text-foreground leading-tight">
-                Everyone who publishes images.
+        {/* AI FEATURES */}
+        <section id="features" className="px-6 py-20 md:py-28 bg-white" aria-labelledby="features-heading">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center max-w-2xl mx-auto mb-16">
+              <p className="text-xs font-bold uppercase tracking-widest text-primary mb-3">AI Features</p>
+              <h2 id="features-heading" className="font-display text-4xl md:text-5xl font-bold leading-tight">
+                One app. Every image tool you need.
               </h2>
+              <p className="text-lg text-foreground/60 mt-4">Powered by AI. Ready in one click.</p>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
               {[
-                { icon: ShoppingCart, title: "Ecom sellers", desc: "Amazon, Shopify, Etsy — every marketplace has different specs." },
-                { icon: PenTool, title: "Creators", desc: "Instagram, TikTok, LinkedIn — perfect crops in one click." },
-                { icon: Home, title: "Realtors", desc: "Listing photos that hit MLS specs, instantly." },
-                { icon: Hotel, title: "Hospitality", desc: "Faster booking pages that convert mobile guests." },
-              ].map(({ icon: Icon, title, desc }) => (
-                <div key={title} className="p-6 rounded-2xl bg-card border border-primary/10 shadow-card">
-                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
-                    <Icon className="w-5 h-5 text-primary" />
+                { icon: Wand2, title: "AI Enhance", desc: "Restore clarity, color and detail automatically.", color: "from-primary to-secondary" },
+                { icon: Maximize2, title: "AI Upscale", desc: "Up to 4× larger with zero loss in sharpness.", color: "from-secondary to-accent" },
+                { icon: Minimize2, title: "Smart Compress", desc: "Up to 80% smaller, no visible quality loss.", color: "from-accent to-primary" },
+                { icon: Crop, title: "Auto Resize", desc: "Perfect crops for every platform, instantly.", color: "from-primary to-accent" },
+                { icon: Palette, title: "Background Removal", desc: "Studio-grade cutouts in seconds.", color: "from-secondary to-primary" },
+                { icon: Zap, title: "Magic Optimize", desc: "Pick a destination — we handle the rest.", color: "from-accent to-secondary" },
+              ].map(({ icon: Icon, title, desc, color }) => (
+                <div
+                  key={title}
+                  className="group p-7 rounded-3xl bg-white border border-border shadow-soft hover:shadow-card hover:-translate-y-1 transition-all duration-300"
+                >
+                  <div className={`w-12 h-12 rounded-2xl mb-5 flex items-center justify-center bg-gradient-to-br ${color} shadow-glow`}>
+                    <Icon className="w-5 h-5 text-white" />
                   </div>
-                  <h3 className="font-display font-bold text-foreground mb-1.5">{title}</h3>
-                  <p className="text-sm text-foreground/60 leading-snug">{desc}</p>
+                  <h3 className="font-display text-lg font-bold mb-2">{title}</h3>
+                  <p className="text-sm text-foreground/60 leading-relaxed">{desc}</p>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* ─── PRICING ─── */}
-        <section id="pricing" className="px-6 py-20 md:py-28 bg-card">
+        {/* CUSTOMER REVIEWS */}
+        <section id="reviews" className="px-6 py-20 md:py-28" aria-labelledby="reviews-heading">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center max-w-2xl mx-auto mb-14">
+              <p className="text-xs font-bold uppercase tracking-widest text-primary mb-3">Reviews</p>
+              <h2 id="reviews-heading" className="font-display text-4xl md:text-5xl font-bold leading-tight">
+                Loved by creators everywhere.
+              </h2>
+              <div className="flex items-center justify-center gap-2 mt-6">
+                <div className="flex gap-0.5 text-warning">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="w-5 h-5 fill-current" />
+                  ))}
+                </div>
+                <span className="text-sm font-semibold text-foreground/70">4.9 · 2,847 reviews</span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              {[
+                { name: "Sarah Jenkins", role: "E-com Director", quote: "The Amazon preset alone saved our team 12 hours a week. It's the standard for our workflow now." },
+                { name: "Marcus Chen", role: "Photographer", quote: "AI upscale is unreal. I've stopped paying for two other tools since switching to PixelSqueeze." },
+                { name: "Elena Rossi", role: "Boutique Owner", quote: "My product photos load faster and look better. Sales pages feel professional again." },
+              ].map((r) => (
+                <div key={r.name} className="bg-white rounded-3xl border border-border p-7 shadow-soft">
+                  <div className="flex gap-0.5 text-warning mb-4">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="w-4 h-4 fill-current" />
+                    ))}
+                  </div>
+                  <blockquote className="text-base leading-relaxed text-foreground/80 mb-6">"{r.quote}"</blockquote>
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary via-secondary to-accent" aria-hidden />
+                    <div>
+                      <p className="font-semibold text-sm">{r.name}</p>
+                      <p className="text-xs text-foreground/50">{r.role}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* PRICING PREVIEW */}
+        <section id="pricing" className="px-6 py-20 md:py-28 bg-white" aria-labelledby="pricing-heading">
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-14">
-              <p className="text-[11px] font-bold uppercase tracking-widest text-primary mb-4">Pricing</p>
-              <h2 className="font-display text-3xl md:text-5xl font-bold text-foreground leading-tight">
+              <p className="text-xs font-bold uppercase tracking-widest text-primary mb-3">Pricing</p>
+              <h2 id="pricing-heading" className="font-display text-4xl md:text-5xl font-bold leading-tight">
                 Simple pricing. Cancel anytime.
               </h2>
-              <p className="text-lg text-foreground/60 mt-4">Start free. Upgrade only when you need more.</p>
+              <p className="text-lg text-foreground/60 mt-4">Start free. Upgrade when you're ready.</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-4xl mx-auto">
-              <div className="bg-background rounded-3xl border border-border p-8">
-                <p className="text-[11px] font-bold uppercase tracking-widest text-foreground/60 mb-2">Free</p>
+              <div className="bg-background rounded-3xl border border-border p-8 shadow-soft">
+                <p className="text-xs font-bold uppercase tracking-widest text-foreground/50 mb-2">Free</p>
                 <div className="flex items-baseline mb-2">
-                  <span className="text-5xl font-bold font-display text-foreground">$0</span>
+                  <span className="text-5xl font-bold font-display">$0</span>
                   <span className="text-sm text-foreground/60 ml-2">/forever</span>
                 </div>
                 <p className="text-sm text-foreground/60 mb-6">Every core tool, no card required.</p>
                 <ul className="space-y-3 mb-8">
-                  {["Magic Optimize (3/day)", "All destination presets", "Batch up to 5 files", "Website scanner", "WebP & AVIF export"].map((f) => (
+                  {["Magic Optimize (3/day)", "All destination presets", "Batch up to 5 files", "WebP & AVIF export"].map((f) => (
                     <li key={f} className="flex items-center gap-2.5 text-sm text-foreground/80">
                       <CheckCircle className="w-4 h-4 text-primary shrink-0" />{f}
                     </li>
                   ))}
                 </ul>
                 <Link to="/auth">
-                  <Button variant="outline" className="w-full h-11 rounded-xl border-2 border-border text-foreground hover:bg-muted font-semibold">
+                  <Button variant="outline" className="w-full h-12 rounded-2xl border-2 font-semibold">
                     Start free
                   </Button>
                 </Link>
               </div>
 
-              <div className="bg-accent rounded-3xl p-8 text-accent-foreground relative overflow-hidden shadow-glow">
-                <div aria-hidden className="absolute -top-10 -right-10 w-40 h-40 bg-primary/30 blur-3xl" />
+              <div className="relative rounded-3xl p-8 text-white overflow-hidden shadow-glow bg-gradient-to-br from-primary via-secondary to-accent">
+                <div aria-hidden className="absolute -top-10 -right-10 w-40 h-40 bg-white/20 blur-3xl" />
                 <div className="relative">
                   <div className="flex items-center justify-between mb-2">
-                    <p className="text-[11px] font-bold uppercase tracking-widest text-primary">Pro</p>
-                    <span className="text-[10px] font-bold uppercase tracking-widest bg-primary text-primary-foreground rounded-full px-2.5 py-1">Most popular</span>
+                    <p className="text-xs font-bold uppercase tracking-widest text-white/90">Pro</p>
+                    <span className="text-[10px] font-bold uppercase tracking-widest bg-white text-primary rounded-full px-2.5 py-1">Most popular</span>
                   </div>
                   <div className="flex items-baseline mb-2">
                     <span className="text-5xl font-bold font-display">$12</span>
-                    <span className="text-sm opacity-70 ml-2">/month</span>
+                    <span className="text-sm opacity-80 ml-2">/month</span>
                   </div>
-                  <p className="text-sm opacity-70 mb-6">For serious sellers and busy creators.</p>
+                  <p className="text-sm opacity-80 mb-6">For serious creators and teams.</p>
                   <ul className="space-y-3 mb-8">
                     {[
-                      "Unlimited Magic Optimize",
+                      "Unlimited AI enhance & upscale",
                       "Batch up to 100 files",
-                      "AI edits & background removal",
+                      "Background removal",
                       "30-day cloud storage",
-                      "Folder & platform automation",
                       "Priority processing",
                     ].map((f) => (
                       <li key={f} className="flex items-center gap-2.5 text-sm">
-                        <CheckCircle className="w-4 h-4 text-primary shrink-0" />{f}
+                        <CheckCircle className="w-4 h-4 text-white shrink-0" />{f}
                       </li>
                     ))}
                   </ul>
-                  <Link to="/auth">
-                    <Button className="w-full h-11 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-semibold">
+                  <Link to="/pricing">
+                    <Button className="w-full h-12 rounded-2xl bg-white text-primary hover:bg-white/95 font-semibold border-0">
                       Start 7-day free trial
                     </Button>
                   </Link>
@@ -430,22 +343,22 @@ const Landing = () => {
           </div>
         </section>
 
-        {/* ─── FAQ ─── */}
-        <section className="px-6 py-20 md:py-28">
+        {/* FAQ */}
+        <section id="faq" className="px-6 py-20 md:py-28" aria-labelledby="faq-heading">
           <div className="max-w-3xl mx-auto">
             <div className="text-center mb-10">
-              <p className="text-[11px] font-bold uppercase tracking-widest text-primary mb-4">FAQ</p>
-              <h2 className="font-display text-3xl md:text-5xl font-bold text-foreground leading-tight">Questions, answered.</h2>
+              <p className="text-xs font-bold uppercase tracking-widest text-primary mb-3">FAQ</p>
+              <h2 id="faq-heading" className="font-display text-4xl md:text-5xl font-bold leading-tight">Questions, answered.</h2>
             </div>
             <Accordion type="single" collapsible className="w-full space-y-3">
               {[
-                { q: "How is Magic Optimize different from a normal compressor?", a: "Regular tools ask you to pick format, quality, and dimensions. Magic Optimize picks all of that for you based on where the image is going — Instagram, Amazon, Print, Web — so you never guess and never over-compress." },
-                { q: "Can I really use it for free?", a: "Yes. The free plan includes every core destination preset and the website scanner. Pro removes the daily cap and unlocks batch, automation, and cloud storage." },
+                { q: "How is PixelSqueeze different from a normal compressor?", a: "PixelSqueeze uses AI to enhance, upscale, and optimize — not just shrink. Pick a destination and we auto-select format, dimensions, and compression." },
+                { q: "Can I really use it for free?", a: "Yes. The free plan includes every core AI tool. Pro removes the daily cap and unlocks batch, cloud storage, and priority processing." },
                 { q: "Where are my images processed?", a: "Free plan processes in-browser. Paid plans use encrypted storage that auto-deletes after 30 days. Files are never shared, sold, or used for training." },
-                { q: "What formats are supported?", a: "JPEG, PNG, WebP, AVIF, and GIF in — WebP or AVIF out, sized correctly for your chosen destination." },
+                { q: "What formats are supported?", a: "JPEG, PNG, WebP, AVIF, GIF and SVG in — WebP or AVIF out, sized correctly for your chosen destination." },
                 { q: "Can I cancel anytime?", a: "One click in your account. You keep Pro access until the end of your billing period." },
               ].map(({ q, a }, i) => (
-                <AccordionItem key={i} value={`item-${i}`} className="bg-card rounded-2xl border border-primary/10 px-6 shadow-card">
+                <AccordionItem key={i} value={`item-${i}`} className="bg-white rounded-2xl border border-border px-6 shadow-soft">
                   <AccordionTrigger className="text-left text-base font-semibold hover:no-underline font-display">{q}</AccordionTrigger>
                   <AccordionContent className="text-foreground/70 pb-5 leading-relaxed">{a}</AccordionContent>
                 </AccordionItem>
@@ -454,21 +367,21 @@ const Landing = () => {
           </div>
         </section>
 
-        {/* ─── FINAL CTA ─── */}
-        <section className="px-6 py-20 md:py-28">
-          <div className="max-w-5xl mx-auto bg-accent rounded-[2rem] p-10 md:p-16 text-accent-foreground text-center relative overflow-hidden shadow-glow">
-            <div aria-hidden className="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-96 bg-primary/25 blur-3xl" />
+        {/* FINAL CTA */}
+        <section className="px-6 pb-24">
+          <div className="max-w-5xl mx-auto rounded-[2.5rem] p-10 md:p-16 text-center relative overflow-hidden shadow-glow bg-gradient-to-br from-primary via-secondary to-accent text-white">
+            <div aria-hidden className="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-96 bg-white/20 blur-3xl" />
             <div className="relative">
-              <h2 className="font-display text-3xl md:text-5xl font-bold mb-4 leading-tight">
-                Your images deserve better tools.
+              <h2 className="font-display text-4xl md:text-5xl font-bold mb-4 leading-tight">
+                Make every photo look professional.
               </h2>
-              <p className="text-lg opacity-70 mb-8 max-w-xl mx-auto">
-                Try Magic Optimize free. No card, no watermarks, no fine print.
+              <p className="text-lg opacity-90 mb-8 max-w-xl mx-auto">
+                Try PixelSqueeze free. No card, no watermarks, no fine print.
               </p>
               <Link to="/auth">
-                <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl px-8 h-12 font-semibold">
-                  <Upload className="w-4 h-4 mr-2" />
-                  Start optimizing free
+                <Button size="lg" className="bg-white text-primary hover:bg-white/95 rounded-2xl px-8 h-14 font-semibold border-0 text-base">
+                  <Upload className="w-5 h-5 mr-2" />
+                  Upload your first image
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </Link>
@@ -477,23 +390,23 @@ const Landing = () => {
         </section>
       </main>
 
-      {/* ─── FOOTER ─── */}
-      <footer className="border-t border-border bg-card">
+      {/* FOOTER */}
+      <footer className="border-t border-border bg-white">
         <div className="max-w-7xl mx-auto px-6 py-14">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <div className="w-7 h-7 rounded-lg bg-accent flex items-center justify-center">
-                  <Minimize2 className="w-3.5 h-3.5 text-accent-foreground" />
+                <div className="w-8 h-8 rounded-2xl bg-gradient-to-br from-primary via-secondary to-accent flex items-center justify-center">
+                  <Sparkles className="w-4 h-4 text-white" />
                 </div>
-                <span className="text-base font-bold font-display text-foreground">PixelSqueeze</span>
+                <span className="text-base font-bold font-display">PixelSqueeze</span>
               </div>
               <p className="text-sm text-foreground/60 leading-relaxed">
-                Destination-aware image optimization. Built for creators who value quality and time.
+                AI-powered image optimization. Enhance, upscale, compress — all in one place.
               </p>
             </div>
             <div>
-              <h4 className="font-display font-semibold mb-3 text-foreground text-sm">Product</h4>
+              <h4 className="font-display font-semibold mb-3 text-sm">Product</h4>
               <ul className="space-y-2 text-sm text-foreground/60">
                 <li><Link to="/auth" className="hover:text-foreground transition-colors">Magic Optimize</Link></li>
                 <li><Link to="/scanner" className="hover:text-foreground transition-colors">Website Scanner</Link></li>
@@ -501,7 +414,7 @@ const Landing = () => {
               </ul>
             </div>
             <div>
-              <h4 className="font-display font-semibold mb-3 text-foreground text-sm">Company</h4>
+              <h4 className="font-display font-semibold mb-3 text-sm">Company</h4>
               <ul className="space-y-2 text-sm text-foreground/60">
                 <li><Link to="/company" className="hover:text-foreground transition-colors">About</Link></li>
                 <li><Link to="/blog" className="hover:text-foreground transition-colors">Blog</Link></li>
@@ -509,15 +422,19 @@ const Landing = () => {
               </ul>
             </div>
             <div>
-              <h4 className="font-display font-semibold mb-3 text-foreground text-sm">Resources</h4>
+              <h4 className="font-display font-semibold mb-3 text-sm">Resources</h4>
               <ul className="space-y-2 text-sm text-foreground/60">
                 <li><Link to="/install" className="hover:text-foreground transition-colors">Install App</Link></li>
                 <li><Link to="/promote" className="hover:text-foreground transition-colors">Affiliate</Link></li>
               </ul>
             </div>
           </div>
-          <div className="mt-12 pt-8 border-t border-border text-center text-xs text-foreground/50">
-            © {new Date().getFullYear()} PixelSqueeze. All rights reserved.
+          <div className="mt-12 pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-3">
+            <p className="text-xs text-foreground/50">© {new Date().getFullYear()} PixelSqueeze. All rights reserved.</p>
+            <div className="flex items-center gap-2 text-xs text-foreground/50">
+              <Shield className="w-3.5 h-3.5" />
+              <span>Private by default · SOC-friendly workflow</span>
+            </div>
           </div>
         </div>
       </footer>

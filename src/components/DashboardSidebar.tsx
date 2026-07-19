@@ -53,6 +53,7 @@ export type ToolCategory =
   | "compress-image"
   | "edit-image"
   | "batch-process"
+  | "batch-studio"
   | "pro-optimize"
   | "print-prep"
   | "compress-video"

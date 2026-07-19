@@ -24,7 +24,10 @@ import {
   Send,
   Zap,
   Gauge,
+  Layers,
 } from "lucide-react";
+
+
 import {
   Sidebar,
   SidebarContent,
@@ -53,6 +56,7 @@ export type ToolCategory =
   | "compress-image"
   | "edit-image"
   | "batch-process"
+  | "batch-studio"
   | "pro-optimize"
   | "print-prep"
   | "compress-video"
@@ -94,6 +98,7 @@ const toolCategories = [
       { id: "compress-image" as ToolCategory, label: "Compress", icon: Upload, description: "Reduce file size" },
       { id: "edit-image" as ToolCategory, label: "Edit & Transform", icon: Wand2, description: "AI editing" },
       { id: "batch-process" as ToolCategory, label: "Batch Process", icon: Package, description: "Multiple images" },
+      { id: "batch-studio" as ToolCategory, label: "Batch Studio", icon: Layers, description: "Folders, ZIPs & queues" },
       { id: "pro-optimize" as ToolCategory, label: "Pro Optimizer", icon: Sparkles, description: "Max quality", pro: true },
       { id: "print-prep" as ToolCategory, label: "Print Prep", icon: Printer, description: "Print-ready sizes" },
     ],

@@ -17,6 +17,7 @@ import { motion, AnimatePresence } from "framer-motion";
 const ImageUploader = lazy(() => import("@/components/ImageUploader").then(m => ({ default: m.ImageUploader })));
 const ImageEditor = lazy(() => import("@/components/ImageEditor").then(m => ({ default: m.ImageEditor })));
 const BatchOptimizer = lazy(() => import("@/components/BatchOptimizer").then(m => ({ default: m.BatchOptimizer })));
+const BatchProcessingStudio = lazy(() => import("@/components/BatchProcessingStudio").then(m => ({ default: m.BatchProcessingStudio })));
 const ProfessionalOptimizer = lazy(() => import("@/components/ProfessionalOptimizer").then(m => ({ default: m.ProfessionalOptimizer })));
 const PrintOptimizer = lazy(() => import("@/components/PrintOptimizer").then(m => ({ default: m.PrintOptimizer })));
 const EnhancedVideoProgress = lazy(() => import("@/components/EnhancedVideoProgress").then(m => ({ default: m.EnhancedVideoProgress })));
@@ -85,6 +86,11 @@ const toolTitles: Record<ToolCategory, { title: string; description: string; gra
     title: "Batch Processor",
     description: "Process multiple images at once with GPU acceleration",
     gradient: "from-amber-500/10 via-orange-500/5 to-transparent",
+  },
+  "batch-studio": {
+    title: "Batch Studio",
+    description: "Folders, ZIPs, hundreds of images — pause, resume, retry, download as ZIP",
+    gradient: "from-amber-500/15 via-orange-500/10 to-transparent",
   },
   "pro-optimize": {
     title: "Professional Optimizer",
@@ -290,6 +296,8 @@ const Index = () => {
           return <ImageEditor />;
         case "batch-process":
           return <BatchOptimizer />;
+        case "batch-studio":
+          return <BatchProcessingStudio />;
         case "pro-optimize":
           return <ProfessionalOptimizer />;
         case "print-prep":

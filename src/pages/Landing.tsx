@@ -275,73 +275,125 @@ const Landing = () => {
         </section>
 
         {/* PRICING PREVIEW */}
-        <section id="pricing" className="px-6 py-20 md:py-28 bg-white" aria-labelledby="pricing-heading">
-          <div className="max-w-5xl mx-auto">
+        <section id="pricing" className="px-6 py-20 md:py-28 bg-gradient-to-b from-white via-white to-primary/[0.03]" aria-labelledby="pricing-heading">
+          <div className="max-w-7xl mx-auto">
             <div className="text-center mb-14">
               <p className="text-xs font-bold uppercase tracking-widest text-primary mb-3">Pricing</p>
               <h2 id="pricing-heading" className="font-display text-4xl md:text-5xl font-bold leading-tight">
-                Simple pricing. Cancel anytime.
+                Plans that scale with you
               </h2>
-              <p className="text-lg text-foreground/60 mt-4">Start free. Upgrade when you're ready.</p>
+              <p className="text-lg text-foreground/60 mt-4">Start free. Upgrade the moment you need more.</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-4xl mx-auto">
-              <div className="bg-background rounded-3xl border border-border p-8 shadow-soft">
-                <p className="text-xs font-bold uppercase tracking-widest text-foreground/50 mb-2">Free</p>
-                <div className="flex items-baseline mb-2">
-                  <span className="text-5xl font-bold font-display">$0</span>
-                  <span className="text-sm text-foreground/60 ml-2">/forever</span>
-                </div>
-                <p className="text-sm text-foreground/60 mb-6">Every core tool, no card required.</p>
-                <ul className="space-y-3 mb-8">
-                  {["Magic Optimize (3/day)", "All destination presets", "Batch up to 5 files", "WebP & AVIF export"].map((f) => (
-                    <li key={f} className="flex items-center gap-2.5 text-sm text-foreground/80">
-                      <CheckCircle className="w-4 h-4 text-primary shrink-0" />{f}
-                    </li>
-                  ))}
-                </ul>
-                <Link to="/auth">
-                  <Button variant="outline" className="w-full h-12 rounded-2xl border-2 font-semibold">
-                    Start free
-                  </Button>
-                </Link>
-              </div>
-
-              <div className="relative rounded-3xl p-8 text-white overflow-hidden shadow-glow bg-gradient-to-br from-primary via-secondary to-accent">
-                <div aria-hidden className="absolute -top-10 -right-10 w-40 h-40 bg-white/20 blur-3xl" />
-                <div className="relative">
-                  <div className="flex items-center justify-between mb-2">
-                    <p className="text-xs font-bold uppercase tracking-widest text-white/90">Pro</p>
-                    <span className="text-[10px] font-bold uppercase tracking-widest bg-white text-primary rounded-full px-2.5 py-1">Most popular</span>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 max-w-7xl mx-auto items-stretch">
+              {[
+                {
+                  name: "Free",
+                  price: "$0",
+                  cadence: "/forever",
+                  tagline: "Try every core tool.",
+                  cta: "Start free",
+                  features: ["25 images / month", "Basic optimization", "No watermark", "Web-ready exports"],
+                  accent: "from-slate-500/10 to-slate-500/5",
+                  border: "border-border",
+                  popular: false,
+                },
+                {
+                  name: "Creator",
+                  price: "$9",
+                  cadence: "/month",
+                  tagline: "For creators & freelancers.",
+                  cta: "Start Creator",
+                  features: ["500 images / month", "AI Enhance", "Batch processing", "Social exports"],
+                  accent: "from-primary via-secondary to-accent",
+                  border: "border-transparent",
+                  popular: true,
+                },
+                {
+                  name: "Pro",
+                  price: "$24",
+                  cadence: "/month",
+                  tagline: "For studios & agencies.",
+                  cta: "Go Pro",
+                  features: ["Unlimited images", "Print Ready (400 DPI)", "API access", "Priority processing"],
+                  accent: "from-indigo-500/10 to-purple-500/5",
+                  border: "border-border",
+                  popular: false,
+                },
+                {
+                  name: "Business",
+                  price: "$79",
+                  cadence: "/month",
+                  tagline: "For growing teams.",
+                  cta: "Contact sales",
+                  features: ["Everything in Pro", "Teams & white label", "Brand presets", "Analytics", "Enterprise support"],
+                  accent: "from-emerald-500/10 to-teal-500/5",
+                  border: "border-border",
+                  popular: false,
+                },
+              ].map((tier) => {
+                const highlight = tier.popular;
+                return (
+                  <div
+                    key={tier.name}
+                    className={`group relative rounded-3xl p-8 transition-all duration-500 ease-out hover:-translate-y-2 hover:shadow-2xl ${
+                      highlight
+                        ? `text-white overflow-hidden shadow-glow bg-gradient-to-br ${tier.accent} lg:scale-[1.04] lg:-translate-y-1 hover:lg:-translate-y-3`
+                        : `bg-background border ${tier.border} shadow-soft hover:border-primary/40`
+                    }`}
+                  >
+                    {highlight && (
+                      <>
+                        <div aria-hidden className="absolute -top-16 -right-16 w-48 h-48 bg-white/20 blur-3xl pointer-events-none" />
+                        <div aria-hidden className="absolute -bottom-20 -left-10 w-56 h-56 bg-white/10 blur-3xl pointer-events-none" />
+                        <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
+                          <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest bg-white text-primary rounded-full px-3 py-1.5 shadow-lg">
+                            <Sparkles className="w-3 h-3" />
+                            Most Popular
+                          </span>
+                        </div>
+                      </>
+                    )}
+                    <div className="relative">
+                      <p className={`text-xs font-bold uppercase tracking-widest mb-2 ${highlight ? "text-white/90" : "text-foreground/50"}`}>
+                        {tier.name}
+                      </p>
+                      <div className="flex items-baseline mb-2">
+                        <span className="text-5xl font-bold font-display">{tier.price}</span>
+                        <span className={`text-sm ml-2 ${highlight ? "opacity-80" : "text-foreground/60"}`}>{tier.cadence}</span>
+                      </div>
+                      <p className={`text-sm mb-6 ${highlight ? "opacity-90" : "text-foreground/60"}`}>{tier.tagline}</p>
+                      <ul className="space-y-3 mb-8 min-h-[168px]">
+                        {tier.features.map((f) => (
+                          <li key={f} className={`flex items-start gap-2.5 text-sm ${highlight ? "" : "text-foreground/80"}`}>
+                            <CheckCircle className={`w-4 h-4 shrink-0 mt-0.5 ${highlight ? "text-white" : "text-primary"}`} />
+                            <span>{f}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      <Link to={tier.name === "Business" ? "/contact" : "/auth"}>
+                        <Button
+                          className={`w-full h-12 rounded-2xl font-semibold transition-transform group-hover:scale-[1.02] ${
+                            highlight
+                              ? "bg-white text-primary hover:bg-white/95 border-0"
+                              : "bg-foreground text-background hover:bg-foreground/90 border-0"
+                          }`}
+                        >
+                          {tier.cta}
+                        </Button>
+                      </Link>
+                    </div>
                   </div>
-                  <div className="flex items-baseline mb-2">
-                    <span className="text-5xl font-bold font-display">$12</span>
-                    <span className="text-sm opacity-80 ml-2">/month</span>
-                  </div>
-                  <p className="text-sm opacity-80 mb-6">For serious creators and teams.</p>
-                  <ul className="space-y-3 mb-8">
-                    {[
-                      "Unlimited AI enhance & upscale",
-                      "Batch up to 100 files",
-                      "Background removal",
-                      "30-day cloud storage",
-                      "Priority processing",
-                    ].map((f) => (
-                      <li key={f} className="flex items-center gap-2.5 text-sm">
-                        <CheckCircle className="w-4 h-4 text-white shrink-0" />{f}
-                      </li>
-                    ))}
-                  </ul>
-                  <Link to="/pricing">
-                    <Button className="w-full h-12 rounded-2xl bg-white text-primary hover:bg-white/95 font-semibold border-0">
-                      Start 7-day free trial
-                    </Button>
-                  </Link>
-                </div>
-              </div>
+                );
+              })}
             </div>
+
+            <p className="text-center text-xs text-foreground/50 mt-8">
+              All plans include no watermark, HTTPS delivery, and cancel-anytime billing.
+            </p>
           </div>
         </section>
+
 
         {/* FAQ */}
         <section id="faq" className="px-6 py-20 md:py-28" aria-labelledby="faq-heading">

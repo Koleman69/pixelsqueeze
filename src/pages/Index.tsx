@@ -10,6 +10,8 @@ import { useVideoCompression } from "@/hooks/useVideoCompression";
 import { Link } from "react-router-dom";
 import { OnboardingFlow, OnboardingTrigger } from "@/components/OnboardingFlow";
 import { UsageLimits, FREE_LIMITS } from "@/components/UsageLimits";
+import { FreeToolGate, FREE_TOOL_LIMIT } from "@/components/FreeToolGate";
+import { supabase } from "@/integrations/supabase/client";
 import { AnalysisResult } from "@/types/analysis";
 import { motion, AnimatePresence } from "framer-motion";
 

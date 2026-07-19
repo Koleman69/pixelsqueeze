@@ -608,6 +608,33 @@ export type Database = {
           },
         ]
       }
+      free_tool_usage: {
+        Row: {
+          count: number
+          created_at: string
+          email: string
+          id: string
+          tool_id: string
+          updated_at: string
+        }
+        Insert: {
+          count?: number
+          created_at?: string
+          email: string
+          id?: string
+          tool_id: string
+          updated_at?: string
+        }
+        Update: {
+          count?: number
+          created_at?: string
+          email?: string
+          id?: string
+          tool_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       posting_workflows: {
         Row: {
           content_pool_ids: string[] | null
@@ -1113,6 +1140,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      consume_free_tool_usage: {
+        Args: { _amount?: number; _email: string; _tool_id: string }
+        Returns: number
+      }
       count_daily_ai_usage: {
         Args: { feature?: string; target_user_id: string }
         Returns: number
@@ -1137,6 +1168,10 @@ export type Database = {
           last_name: string
           user_id: string
         }[]
+      }
+      get_free_tool_usage: {
+        Args: { _email: string; _tool_id: string }
+        Returns: number
       }
       get_my_subscription_status: { Args: never; Returns: Json }
       get_safe_subscriber_status: {

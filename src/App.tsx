@@ -34,6 +34,10 @@ const SolutionsIndex = lazy(() => import("./pages/SolutionsIndex"));
 const IndustryLanding = lazy(() => import("./pages/IndustryLanding"));
 const EnhanceIndex = lazy(() => import("./pages/EnhanceIndex"));
 const EnhanceTopic = lazy(() => import("./pages/EnhanceTopic"));
+const LearnHub = lazy(() => import("./pages/learn/LearnHub"));
+const LearnCategory = lazy(() => import("./pages/learn/LearnCategory"));
+const LearnArticle = lazy(() => import("./pages/learn/LearnArticle"));
+const Calculators = lazy(() => import("./pages/learn/Calculators"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -158,6 +162,10 @@ const App = () => (
                 <Route path="/for/:slug" element={<IndustryLanding />} />
                 <Route path="/enhance" element={<EnhanceIndex />} />
                 <Route path="/enhance/:slug" element={<EnhanceTopic />} />
+                <Route path="/learn" element={<LearnHub />} />
+                <Route path="/learn/calculators/:slug" element={<Calculators />} />
+                <Route path="/learn/:category" element={<LearnCategory />} />
+                <Route path="/learn/:category/:slug" element={<LearnArticle />} />
                 <Route path="/share/:shareCode" element={<SharedFile />} />
                 <Route path="/account" element={
                   <ProtectedRoute>

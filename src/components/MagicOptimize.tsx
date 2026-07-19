@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, useMemo, useEffect, type ChangeEvent, type DragEvent, type ElementType } from "react";
+import { useToolQuota } from "@/components/FreeToolGate";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -105,6 +106,7 @@ interface MagicOptimizeProps {
 
 export const MagicOptimize = ({ isSubscribed = false }: MagicOptimizeProps) => {
   const { toast } = useToast();
+  const quota = useToolQuota();
   const { createCheckout } = useImageCompression();
   const { isProcessing, overallProgress, processFiles, downloadResult, downloadAllAsZip, clearJobs } =
     useOptimizationPipeline();
@@ -156,6 +158,13 @@ export const MagicOptimize = ({ isSubscribed = false }: MagicOptimizeProps) => {
     if (!images.length && !videos.length) {
       toast({ title: "Unsupported files", description: "Upload images (PNG, JPEG, WebP, HEIC, TIFF, AVIF, SVG) or videos.", variant: "destructive" });
       return;
+    }
+
+    // Free trial quota: charge one credit per image/video added
+    if (quota && !quota.unlimited) {
+      const need = images.length + videos.length;
+      const ok = await quota.consume(need);
+      if (!ok) return;
     }
 
     setVideoFiles((prev) => [...prev, ...videos]);

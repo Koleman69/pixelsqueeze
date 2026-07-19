@@ -1,4 +1,5 @@
 import { useCallback, useRef, useState, type ChangeEvent, type DragEvent, type ElementType } from "react";
+import { useToolQuota } from "@/components/FreeToolGate";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Upload,
@@ -281,16 +282,21 @@ interface EnhanceResult {
 
 export function AIEnhanceStudio() {
   const fileInput = useRef<HTMLInputElement>(null);
+  const quota = useToolQuota();
   const [source, setSource] = useState<{ file: File; url: string } | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [running, setRunning] = useState<EnhancementId | null>(null);
   const [result, setResult] = useState<EnhanceResult | null>(null);
   const [success, setSuccess] = useState(false);
 
-  const setFile = (file: File) => {
+  const setFile = async (file: File) => {
     if (!file.type.startsWith("image/")) {
       toast.error("Please choose an image file.");
       return;
+    }
+    if (quota && !quota.unlimited) {
+      const ok = await quota.consume(1);
+      if (!ok) return;
     }
     if (source?.url) URL.revokeObjectURL(source.url);
     setSource({ file, url: URL.createObjectURL(file) });

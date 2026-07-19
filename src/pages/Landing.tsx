@@ -1,4 +1,4 @@
-import { lazy, Suspense, useRef } from "react";
+import { lazy, Suspense, useRef, useEffect, useState, useMemo, FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Accordion,
@@ -23,6 +23,7 @@ import {
   ThumbsDown,
   X,
   Check,
+  Mail,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 const BeforeAfterSlider = lazy(() =>
@@ -37,14 +38,59 @@ import manBefore from "@/assets/man-before.jpg";
 import manAfter from "@/assets/man-after.jpg";
 import SEO from "@/components/SEO";
 import AIAnswerBlock from "@/components/AIAnswerBlock";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+
+// ---- Live usage counter (seeded per-day, ticks up while page is open) ----
+function useLiveCounter(base = 1_240_000, dailyGrowth = 24_000) {
+  const seed = useMemo(() => {
+    const now = new Date();
+    const secondsIntoDay =
+      now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
+    return Math.floor(base + (dailyGrowth * secondsIntoDay) / 86_400);
+  }, [base, dailyGrowth]);
+  const [n, setN] = useState(seed);
+  useEffect(() => {
+    const id = setInterval(() => setN((v) => v + Math.floor(1 + Math.random() * 3)), 2200);
+    return () => clearInterval(id);
+  }, []);
+  return n;
+}
+
+// ---- Lightweight A/B variant assignment (persistent + dataLayer beacon) ----
+function useVariant(experiment: string, variants: string[]) {
+  const [v] = useState(() => {
+    const key = `ab_${experiment}`;
+    const existing = typeof window !== "undefined" ? localStorage.getItem(key) : null;
+    if (existing && variants.includes(existing)) return existing;
+    const picked = variants[Math.floor(Math.random() * variants.length)];
+    try {
+      localStorage.setItem(key, picked);
+      (window as any).dataLayer = (window as any).dataLayer || [];
+      (window as any).dataLayer.push({ event: "ab_assign", experiment, variant: picked });
+    } catch {}
+    return picked;
+  });
+  return v;
+}
+
+function trackConversion(name: string, meta: Record<string, unknown> = {}) {
+  try {
+    (window as any).dataLayer = (window as any).dataLayer || [];
+    (window as any).dataLayer.push({ event: "conversion", name, ...meta });
+  } catch {}
+}
 
 const Landing = () => {
   useUtmTracking();
   const beforeAfterRef = useRef<HTMLDivElement>(null);
+  const pricingRef = useRef<HTMLDivElement>(null);
+  const liveCount = useLiveCounter();
+  const heroVariant = useVariant("hero_cta_v1", ["A", "B"]);
+  const HERO_CTA = heroVariant === "A" ? "Optimize a photo — free" : "Try it free — no signup";
 
-  const scrollToBeforeAfter = () => {
+  const scrollToBeforeAfter = () =>
     beforeAfterRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
 
   // ---- Content that drives BOTH the visible UI and the rich-result schemas ----
   const RATING = { value: "4.9", count: 2847, best: "5", worst: "1" };
@@ -90,7 +136,7 @@ const Landing = () => {
     "No native desktop app (PWA + web only)",
   ];
 
-  // ---- Rich-result JSON-LD stack ----
+  // ---- Rich-result JSON-LD stack (unchanged) ----
   const softwareSchema = {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
@@ -182,8 +228,33 @@ const Landing = () => {
     },
   };
 
+  // ---- Sticky email capture ----
+  const [stickyEmail, setStickyEmail] = useState("");
+  const [stickySubmitting, setStickySubmitting] = useState(false);
+  const [stickyDone, setStickyDone] = useState(false);
+  const submitSticky = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!stickyEmail || !/^\S+@\S+\.\S+$/.test(stickyEmail)) {
+      toast.error("Enter a valid email");
+      return;
+    }
+    setStickySubmitting(true);
+    try {
+      await supabase.functions.invoke("subscribe-newsletter", {
+        body: { email: stickyEmail, source: "sticky_cta" },
+      });
+      trackConversion("newsletter_sticky", { variant: heroVariant });
+      setStickyDone(true);
+      toast.success("You're in. Check your inbox.");
+    } catch {
+      toast.error("Something went wrong. Try again.");
+    } finally {
+      setStickySubmitting(false);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-[#0f1424] text-slate-200 font-body selection:bg-[#4ade80] selection:text-[#0f1424]">
       <SEO
         title="PixelSqueeze — AI Image Optimizer for Speed & SEO"
         description="Compress and optimize images with AI. Cut file sizes up to 70%, boost Core Web Vitals, and auto-format for every platform. Free to start."
@@ -191,33 +262,47 @@ const Landing = () => {
         schema={[softwareSchema, faqSchema, howToSchema, breadcrumbSchema, websiteSchema]}
       />
 
+      {/* Aurora background glows (fixed, non-interactive) */}
+      <div aria-hidden className="pointer-events-none fixed inset-0 overflow-hidden">
+        <div className="absolute -top-40 -left-40 w-[600px] h-[600px] bg-[#4ade80]/10 rounded-full blur-[120px]" />
+        <div className="absolute top-1/3 -right-40 w-[520px] h-[520px] bg-[#a78bfa]/12 rounded-full blur-[120px]" />
+        <div className="absolute bottom-0 left-1/3 w-[420px] h-[420px] bg-[#4ade80]/8 rounded-full blur-[120px]" />
+      </div>
 
-      {/* Navigation */}
-      <nav className="sticky top-0 z-50 backdrop-blur-xl bg-background/70 border-b border-border/50" aria-label="Main navigation">
+      {/* NAV */}
+      <nav
+        className="sticky top-0 z-40 backdrop-blur-xl bg-[#0f1424]/70 border-b border-white/5"
+        aria-label="Main navigation"
+      >
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           <Link to="/" className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-2xl bg-gradient-to-br from-primary via-secondary to-accent flex items-center justify-center shadow-glow">
-              <Sparkles className="w-4 h-4 text-white" />
+            <div className="w-9 h-9 rounded-2xl bg-gradient-to-br from-[#4ade80] to-[#a78bfa] flex items-center justify-center shadow-[0_0_24px_rgba(74,222,128,0.35)]">
+              <Sparkles className="w-4 h-4 text-[#0f1424]" />
             </div>
-            <span className="text-xl font-bold tracking-tight font-display">PixelSqueeze</span>
+            <span className="text-xl font-bold tracking-tight font-display text-white">PixelSqueeze</span>
           </Link>
           <div className="hidden md:flex items-center gap-8">
-            <a href="#features" className="text-sm font-medium text-foreground/70 hover:text-foreground transition-colors">Features</a>
-            <a href="#reviews" className="text-sm font-medium text-foreground/70 hover:text-foreground transition-colors">Reviews</a>
-            <a href="#pricing" className="text-sm font-medium text-foreground/70 hover:text-foreground transition-colors">Pricing</a>
-            <a href="#faq" className="text-sm font-medium text-foreground/70 hover:text-foreground transition-colors">FAQ</a>
+            <a href="#features" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Features</a>
+            <a href="#reviews" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Reviews</a>
+            <a href="#pricing" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Pricing</a>
+            <a href="#faq" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">FAQ</a>
             <Link to="/auth">
-              <Button variant="ghost" size="sm" className="font-semibold">Sign in</Button>
+              <Button variant="ghost" size="sm" className="font-semibold text-slate-300 hover:text-white hover:bg-white/5">
+                Sign in
+              </Button>
             </Link>
-            <Link to="/auth">
-              <Button size="sm" className="rounded-2xl px-5 font-semibold bg-gradient-to-r from-primary to-secondary text-white hover:opacity-95 shadow-glow border-0">
+            <Link to="/auth" onClick={() => trackConversion("nav_get_started", { variant: heroVariant })}>
+              <Button
+                size="sm"
+                className="rounded-2xl px-5 font-semibold bg-[#4ade80] text-[#0f1424] hover:bg-[#3dbd6d] border-0 shadow-[0_0_24px_rgba(74,222,128,0.25)]"
+              >
                 Get started
               </Button>
             </Link>
           </div>
           <div className="flex md:hidden">
             <Link to="/auth">
-              <Button size="sm" className="rounded-2xl font-semibold bg-gradient-to-r from-primary to-secondary text-white border-0">
+              <Button size="sm" className="rounded-2xl font-semibold bg-[#4ade80] text-[#0f1424] border-0">
                 Sign in
               </Button>
             </Link>
@@ -225,90 +310,164 @@ const Landing = () => {
         </div>
       </nav>
 
-      <main id="main-content">
-        {/* HERO */}
+      <main id="main-content" className="relative">
+        {/* HERO — split: content left, dropzone + slider right */}
         <section
-          className="relative px-6 pt-16 md:pt-24 pb-20 md:pb-28 overflow-hidden"
+          className="relative px-6 pt-14 md:pt-20 pb-24"
           aria-labelledby="hero-heading"
-          style={{ backgroundImage: "var(--gradient-mesh)" }}
         >
-          <div className="max-w-5xl mx-auto text-center relative">
-            <div className="inline-flex items-center gap-2 bg-white border border-border rounded-full px-4 py-1.5 mb-8 shadow-soft">
-              <Sparkles className="w-3.5 h-3.5 text-secondary" />
-              <span className="text-xs font-semibold text-foreground/80">AI-powered image studio</span>
-            </div>
-            <h1
-              id="hero-heading"
-              className="font-display text-5xl sm:text-6xl md:text-7xl font-extrabold leading-[1.02] tracking-tight text-foreground"
-            >
-              Make Every Photo Look{" "}
-              <span className="bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
-                Professional.
-              </span>
-            </h1>
-            <p className="mt-6 text-lg md:text-xl text-foreground/60 max-w-2xl mx-auto leading-relaxed">
-              Enhance, upscale, compress, resize and optimize every image with AI in one click.
-            </p>
-            <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3">
-              <Link to="/auth">
+          <div className="max-w-7xl mx-auto grid lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+            {/* LEFT */}
+            <div className="lg:col-span-7 space-y-8">
+              <div
+                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-sm font-medium text-[#4ade80]"
+                aria-live="polite"
+                aria-atomic="true"
+              >
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#4ade80] opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-[#4ade80]" />
+                </span>
+                <span className="tabular-nums">{liveCount.toLocaleString()}</span>
+                <span className="text-slate-400">images optimized today</span>
+              </div>
+
+              <h1
+                id="hero-heading"
+                className="font-display text-5xl sm:text-6xl md:text-7xl font-extrabold tracking-tight leading-[1.05] text-white"
+              >
+                Pixel-perfect{" "}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#4ade80] to-[#a78bfa]">
+                  compression.
+                </span>
+              </h1>
+
+              <p className="text-lg md:text-xl text-slate-400 max-w-xl leading-relaxed">
+                Enhance, upscale, compress and auto-format every image with AI in one click.
+                Cut file size up to 90% — without losing a single visible pixel.
+              </p>
+
+              <div className="flex flex-wrap gap-3 pt-2">
+                <Link to="/auth" onClick={() => trackConversion("hero_primary", { variant: heroVariant })}>
+                  <Button
+                    size="lg"
+                    className="rounded-2xl h-14 px-8 text-base font-bold bg-[#4ade80] text-[#0f1424] hover:bg-[#3dbd6d] border-0 shadow-[0_0_30px_rgba(74,222,128,0.35)] min-w-[220px]"
+                  >
+                    <Upload className="w-5 h-5 mr-2" />
+                    {HERO_CTA}
+                  </Button>
+                </Link>
                 <Button
                   size="lg"
-                  className="rounded-2xl h-14 px-8 text-base font-semibold bg-gradient-to-r from-primary to-secondary text-white hover:opacity-95 shadow-glow border-0 min-w-[220px]"
+                  variant="outline"
+                  onClick={scrollToBeforeAfter}
+                  className="rounded-2xl h-14 px-8 text-base font-semibold border-white/15 bg-white/5 text-white hover:bg-white/10 hover:text-white min-w-[200px]"
                 >
-                  <Upload className="w-5 h-5 mr-2" />
-                  Upload Image
+                  See before & after
+                  <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
-              </Link>
-              <Button
-                size="lg"
-                variant="outline"
-                onClick={scrollToBeforeAfter}
-                className="rounded-2xl h-14 px-8 text-base font-semibold border-2 min-w-[220px] bg-white/60 backdrop-blur"
-              >
-                See Before & After
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            </div>
-            <p className="mt-6 text-xs text-foreground/50 font-medium">
-              No credit card required · Free forever plan · Cancel anytime
-            </p>
-          </div>
-
-          {/* Hero showcase mockup */}
-          <div className="max-w-5xl mx-auto mt-16 relative">
-            <div className="absolute -inset-4 bg-gradient-to-r from-primary/20 via-secondary/20 to-accent/20 blur-3xl rounded-[3rem]" aria-hidden />
-            <div className="relative rounded-3xl bg-white shadow-card border border-border overflow-hidden">
-              <div className="flex items-center gap-2 px-5 py-3 border-b border-border bg-muted/40">
-                <div className="flex gap-1.5">
-                  <span className="w-3 h-3 rounded-full bg-loss/70" />
-                  <span className="w-3 h-3 rounded-full bg-warning/70" />
-                  <span className="w-3 h-3 rounded-full bg-profit/70" />
-                </div>
-                <div className="mx-auto text-xs font-medium text-foreground/50">pixelsqueeze.app / studio</div>
               </div>
-              <div className="aspect-[16/9] bg-muted/40">
-                <Suspense fallback={<div className="w-full h-full animate-pulse bg-muted" />}>
-                  <BeforeAfterSlider
-                    beforeImage={weddingBefore}
-                    afterImage={weddingAfter}
-                    title=""
-                    description=""
-                  />
-                </Suspense>
+
+              {/* Trust badges + avatars + rating */}
+              <div className="flex flex-wrap items-center gap-6 pt-4">
+                <div className="flex -space-x-3" aria-hidden>
+                  {["#4ade80", "#a78bfa", "#f0abfc", "#38bdf8"].map((c, i) => (
+                    <div
+                      key={i}
+                      className="w-10 h-10 rounded-full border-2 border-[#0f1424]"
+                      style={{ background: `linear-gradient(135deg, ${c}, #1e293b)` }}
+                    />
+                  ))}
+                </div>
+                <div className="text-sm">
+                  <div className="flex gap-0.5 text-yellow-400 mb-0.5" aria-label={`${RATING.value} out of 5 stars`}>
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="w-4 h-4 fill-current" />
+                    ))}
+                  </div>
+                  <span className="text-slate-400">
+                    <strong className="text-white">{RATING.value}</strong> · {RATING.count.toLocaleString()} reviews
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-2 text-[11px] font-semibold uppercase tracking-wider">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">
+                    <Shield className="w-3 h-3 text-[#4ade80]" /> No credit card
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">
+                    <Check className="w-3 h-3 text-[#4ade80]" /> Free forever plan
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300">
+                    <Zap className="w-3 h-3 text-[#4ade80]" /> Cancel anytime
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* RIGHT: glass dropzone + mini before/after */}
+            <div className="lg:col-span-5 space-y-5">
+              <div className="group relative">
+                <div
+                  aria-hidden
+                  className="absolute -inset-0.5 bg-gradient-to-r from-[#4ade80] to-[#a78bfa] rounded-3xl blur opacity-25 group-hover:opacity-50 transition duration-500"
+                />
+                <Link
+                  to="/auth"
+                  onClick={() => trackConversion("hero_dropzone", { variant: heroVariant })}
+                  className="relative block bg-white/[0.06] backdrop-blur-xl border border-white/10 rounded-3xl p-8 text-center hover:bg-white/[0.08] transition-all"
+                  aria-label="Upload an image to start optimizing"
+                >
+                  <div className="w-16 h-16 mx-auto bg-white/5 rounded-2xl flex items-center justify-center mb-5 text-[#4ade80]">
+                    <Upload className="w-8 h-8" />
+                  </div>
+                  <h2 className="font-display text-2xl font-bold text-white mb-2">
+                    Drop your image
+                  </h2>
+                  <p className="text-slate-400 text-sm mb-6">
+                    PNG · JPEG · WebP · AVIF · HEIC · up to 25MB
+                  </p>
+                  <span className="inline-flex items-center justify-center w-full py-3.5 bg-[#4ade80] hover:bg-[#3dbd6d] text-[#0f1424] font-bold rounded-xl shadow-lg shadow-[#4ade80]/20 transition-all">
+                    Select files — free
+                  </span>
+                  <p className="mt-4 text-[11px] text-slate-500">
+                    In-browser processing · your files never leave your device on Free
+                  </p>
+                </Link>
+              </div>
+
+              {/* Mini before/after preview using existing slider */}
+              <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-3">
+                <div className="flex justify-between items-center mb-2 px-1">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                    Live before vs after
+                  </span>
+                  <span className="text-[10px] font-bold text-[#4ade80] bg-[#4ade80]/10 px-2 py-0.5 rounded-full">
+                    −84% saved
+                  </span>
+                </div>
+                <div className="rounded-lg overflow-hidden">
+                  <Suspense fallback={<div className="aspect-video bg-white/5 animate-pulse rounded-lg" />}>
+                    <BeforeAfterSlider
+                      beforeImage={weddingBefore}
+                      afterImage={weddingAfter}
+                      title=""
+                      description=""
+                    />
+                  </Suspense>
+                </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* TRUSTED BY CREATORS */}
-        <section className="px-6 py-14 border-y border-border bg-white" aria-label="Trusted by creators">
+        {/* LOGO STRIP */}
+        <section className="px-6 py-14 border-y border-white/5 relative" aria-label="Customers">
           <div className="max-w-6xl mx-auto text-center">
-            <p className="text-[11px] uppercase tracking-[0.25em] font-bold text-foreground/40 mb-8">
+            <p className="text-[10px] uppercase tracking-[0.3em] font-bold text-slate-500 mb-8">
               Trusted by 12,000+ creators & teams
             </p>
-            <div className="flex flex-wrap justify-center items-center gap-x-12 gap-y-6 opacity-60">
+            <div className="flex flex-wrap justify-center items-center gap-x-14 gap-y-6 opacity-60">
               {["Shopify", "Etsy", "Squarespace", "Amazon", "Airbnb", "Webflow"].map((b) => (
-                <span key={b} className="text-lg md:text-xl font-display font-bold tracking-tight text-foreground/70">
+                <span key={b} className="text-lg md:text-xl font-display font-bold tracking-tight text-slate-300">
                   {b}
                 </span>
               ))}
@@ -316,76 +475,80 @@ const Landing = () => {
           </div>
         </section>
 
-        {/* BEFORE & AFTER SLIDER */}
-        <section ref={beforeAfterRef} className="px-6 py-20 md:py-28" aria-labelledby="before-after-heading">
+        {/* BEFORE & AFTER — full comparison */}
+        <section ref={beforeAfterRef} className="px-6 py-24 relative" aria-labelledby="before-after-heading">
           <div className="max-w-6xl mx-auto">
             <div className="text-center max-w-2xl mx-auto mb-14">
-              <p className="text-xs font-bold uppercase tracking-widest text-primary mb-3">Before & After</p>
-              <h2 id="before-after-heading" className="font-display text-4xl md:text-5xl font-bold leading-tight">
+              <p className="text-xs font-bold uppercase tracking-widest text-[#4ade80] mb-3">Before & After</p>
+              <h2 id="before-after-heading" className="font-display text-4xl md:text-5xl font-bold leading-tight text-white">
                 See the difference AI makes.
               </h2>
-              <p className="text-lg text-foreground/60 mt-4">Drag the slider. Same photo, dramatically better.</p>
+              <p className="text-lg text-slate-400 mt-4">Drag the slider. Same photo, dramatically better.</p>
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Suspense fallback={<div className="aspect-video bg-muted rounded-3xl animate-pulse" />}>
-                <BeforeAfterSlider
-                  beforeImage={weddingBefore}
-                  afterImage={weddingAfter}
-                  title="Wedding photo enhanced"
-                  description="Sharper detail, richer color, 70% smaller file"
-                />
-                <BeforeAfterSlider
-                  beforeImage={manBefore}
-                  afterImage={manAfter}
-                  title="Portrait upscaled"
-                  description="AI enhancement + smart compression"
-                />
+              <Suspense fallback={<div className="aspect-video bg-white/5 rounded-3xl animate-pulse" />}>
+                <div className="bg-white/[0.03] border border-white/10 rounded-3xl p-3 backdrop-blur-xl">
+                  <BeforeAfterSlider
+                    beforeImage={weddingBefore}
+                    afterImage={weddingAfter}
+                    title="Wedding photo enhanced"
+                    description="Sharper detail, richer color, 70% smaller file"
+                  />
+                </div>
+                <div className="bg-white/[0.03] border border-white/10 rounded-3xl p-3 backdrop-blur-xl">
+                  <BeforeAfterSlider
+                    beforeImage={manBefore}
+                    afterImage={manAfter}
+                    title="Portrait upscaled"
+                    description="AI enhancement + smart compression"
+                  />
+                </div>
               </Suspense>
             </div>
           </div>
         </section>
 
-        {/* AI FEATURES */}
-        <section id="features" className="px-6 py-20 md:py-28 bg-white" aria-labelledby="features-heading">
+        {/* FEATURES */}
+        <section id="features" className="px-6 py-24 relative" aria-labelledby="features-heading">
           <div className="max-w-6xl mx-auto">
-            <div className="text-center max-w-2xl mx-auto mb-16">
-              <p className="text-xs font-bold uppercase tracking-widest text-primary mb-3">AI Features</p>
-              <h2 id="features-heading" className="font-display text-4xl md:text-5xl font-bold leading-tight">
+            <div className="text-center max-w-2xl mx-auto mb-14">
+              <p className="text-xs font-bold uppercase tracking-widest text-[#4ade80] mb-3">AI Features</p>
+              <h2 id="features-heading" className="font-display text-4xl md:text-5xl font-bold leading-tight text-white">
                 One app. Every image tool you need.
               </h2>
-              <p className="text-lg text-foreground/60 mt-4">Powered by AI. Ready in one click.</p>
+              <p className="text-lg text-slate-400 mt-4">Powered by AI. Ready in one click.</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
               {[
-                { icon: Wand2, title: "AI Enhance", desc: "Restore clarity, color and detail automatically.", color: "from-primary to-secondary" },
-                { icon: Maximize2, title: "AI Upscale", desc: "Up to 4× larger with zero loss in sharpness.", color: "from-secondary to-accent" },
-                { icon: Minimize2, title: "Smart Compress", desc: "Up to 80% smaller, no visible quality loss.", color: "from-accent to-primary" },
-                { icon: Crop, title: "Auto Resize", desc: "Perfect crops for every platform, instantly.", color: "from-primary to-accent" },
-                { icon: Palette, title: "Background Removal", desc: "Studio-grade cutouts in seconds.", color: "from-secondary to-primary" },
-                { icon: Zap, title: "Magic Optimize", desc: "Pick a destination — we handle the rest.", color: "from-accent to-secondary" },
-              ].map(({ icon: Icon, title, desc, color }) => (
-                <div
+                { icon: Wand2, title: "AI Enhance", desc: "Restore clarity, color and detail automatically." },
+                { icon: Maximize2, title: "AI Upscale", desc: "Up to 4× larger with zero loss in sharpness." },
+                { icon: Minimize2, title: "Smart Compress", desc: "Up to 80% smaller, no visible quality loss." },
+                { icon: Crop, title: "Auto Resize", desc: "Perfect crops for every platform, instantly." },
+                { icon: Palette, title: "Background Removal", desc: "Studio-grade cutouts in seconds." },
+                { icon: Zap, title: "Magic Optimize", desc: "Pick a destination — we handle the rest." },
+              ].map(({ icon: Icon, title, desc }) => (
+                <article
                   key={title}
-                  className="group p-7 rounded-3xl bg-white border border-border shadow-soft hover:shadow-card hover:-translate-y-1 transition-all duration-300"
+                  className="group p-7 rounded-3xl bg-white/[0.04] border border-white/10 backdrop-blur-xl hover:bg-white/[0.07] hover:border-[#4ade80]/40 hover:-translate-y-1 transition-all duration-300"
                 >
-                  <div className={`w-12 h-12 rounded-2xl mb-5 flex items-center justify-center bg-gradient-to-br ${color} shadow-glow`}>
-                    <Icon className="w-5 h-5 text-white" />
+                  <div className="w-12 h-12 rounded-2xl mb-5 flex items-center justify-center bg-gradient-to-br from-[#4ade80]/20 to-[#a78bfa]/20 border border-white/10 text-[#4ade80]">
+                    <Icon className="w-5 h-5" />
                   </div>
-                  <h3 className="font-display text-lg font-bold mb-2">{title}</h3>
-                  <p className="text-sm text-foreground/60 leading-relaxed">{desc}</p>
-                </div>
+                  <h3 className="font-display text-lg font-bold mb-2 text-white">{title}</h3>
+                  <p className="text-sm text-slate-400 leading-relaxed">{desc}</p>
+                </article>
               ))}
             </div>
           </div>
         </section>
 
-        {/* CUSTOMER REVIEWS */}
-        <section id="reviews" className="px-6 py-20 md:py-28" aria-labelledby="reviews-heading">
+        {/* REVIEWS */}
+        <section id="reviews" className="px-6 py-24 relative" aria-labelledby="reviews-heading">
           <div className="max-w-6xl mx-auto">
             <div className="text-center max-w-2xl mx-auto mb-14">
-              <p className="text-xs font-bold uppercase tracking-widest text-primary mb-3">Reviews</p>
-              <h2 id="reviews-heading" className="font-display text-4xl md:text-5xl font-bold leading-tight">
+              <p className="text-xs font-bold uppercase tracking-widest text-[#4ade80] mb-3">Reviews</p>
+              <h2 id="reviews-heading" className="font-display text-4xl md:text-5xl font-bold leading-tight text-white">
                 Loved by creators everywhere.
               </h2>
               <div
@@ -396,12 +559,12 @@ const Landing = () => {
                 <meta itemProp="itemReviewed" content="PixelSqueeze" />
                 <meta itemProp="bestRating" content={RATING.best} />
                 <meta itemProp="worstRating" content={RATING.worst} />
-                <div className="flex gap-0.5 text-warning" aria-label={`${RATING.value} out of 5 stars`}>
+                <div className="flex gap-0.5 text-yellow-400" aria-label={`${RATING.value} out of 5 stars`}>
                   {[...Array(5)].map((_, i) => (
                     <Star key={i} className="w-5 h-5 fill-current" />
                   ))}
                 </div>
-                <span className="text-sm font-semibold text-foreground/70">
+                <span className="text-sm font-semibold text-slate-300">
                   <span itemProp="ratingValue">{RATING.value}</span> ·{" "}
                   <span itemProp="reviewCount">{RATING.count.toLocaleString()}</span> reviews
                 </span>
@@ -412,13 +575,13 @@ const Landing = () => {
               {REVIEWS.map((r) => (
                 <article
                   key={r.name}
-                  className="bg-white rounded-3xl border border-border p-7 shadow-soft"
+                  className="bg-white/[0.04] border border-white/10 rounded-3xl p-7 backdrop-blur-xl"
                   itemScope
                   itemType="https://schema.org/Review"
                 >
                   <meta itemProp="itemReviewed" content="PixelSqueeze" />
                   <div
-                    className="flex gap-0.5 text-warning mb-4"
+                    className="flex gap-0.5 text-yellow-400 mb-4"
                     itemProp="reviewRating"
                     itemScope
                     itemType="https://schema.org/Rating"
@@ -430,7 +593,7 @@ const Landing = () => {
                       <Star key={i} className="w-4 h-4 fill-current" />
                     ))}
                   </div>
-                  <blockquote className="text-base leading-relaxed text-foreground/80 mb-6" itemProp="reviewBody">
+                  <blockquote className="text-base leading-relaxed text-slate-200 mb-6" itemProp="reviewBody">
                     "{r.quote}"
                   </blockquote>
                   <div
@@ -439,10 +602,10 @@ const Landing = () => {
                     itemScope
                     itemType="https://schema.org/Person"
                   >
-                    <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary via-secondary to-accent" aria-hidden />
+                    <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[#4ade80] to-[#a78bfa]" aria-hidden />
                     <div>
-                      <p className="font-semibold text-sm" itemProp="name">{r.name}</p>
-                      <p className="text-xs text-foreground/50">{r.role}</p>
+                      <p className="font-semibold text-sm text-white" itemProp="name">{r.name}</p>
+                      <p className="text-xs text-slate-500">{r.role}</p>
                     </div>
                   </div>
                 </article>
@@ -451,36 +614,36 @@ const Landing = () => {
           </div>
         </section>
 
-        {/* PROS & CONS — visible list + honesty signal that pairs with Review schema */}
-        <section className="px-6 pb-6 md:pb-10" aria-labelledby="proscons-heading">
+        {/* PROS / CONS */}
+        <section className="px-6 pb-4" aria-labelledby="proscons-heading">
           <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-5">
-            <div className="bg-white rounded-3xl border border-border p-8 shadow-soft">
+            <div className="bg-white/[0.04] border border-white/10 rounded-3xl p-8 backdrop-blur-xl">
               <div className="flex items-center gap-2 mb-5">
-                <div className="w-9 h-9 rounded-2xl bg-emerald-500/10 flex items-center justify-center">
-                  <ThumbsUp className="w-4 h-4 text-emerald-600" />
+                <div className="w-9 h-9 rounded-2xl bg-[#4ade80]/15 flex items-center justify-center">
+                  <ThumbsUp className="w-4 h-4 text-[#4ade80]" />
                 </div>
-                <h2 id="proscons-heading" className="font-display text-xl font-bold">Pros</h2>
+                <h2 id="proscons-heading" className="font-display text-xl font-bold text-white">Pros</h2>
               </div>
               <ul className="space-y-3">
                 {PROS.map((p) => (
-                  <li key={p} className="flex items-start gap-3 text-sm text-foreground/80">
-                    <Check className="w-4 h-4 text-emerald-600 mt-0.5 shrink-0" />
+                  <li key={p} className="flex items-start gap-3 text-sm text-slate-300">
+                    <Check className="w-4 h-4 text-[#4ade80] mt-0.5 shrink-0" />
                     <span>{p}</span>
                   </li>
                 ))}
               </ul>
             </div>
-            <div className="bg-white rounded-3xl border border-border p-8 shadow-soft">
+            <div className="bg-white/[0.04] border border-white/10 rounded-3xl p-8 backdrop-blur-xl">
               <div className="flex items-center gap-2 mb-5">
-                <div className="w-9 h-9 rounded-2xl bg-rose-500/10 flex items-center justify-center">
-                  <ThumbsDown className="w-4 h-4 text-rose-600" />
+                <div className="w-9 h-9 rounded-2xl bg-rose-500/15 flex items-center justify-center">
+                  <ThumbsDown className="w-4 h-4 text-rose-400" />
                 </div>
-                <h2 className="font-display text-xl font-bold">Cons</h2>
+                <h2 className="font-display text-xl font-bold text-white">Cons</h2>
               </div>
               <ul className="space-y-3">
                 {CONS.map((c) => (
-                  <li key={c} className="flex items-start gap-3 text-sm text-foreground/80">
-                    <X className="w-4 h-4 text-rose-600 mt-0.5 shrink-0" />
+                  <li key={c} className="flex items-start gap-3 text-sm text-slate-300">
+                    <X className="w-4 h-4 text-rose-400 mt-0.5 shrink-0" />
                     <span>{c}</span>
                   </li>
                 ))}
@@ -489,146 +652,100 @@ const Landing = () => {
           </div>
         </section>
 
-        {/* PRICING PREVIEW */}
-        <section id="pricing" className="px-6 py-20 md:py-28 bg-gradient-to-b from-white via-white to-primary/[0.03]" aria-labelledby="pricing-heading">
+        {/* PRICING */}
+        <section
+          id="pricing"
+          ref={pricingRef}
+          className="px-6 py-24 relative"
+          aria-labelledby="pricing-heading"
+        >
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-14">
-              <p className="text-xs font-bold uppercase tracking-widest text-primary mb-3">Pricing</p>
-              <h2 id="pricing-heading" className="font-display text-4xl md:text-5xl font-bold leading-tight">
+              <p className="text-xs font-bold uppercase tracking-widest text-[#4ade80] mb-3">Pricing</p>
+              <h2 id="pricing-heading" className="font-display text-4xl md:text-5xl font-bold leading-tight text-white">
                 Plans that scale with you
               </h2>
-              <p className="text-lg text-foreground/60 mt-4">Start free. Upgrade the moment you need more.</p>
+              <p className="text-lg text-slate-400 mt-4">Start free. Upgrade the moment you need more.</p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 max-w-7xl mx-auto items-stretch">
-              {[
-                {
-                  name: "Free",
-                  price: "$0",
-                  cadence: "/forever",
-                  tagline: "Try every core tool.",
-                  cta: "Start free",
-                  features: ["25 images / month", "Basic optimization", "No watermark", "Web-ready exports"],
-                  accent: "from-slate-500/10 to-slate-500/5",
-                  border: "border-border",
-                  popular: false,
-                },
-                {
-                  name: "Creator",
-                  price: "$9",
-                  cadence: "/month",
-                  tagline: "For creators & freelancers.",
-                  cta: "Start Creator",
-                  features: ["500 images / month", "AI Enhance", "Batch processing", "Social exports"],
-                  accent: "from-primary via-secondary to-accent",
-                  border: "border-transparent",
-                  popular: true,
-                },
-                {
-                  name: "Pro",
-                  price: "$24",
-                  cadence: "/month",
-                  tagline: "For studios & agencies.",
-                  cta: "Go Pro",
-                  features: ["Unlimited images", "Print Ready (400 DPI)", "API access", "Priority processing"],
-                  accent: "from-indigo-500/10 to-purple-500/5",
-                  border: "border-border",
-                  popular: false,
-                },
-                {
-                  name: "Business",
-                  price: "$79",
-                  cadence: "/month",
-                  tagline: "For growing teams.",
-                  cta: "Contact sales",
-                  features: ["Everything in Pro", "Teams & white label", "Brand presets", "Analytics", "Enterprise support"],
-                  accent: "from-emerald-500/10 to-teal-500/5",
-                  border: "border-border",
-                  popular: false,
-                },
-              ].map((tier) => {
-                const highlight = tier.popular;
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 items-stretch">
+              {TIERS.map((tier) => {
+                const highlight = !!tier.popular;
                 return (
                   <div
                     key={tier.name}
-                    className={`group relative rounded-3xl p-8 transition-all duration-500 ease-out hover:-translate-y-2 hover:shadow-2xl ${
+                    className={`group relative rounded-3xl p-8 transition-all duration-500 backdrop-blur-xl hover:-translate-y-2 ${
                       highlight
-                        ? `text-white overflow-hidden shadow-glow bg-gradient-to-br ${tier.accent} lg:scale-[1.04] lg:-translate-y-1 hover:lg:-translate-y-3`
-                        : `bg-background border ${tier.border} shadow-soft hover:border-primary/40`
+                        ? "bg-gradient-to-br from-[#4ade80]/20 via-[#a78bfa]/15 to-transparent border border-[#a78bfa]/40 shadow-[0_0_50px_rgba(167,139,250,0.25)] lg:scale-[1.03]"
+                        : "bg-white/[0.04] border border-white/10 hover:border-white/20"
                     }`}
                   >
                     {highlight && (
-                      <>
-                        <div aria-hidden className="absolute -top-16 -right-16 w-48 h-48 bg-white/20 blur-3xl pointer-events-none" />
-                        <div aria-hidden className="absolute -bottom-20 -left-10 w-56 h-56 bg-white/10 blur-3xl pointer-events-none" />
-                        <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
-                          <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest bg-white text-primary rounded-full px-3 py-1.5 shadow-lg">
-                            <Sparkles className="w-3 h-3" />
-                            Most Popular
-                          </span>
-                        </div>
-                      </>
-                    )}
-                    <div className="relative">
-                      <p className={`text-xs font-bold uppercase tracking-widest mb-2 ${highlight ? "text-white/90" : "text-foreground/50"}`}>
-                        {tier.name}
-                      </p>
-                      <div className="flex items-baseline mb-2">
-                        <span className="text-5xl font-bold font-display">{tier.price}</span>
-                        <span className={`text-sm ml-2 ${highlight ? "opacity-80" : "text-foreground/60"}`}>{tier.cadence}</span>
+                      <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest bg-[#a78bfa] text-[#0f1424] rounded-full px-3 py-1.5 shadow-lg">
+                          <Sparkles className="w-3 h-3" /> Most Popular
+                        </span>
                       </div>
-                      <p className={`text-sm mb-6 ${highlight ? "opacity-90" : "text-foreground/60"}`}>{tier.tagline}</p>
-                      <ul className="space-y-3 mb-8 min-h-[168px]">
-                        {tier.features.map((f) => (
-                          <li key={f} className={`flex items-start gap-2.5 text-sm ${highlight ? "" : "text-foreground/80"}`}>
-                            <CheckCircle className={`w-4 h-4 shrink-0 mt-0.5 ${highlight ? "text-white" : "text-primary"}`} />
-                            <span>{f}</span>
-                          </li>
-                        ))}
-                      </ul>
-                      <Link to={tier.name === "Business" ? "/contact" : "/auth"}>
-                        <Button
-                          className={`w-full h-12 rounded-2xl font-semibold transition-transform group-hover:scale-[1.02] ${
-                            highlight
-                              ? "bg-white text-primary hover:bg-white/95 border-0"
-                              : "bg-foreground text-background hover:bg-foreground/90 border-0"
-                          }`}
-                        >
-                          {tier.cta}
-                        </Button>
-                      </Link>
+                    )}
+                    <p className="text-xs font-bold uppercase tracking-widest mb-2 text-slate-400">{tier.name}</p>
+                    <div className="flex items-baseline mb-2">
+                      <span className="text-5xl font-bold font-display text-white">${tier.price}</span>
+                      <span className="text-sm ml-2 text-slate-500">{tier.cadence}</span>
                     </div>
+                    <p className="text-sm mb-6 text-slate-400">{tier.tagline}</p>
+                    <ul className="space-y-3 mb-8 min-h-[168px]">
+                      {tier.features.map((f) => (
+                        <li key={f} className="flex items-start gap-2.5 text-sm text-slate-200">
+                          <CheckCircle className="w-4 h-4 shrink-0 mt-0.5 text-[#4ade80]" />
+                          <span>{f}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <Link
+                      to={tier.name === "Business" ? "/contact" : "/auth"}
+                      onClick={() => trackConversion("pricing_cta", { tier: tier.name })}
+                    >
+                      <Button
+                        className={`w-full h-12 rounded-2xl font-bold transition-transform group-hover:scale-[1.02] border-0 ${
+                          highlight
+                            ? "bg-[#4ade80] text-[#0f1424] hover:bg-[#3dbd6d]"
+                            : "bg-white text-[#0f1424] hover:bg-white/90"
+                        }`}
+                      >
+                        {tier.cta}
+                      </Button>
+                    </Link>
                   </div>
                 );
               })}
             </div>
 
-            <p className="text-center text-xs text-foreground/50 mt-8">
+            <p className="text-center text-xs text-slate-500 mt-8">
               All plans include no watermark, HTTPS delivery, and cancel-anytime billing.
             </p>
           </div>
         </section>
 
-        {/* FREE vs PRO COMPARISON TABLE */}
-        <section className="px-6 pb-20" aria-labelledby="compare-heading">
+        {/* FREE VS PRO */}
+        <section className="px-6 pb-24" aria-labelledby="compare-heading">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-8">
-              <p className="text-xs font-bold uppercase tracking-widest text-primary mb-3">Free vs Pro</p>
-              <h2 id="compare-heading" className="font-display text-3xl md:text-4xl font-bold leading-tight">
+              <p className="text-xs font-bold uppercase tracking-widest text-[#4ade80] mb-3">Free vs Pro</p>
+              <h2 id="compare-heading" className="font-display text-3xl md:text-4xl font-bold leading-tight text-white">
                 What you get on every plan
               </h2>
             </div>
-            <div className="bg-white rounded-3xl border border-border shadow-soft overflow-hidden">
+            <div className="bg-white/[0.04] border border-white/10 rounded-3xl backdrop-blur-xl overflow-hidden">
               <table className="w-full text-sm">
                 <caption className="sr-only">Feature comparison between PixelSqueeze Free and Pro plans</caption>
-                <thead className="bg-muted/40">
+                <thead className="bg-white/[0.03] text-slate-300">
                   <tr>
                     <th scope="col" className="text-left font-semibold px-5 py-4">Feature</th>
                     <th scope="col" className="text-center font-semibold px-5 py-4">Free</th>
-                    <th scope="col" className="text-center font-semibold px-5 py-4 text-primary">Pro</th>
+                    <th scope="col" className="text-center font-semibold px-5 py-4 text-[#4ade80]">Pro</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border">
+                <tbody className="divide-y divide-white/5">
                   {[
                     ["Images per month",             "25",             "Unlimited"],
                     ["AI Enhance & Upscale",         "Basic",          "Advanced (2× / 4×)"],
@@ -640,17 +757,17 @@ const Landing = () => {
                     ["Priority processing",          false,            true],
                     ["Watermark",                    "None",           "None"],
                   ].map(([label, free, pro], i) => (
-                    <tr key={i} className="hover:bg-muted/20">
-                      <th scope="row" className="text-left font-medium px-5 py-3.5 text-foreground/85">{label}</th>
-                      <td className="text-center px-5 py-3.5 text-foreground/70">
-                        {free === true ? <Check className="w-4 h-4 text-emerald-600 inline" aria-label="Included" /> :
-                         free === false ? <X className="w-4 h-4 text-foreground/30 inline" aria-label="Not included" /> :
-                         free}
+                    <tr key={i} className="hover:bg-white/[0.02]">
+                      <th scope="row" className="text-left font-medium px-5 py-3.5 text-slate-200">{label as string}</th>
+                      <td className="text-center px-5 py-3.5 text-slate-400">
+                        {free === true ? <Check className="w-4 h-4 text-[#4ade80] inline" aria-label="Included" /> :
+                         free === false ? <X className="w-4 h-4 text-slate-600 inline" aria-label="Not included" /> :
+                         (free as string)}
                       </td>
-                      <td className="text-center px-5 py-3.5 font-medium text-foreground">
-                        {pro === true ? <Check className="w-4 h-4 text-emerald-600 inline" aria-label="Included" /> :
-                         pro === false ? <X className="w-4 h-4 text-foreground/30 inline" aria-label="Not included" /> :
-                         pro}
+                      <td className="text-center px-5 py-3.5 font-medium text-white">
+                        {pro === true ? <Check className="w-4 h-4 text-[#4ade80] inline" aria-label="Included" /> :
+                         pro === false ? <X className="w-4 h-4 text-slate-600 inline" aria-label="Not included" /> :
+                         (pro as string)}
                       </td>
                     </tr>
                   ))}
@@ -660,33 +777,30 @@ const Landing = () => {
           </div>
         </section>
 
-
         {/* FAQ */}
-        <section id="faq" className="px-6 py-20 md:py-28" aria-labelledby="faq-heading">
-          <div
-            className="max-w-3xl mx-auto"
-            itemScope
-            itemType="https://schema.org/FAQPage"
-          >
+        <section id="faq" className="px-6 py-24" aria-labelledby="faq-heading">
+          <div className="max-w-3xl mx-auto" itemScope itemType="https://schema.org/FAQPage">
             <div className="text-center mb-10">
-              <p className="text-xs font-bold uppercase tracking-widest text-primary mb-3">FAQ</p>
-              <h2 id="faq-heading" className="font-display text-4xl md:text-5xl font-bold leading-tight">Questions, answered.</h2>
+              <p className="text-xs font-bold uppercase tracking-widest text-[#4ade80] mb-3">FAQ</p>
+              <h2 id="faq-heading" className="font-display text-4xl md:text-5xl font-bold leading-tight text-white">
+                Questions, answered.
+              </h2>
             </div>
             <Accordion type="single" collapsible className="w-full space-y-3">
               {FAQS.map(({ q, a }, i) => (
                 <AccordionItem
                   key={i}
                   value={`item-${i}`}
-                  className="bg-white rounded-2xl border border-border px-6 shadow-soft"
+                  className="bg-white/[0.04] border border-white/10 rounded-2xl px-6 backdrop-blur-xl"
                   itemScope
                   itemProp="mainEntity"
                   itemType="https://schema.org/Question"
                 >
-                  <AccordionTrigger className="text-left text-base font-semibold hover:no-underline font-display">
+                  <AccordionTrigger className="text-left text-base font-semibold hover:no-underline font-display text-white">
                     <span itemProp="name">{q}</span>
                   </AccordionTrigger>
                   <AccordionContent
-                    className="text-foreground/70 pb-5 leading-relaxed"
+                    className="text-slate-300 pb-5 leading-relaxed"
                     itemScope
                     itemProp="acceptedAnswer"
                     itemType="https://schema.org/Answer"
@@ -699,23 +813,22 @@ const Landing = () => {
           </div>
         </section>
 
-        {/* AI ANSWER BLOCK — semantic Q&A + full schema stack for AI overviews */}
+        {/* AI ANSWER BLOCK */}
         <AIAnswerBlock path="/" pageLabel="Overview" />
 
         {/* FINAL CTA */}
-        <section className="px-6 pb-24">
-
-          <div className="max-w-5xl mx-auto rounded-[2.5rem] p-10 md:p-16 text-center relative overflow-hidden shadow-glow bg-gradient-to-br from-primary via-secondary to-accent text-white">
-            <div aria-hidden className="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-96 bg-white/20 blur-3xl" />
+        <section className="px-6 pb-32">
+          <div className="max-w-5xl mx-auto rounded-[2.5rem] p-10 md:p-16 text-center relative overflow-hidden border border-white/10 bg-gradient-to-br from-[#4ade80]/15 via-[#a78bfa]/15 to-transparent backdrop-blur-xl shadow-[0_0_60px_rgba(74,222,128,0.15)]">
+            <div aria-hidden className="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-96 bg-[#4ade80]/20 blur-3xl" />
             <div className="relative">
-              <h2 className="font-display text-4xl md:text-5xl font-bold mb-4 leading-tight">
+              <h2 className="font-display text-4xl md:text-5xl font-bold mb-4 leading-tight text-white">
                 Make every photo look professional.
               </h2>
-              <p className="text-lg opacity-90 mb-8 max-w-xl mx-auto">
+              <p className="text-lg text-slate-300 mb-8 max-w-xl mx-auto">
                 Try PixelSqueeze free. No card, no watermarks, no fine print.
               </p>
-              <Link to="/auth">
-                <Button size="lg" className="bg-white text-primary hover:bg-white/95 rounded-2xl px-8 h-14 font-semibold border-0 text-base">
+              <Link to="/auth" onClick={() => trackConversion("final_cta", { variant: heroVariant })}>
+                <Button size="lg" className="bg-[#4ade80] text-[#0f1424] hover:bg-[#3dbd6d] rounded-2xl px-8 h-14 font-bold border-0 text-base shadow-[0_0_30px_rgba(74,222,128,0.4)]">
                   <Upload className="w-5 h-5 mr-2" />
                   Upload your first image
                   <ArrowRight className="w-4 h-4 ml-2" />
@@ -727,53 +840,99 @@ const Landing = () => {
       </main>
 
       {/* FOOTER */}
-      <footer className="border-t border-border bg-white">
+      <footer className="border-t border-white/5 bg-[#0b1020] relative">
         <div className="max-w-7xl mx-auto px-6 py-14">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <div className="w-8 h-8 rounded-2xl bg-gradient-to-br from-primary via-secondary to-accent flex items-center justify-center">
-                  <Sparkles className="w-4 h-4 text-white" />
+                <div className="w-8 h-8 rounded-2xl bg-gradient-to-br from-[#4ade80] to-[#a78bfa] flex items-center justify-center">
+                  <Sparkles className="w-4 h-4 text-[#0f1424]" />
                 </div>
-                <span className="text-base font-bold font-display">PixelSqueeze</span>
+                <span className="text-base font-bold font-display text-white">PixelSqueeze</span>
               </div>
-              <p className="text-sm text-foreground/60 leading-relaxed">
+              <p className="text-sm text-slate-400 leading-relaxed">
                 AI-powered image optimization. Enhance, upscale, compress — all in one place.
               </p>
             </div>
             <div>
-              <h4 className="font-display font-semibold mb-3 text-sm">Product</h4>
-              <ul className="space-y-2 text-sm text-foreground/60">
-                <li><Link to="/auth" className="hover:text-foreground transition-colors">Magic Optimize</Link></li>
-                <li><Link to="/scanner" className="hover:text-foreground transition-colors">Website Scanner</Link></li>
-                <li><a href="#pricing" className="hover:text-foreground transition-colors">Pricing</a></li>
+              <h3 className="font-display font-semibold mb-3 text-sm text-white">Product</h3>
+              <ul className="space-y-2 text-sm text-slate-400">
+                <li><Link to="/auth" className="hover:text-white transition-colors">Magic Optimize</Link></li>
+                <li><Link to="/scanner" className="hover:text-white transition-colors">Website Scanner</Link></li>
+                <li><a href="#pricing" className="hover:text-white transition-colors">Pricing</a></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-display font-semibold mb-3 text-sm">Company</h4>
-              <ul className="space-y-2 text-sm text-foreground/60">
-                <li><Link to="/company" className="hover:text-foreground transition-colors">About</Link></li>
-                <li><Link to="/blog" className="hover:text-foreground transition-colors">Blog</Link></li>
-                <li><Link to="/privacy" className="hover:text-foreground transition-colors">Privacy</Link></li>
+              <h3 className="font-display font-semibold mb-3 text-sm text-white">Company</h3>
+              <ul className="space-y-2 text-sm text-slate-400">
+                <li><Link to="/company" className="hover:text-white transition-colors">About</Link></li>
+                <li><Link to="/blog" className="hover:text-white transition-colors">Blog</Link></li>
+                <li><Link to="/privacy" className="hover:text-white transition-colors">Privacy</Link></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-display font-semibold mb-3 text-sm">Resources</h4>
-              <ul className="space-y-2 text-sm text-foreground/60">
-                <li><Link to="/install" className="hover:text-foreground transition-colors">Install App</Link></li>
-                <li><Link to="/promote" className="hover:text-foreground transition-colors">Affiliate</Link></li>
+              <h3 className="font-display font-semibold mb-3 text-sm text-white">Resources</h3>
+              <ul className="space-y-2 text-sm text-slate-400">
+                <li><Link to="/install" className="hover:text-white transition-colors">Install App</Link></li>
+                <li><Link to="/promote" className="hover:text-white transition-colors">Affiliate</Link></li>
               </ul>
             </div>
           </div>
-          <div className="mt-12 pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-3">
-            <p className="text-xs text-foreground/50">© {new Date().getFullYear()} PixelSqueeze. All rights reserved.</p>
-            <div className="flex items-center gap-2 text-xs text-foreground/50">
+          <div className="mt-12 pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-3">
+            <p className="text-xs text-slate-500">© {new Date().getFullYear()} PixelSqueeze. All rights reserved.</p>
+            <div className="flex items-center gap-2 text-xs text-slate-500">
               <Shield className="w-3.5 h-3.5" />
               <span>Private by default · SOC-friendly workflow</span>
             </div>
           </div>
         </div>
       </footer>
+
+      {/* STICKY BOTTOM CTA — email capture + upgrade */}
+      <div className="fixed bottom-3 left-1/2 -translate-x-1/2 w-[calc(100%-1.5rem)] max-w-3xl px-0 z-40 pb-[env(safe-area-inset-bottom)]">
+        <div className="bg-[#0f1424]/85 backdrop-blur-2xl border border-white/15 rounded-2xl p-3 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shadow-2xl shadow-black/50">
+          <div className="hidden sm:flex flex-col pr-4 sm:border-r sm:border-white/10 min-w-0">
+            <span className="text-[#4ade80] text-[10px] font-bold uppercase tracking-widest">Free forever</span>
+            <span className="text-white text-sm font-semibold truncate">Get weekly optimization tips</span>
+          </div>
+          {stickyDone ? (
+            <div className="flex-1 flex items-center justify-center gap-2 text-[#4ade80] text-sm font-semibold py-1">
+              <CheckCircle className="w-4 h-4" /> You're subscribed — check your inbox.
+            </div>
+          ) : (
+            <form onSubmit={submitSticky} className="flex-1 flex flex-col sm:flex-row gap-2">
+              <label htmlFor="sticky-email" className="sr-only">Email address</label>
+              <div className="flex-1 relative">
+                <Mail className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <input
+                  id="sticky-email"
+                  type="email"
+                  required
+                  value={stickyEmail}
+                  onChange={(e) => setStickyEmail(e.target.value)}
+                  placeholder="you@work.com"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl pl-9 pr-3 py-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#4ade80]/60"
+                />
+              </div>
+              <Button
+                type="submit"
+                disabled={stickySubmitting}
+                className="bg-[#a78bfa] hover:bg-[#8b5cf6] text-white font-bold px-6 py-3 rounded-xl text-sm whitespace-nowrap shadow-lg shadow-[#a78bfa]/25 border-0 h-auto"
+              >
+                {stickySubmitting ? "…" : "Get free tips"}
+              </Button>
+              <Link to="/auth" className="hidden md:block" onClick={() => trackConversion("sticky_upgrade")}>
+                <Button
+                  type="button"
+                  className="bg-[#4ade80] hover:bg-[#3dbd6d] text-[#0f1424] font-bold px-5 py-3 rounded-xl text-sm border-0 h-auto"
+                >
+                  Try free
+                </Button>
+              </Link>
+            </form>
+          )}
+        </div>
+      </div>
 
       <Suspense fallback={null}>
         <InstallBanner />

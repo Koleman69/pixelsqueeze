@@ -51,7 +51,7 @@ const SolutionsIndex = () => {
         </header>
 
         <div className="max-w-6xl mx-auto px-6 pt-6">
-          <Breadcrumbs items={[{ name: "Solutions", href: "/for" }]} />
+          <Breadcrumbs items={[{ label: "Solutions", path: "/for" }]} />
         </div>
 
         <section className="max-w-4xl mx-auto px-6 pt-10 pb-8 text-center">

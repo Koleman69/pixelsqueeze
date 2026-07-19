@@ -93,8 +93,8 @@ const IndustryLanding = () => {
         <div className="max-w-6xl mx-auto px-6 pt-6">
           <Breadcrumbs
             items={[
-              { name: "Solutions", href: "/for" },
-              { name: industry.audience, href: path },
+              { label: "Solutions", path: "/for" },
+              { label: industry.audience, path },
             ]}
           />
         </div>

@@ -337,6 +337,8 @@ const Index = () => {
           return <SocialMediaExporter />;
         case "social-studio":
           return <SocialStudio />;
+        case "image-score":
+          return <AIImageScore />;
         case "analytics":
           return <BatchAnalyticsDashboard />;
         case "competitor":

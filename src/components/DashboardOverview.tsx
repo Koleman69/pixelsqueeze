@@ -568,7 +568,7 @@ export function DashboardOverview({ isSubscribed = false, onQuickAction }: Dashb
                 <div>
                   <p className="text-xs uppercase tracking-wider text-slate-400">Current plan</p>
                   <p className="text-lg font-semibold capitalize text-slate-50">
-                    {subscription?.subscription_tier || (isSubscribed ? "Creator+" : "Free")}
+                    {isSubscribed || subscription?.subscribed ? "Creator+" : "Free"}
                   </p>
                 </div>
                 <Badge

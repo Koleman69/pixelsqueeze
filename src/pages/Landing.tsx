@@ -409,27 +409,82 @@ const Landing = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-              {[
-                { name: "Sarah Jenkins", role: "E-com Director", quote: "The Amazon preset alone saved our team 12 hours a week. It's the standard for our workflow now." },
-                { name: "Marcus Chen", role: "Photographer", quote: "AI upscale is unreal. I've stopped paying for two other tools since switching to PixelSqueeze." },
-                { name: "Elena Rossi", role: "Boutique Owner", quote: "My product photos load faster and look better. Sales pages feel professional again." },
-              ].map((r) => (
-                <div key={r.name} className="bg-white rounded-3xl border border-border p-7 shadow-soft">
-                  <div className="flex gap-0.5 text-warning mb-4">
+              {REVIEWS.map((r) => (
+                <article
+                  key={r.name}
+                  className="bg-white rounded-3xl border border-border p-7 shadow-soft"
+                  itemScope
+                  itemType="https://schema.org/Review"
+                >
+                  <meta itemProp="itemReviewed" content="PixelSqueeze" />
+                  <div
+                    className="flex gap-0.5 text-warning mb-4"
+                    itemProp="reviewRating"
+                    itemScope
+                    itemType="https://schema.org/Rating"
+                    aria-label={`${r.rating} out of 5 stars`}
+                  >
+                    <meta itemProp="ratingValue" content={String(r.rating)} />
+                    <meta itemProp="bestRating" content="5" />
                     {[...Array(5)].map((_, i) => (
                       <Star key={i} className="w-4 h-4 fill-current" />
                     ))}
                   </div>
-                  <blockquote className="text-base leading-relaxed text-foreground/80 mb-6">"{r.quote}"</blockquote>
-                  <div className="flex items-center gap-3">
+                  <blockquote className="text-base leading-relaxed text-foreground/80 mb-6" itemProp="reviewBody">
+                    "{r.quote}"
+                  </blockquote>
+                  <div
+                    className="flex items-center gap-3"
+                    itemProp="author"
+                    itemScope
+                    itemType="https://schema.org/Person"
+                  >
                     <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary via-secondary to-accent" aria-hidden />
                     <div>
-                      <p className="font-semibold text-sm">{r.name}</p>
+                      <p className="font-semibold text-sm" itemProp="name">{r.name}</p>
                       <p className="text-xs text-foreground/50">{r.role}</p>
                     </div>
                   </div>
-                </div>
+                </article>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* PROS & CONS — visible list + honesty signal that pairs with Review schema */}
+        <section className="px-6 pb-6 md:pb-10" aria-labelledby="proscons-heading">
+          <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-5">
+            <div className="bg-white rounded-3xl border border-border p-8 shadow-soft">
+              <div className="flex items-center gap-2 mb-5">
+                <div className="w-9 h-9 rounded-2xl bg-emerald-500/10 flex items-center justify-center">
+                  <ThumbsUp className="w-4 h-4 text-emerald-600" />
+                </div>
+                <h2 id="proscons-heading" className="font-display text-xl font-bold">Pros</h2>
+              </div>
+              <ul className="space-y-3">
+                {PROS.map((p) => (
+                  <li key={p} className="flex items-start gap-3 text-sm text-foreground/80">
+                    <Check className="w-4 h-4 text-emerald-600 mt-0.5 shrink-0" />
+                    <span>{p}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="bg-white rounded-3xl border border-border p-8 shadow-soft">
+              <div className="flex items-center gap-2 mb-5">
+                <div className="w-9 h-9 rounded-2xl bg-rose-500/10 flex items-center justify-center">
+                  <ThumbsDown className="w-4 h-4 text-rose-600" />
+                </div>
+                <h2 className="font-display text-xl font-bold">Cons</h2>
+              </div>
+              <ul className="space-y-3">
+                {CONS.map((c) => (
+                  <li key={c} className="flex items-start gap-3 text-sm text-foreground/80">
+                    <X className="w-4 h-4 text-rose-600 mt-0.5 shrink-0" />
+                    <span>{c}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         </section>

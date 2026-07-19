@@ -38,6 +38,7 @@ import { PipelineResult, GoalPreset } from "@/services/imageOptimizationPipeline
 import { useImageCompression } from "@/hooks/useImageCompression";
 import { useToast } from "@/hooks/use-toast";
 import { BeforeAfterSlider } from "@/components/BeforeAfterSlider";
+import { OptimizationResultDashboard } from "@/components/OptimizationResultDashboard";
 import { cn } from "@/lib/utils";
 
 // Pinterest icon (simple svg to avoid extra deps)

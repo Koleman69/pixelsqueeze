@@ -232,7 +232,7 @@ const Index = () => {
     const content = (() => {
       switch (activeTool) {
         case "overview":
-          return <DashboardOverview isSubscribed={subscription.subscribed} />;
+          return <DashboardOverview isSubscribed={subscription.subscribed} onQuickAction={(t) => setActiveTool(t as any)} />;
         case "magic-optimize":
           return <MagicOptimize isSubscribed={subscription.subscribed} />;
         case "quick-optimize":

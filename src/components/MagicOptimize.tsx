@@ -95,6 +95,7 @@ interface UploadedFile {
 
 interface MagicResult extends PipelineResult {
   beforeUrl: string;
+  originalFile?: File;
 }
 
 interface MagicOptimizeProps {

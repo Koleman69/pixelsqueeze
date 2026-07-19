@@ -206,9 +206,10 @@ export function DashboardOverview({ isSubscribed = false, onQuickAction }: Dashb
     return { images, saved, original, avgRatio, downloads, storageUsed, qualityBoost };
   }, [batches, files]);
 
-  const tier = (subscription?.subscription_tier || "free").toLowerCase();
+  const tier = isSubscribed || subscription?.subscribed ? "creator" : "free";
   const storageQuota = STORAGE_QUOTA[tier] ?? STORAGE_QUOTA.free;
   const storagePct = storageQuota > 0 ? Math.min(100, (totals.storageUsed / storageQuota) * 100) : 0;
+
 
   const filteredFiles = useMemo(() => {
     let list = files;

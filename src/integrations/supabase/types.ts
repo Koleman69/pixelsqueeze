@@ -759,7 +759,9 @@ export type Database = {
           file_path: string
           file_size: number | null
           file_type: string | null
+          folder_id: string | null
           id: string
+          is_favorite: boolean
           share_code: string
           updated_at: string | null
           user_id: string
@@ -772,7 +774,9 @@ export type Database = {
           file_path: string
           file_size?: number | null
           file_type?: string | null
+          folder_id?: string | null
           id?: string
+          is_favorite?: boolean
           share_code?: string
           updated_at?: string | null
           user_id: string
@@ -785,12 +789,22 @@ export type Database = {
           file_path?: string
           file_size?: number | null
           file_type?: string | null
+          folder_id?: string | null
           id?: string
+          is_favorite?: boolean
           share_code?: string
           updated_at?: string | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "shared_files_folder_id_fkey"
+            columns: ["folder_id"]
+            isOneToOne: false
+            referencedRelation: "user_folders"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       subscriber_audit_log: {
         Row: {
@@ -924,6 +938,33 @@ export type Database = {
           updated_at?: string
           user_id?: string
           website_url?: string
+        }
+        Relationships: []
+      }
+      user_folders: {
+        Row: {
+          color: string
+          created_at: string
+          id: string
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          id?: string
+          name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          id?: string
+          name?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }

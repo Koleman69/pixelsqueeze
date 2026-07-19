@@ -31,6 +31,7 @@ const AutomationFlow = lazy(() => import("@/components/AutomationFlow").then(m =
 const DashboardOverview = lazy(() => import("@/components/DashboardOverview").then(m => ({ default: m.DashboardOverview })));
 const QuickOptimize = lazy(() => import("@/components/QuickOptimize").then(m => ({ default: m.QuickOptimize })));
 const MagicOptimize = lazy(() => import("@/components/MagicOptimize").then(m => ({ default: m.MagicOptimize })));
+const AIEnhanceStudio = lazy(() => import("@/components/AIEnhanceStudio").then(m => ({ default: m.AIEnhanceStudio })));
 const ContentDistributor = lazy(() => import("@/components/ContentDistributor").then(m => ({ default: m.ContentDistributor })));
 const PostingWorkflows = lazy(() => import("@/components/PostingWorkflows").then(m => ({ default: m.PostingWorkflows })));
 
@@ -57,6 +58,11 @@ const toolTitles: Record<ToolCategory, { title: string; description: string; gra
     title: "Magic Optimize",
     description: "Pick a destination and we'll optimize automatically — Apple-level simple",
     gradient: "from-primary/20 via-accent/10 to-transparent",
+  },
+  "ai-enhance": {
+    title: "AI Enhance Studio",
+    description: "Upscale, sharpen, denoise, remove backgrounds & more — one click each",
+    gradient: "from-indigo-500/20 via-purple-500/10 to-transparent",
   },
   "quick-optimize": {
     title: "Quick Optimize",
@@ -235,6 +241,8 @@ const Index = () => {
           return <DashboardOverview isSubscribed={subscription.subscribed} onQuickAction={(t) => setActiveTool(t as any)} />;
         case "magic-optimize":
           return <MagicOptimize isSubscribed={subscription.subscribed} />;
+        case "ai-enhance":
+          return <AIEnhanceStudio />;
         case "quick-optimize":
           return <QuickOptimize isSubscribed={subscription.subscribed} />;
         case "compress-image":

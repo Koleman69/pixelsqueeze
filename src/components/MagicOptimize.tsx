@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, useMemo, useEffect, type ChangeEvent, type DragEvent, type ElementType } from "react";
+import { useToolQuota } from "@/components/FreeToolGate";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";

@@ -187,7 +187,7 @@ async function runEnhancement(id: EnhancementId, sourceFile: File): Promise<{ bl
     let canvas: HTMLCanvasElement;
     let mime = "image/png";
     let quality = 0.92;
-    let suffix = id;
+    let suffix: string = id;
 
     switch (id) {
       case "upscale": {

@@ -38,6 +38,7 @@ import { PipelineResult, GoalPreset } from "@/services/imageOptimizationPipeline
 import { useImageCompression } from "@/hooks/useImageCompression";
 import { useToast } from "@/hooks/use-toast";
 import { BeforeAfterSlider } from "@/components/BeforeAfterSlider";
+import { OptimizationResultDashboard } from "@/components/OptimizationResultDashboard";
 import { cn } from "@/lib/utils";
 
 // Pinterest icon (simple svg to avoid extra deps)
@@ -95,6 +96,7 @@ interface UploadedFile {
 
 interface MagicResult extends PipelineResult {
   beforeUrl: string;
+  originalFile?: File;
 }
 
 interface MagicOptimizeProps {
@@ -223,6 +225,7 @@ export const MagicOptimize = ({ isSubscribed = false }: MagicOptimizeProps) => {
     const magic: MagicResult[] = pipelineResults.map((r, idx) => ({
       ...r,
       beforeUrl: uploads[idx]?.previewUrl ?? r.url,
+      originalFile: uploads[idx]?.file,
     }));
     setResults(magic);
     setShowSuccess(true);
@@ -538,83 +541,13 @@ export const MagicOptimize = ({ isSubscribed = false }: MagicOptimizeProps) => {
         </>
       )}
 
-      {/* ───────────────────── STEP 3 — RESULTS ───────────────────── */}
+      {/* ───────────────────── STEP 3 — RESULT DASHBOARD ───────────────────── */}
       {results.length > 0 && (
-        <Card className="overflow-hidden border-border/40 bg-card/70 backdrop-blur-xl">
-          <div className="flex flex-col gap-3 border-b border-border/40 bg-background/40 p-4 md:flex-row md:items-center md:justify-between">
-            <div className="flex items-center gap-2">
-              <CheckCircle2 className="h-5 w-5 text-primary" />
-              <h3 className="font-semibold">
-                {results.length} optimized{destination ? ` for ${destination.label}` : ""}
-              </h3>
-            </div>
-            <div className="flex flex-wrap items-center gap-2">
-              {results.length > 1 && (
-                <Button size="sm" onClick={() => downloadAllAsZip(results)} className="bg-primary text-primary-foreground shadow-[var(--shadow-glow)] hover:bg-primary/90">
-                  <FileArchive className="mr-1 h-3.5 w-3.5" />
-                  Download ZIP
-                </Button>
-              )}
-              <Button variant="outline" size="sm" onClick={handleReset}>
-                <RotateCcw className="mr-1 h-3.5 w-3.5" />
-                Start over
-              </Button>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-px bg-border/40 sm:grid-cols-4">
-            <div className="bg-background/60 p-4"><p className="text-[11px] uppercase text-muted-foreground">Saved</p><p className="text-lg font-bold text-primary">{formatBytes(totals.saved)}</p></div>
-            <div className="bg-background/60 p-4"><p className="text-[11px] uppercase text-muted-foreground">Avg compression</p><p className="text-lg font-bold">{totals.avgRatio}%</p></div>
-            <div className="bg-background/60 p-4"><p className="text-[11px] uppercase text-muted-foreground">Original</p><p className="text-lg font-bold">{formatBytes(totals.original)}</p></div>
-            <div className="bg-background/60 p-4"><p className="text-[11px] uppercase text-muted-foreground">Optimized</p><p className="text-lg font-bold">{formatBytes(totals.optimized)}</p></div>
-          </div>
-
-          <div className="divide-y divide-border/40">
-            {results.map((r) => {
-              const quality = qualityRetained(r.compressionRatio);
-              const isOpen = openSlider === r.seoFileName;
-              return (
-                <div key={r.seoFileName} className="space-y-4 p-4 md:p-5">
-                  <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
-                    <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-xl border border-border/40 bg-muted/50 shadow-[var(--shadow-card)]">
-                      <img src={r.url} alt={r.altText} className="h-full w-full object-cover" />
-                    </div>
-                    <div className="min-w-0 flex-1 space-y-1.5">
-                      <p className="truncate text-sm font-medium">{r.seoFileName}</p>
-                      <div className="grid grid-cols-1 gap-x-4 gap-y-0.5 text-xs sm:grid-cols-2">
-                        <div className="text-muted-foreground"><span className="font-medium text-foreground">Original:</span> {formatBytes(r.originalSize)} · {r.originalWidth}×{r.originalHeight}</div>
-                        <div className="text-muted-foreground"><span className="font-medium text-foreground">Optimized:</span> {formatBytes(r.optimizedSize)} · {r.outputWidth}×{r.outputHeight} · {r.format.toUpperCase()}</div>
-                      </div>
-                      <div className="flex flex-wrap gap-1.5 pt-0.5">
-                        <Badge variant="outline" className="border-primary/20 bg-primary/5 text-[10px] text-foreground">✓ {r.compressionRatio}% smaller</Badge>
-                        <Badge variant="outline" className="text-[10px]">{quality}% quality retained</Badge>
-                      </div>
-                    </div>
-                    <div className="flex flex-shrink-0 flex-wrap gap-2">
-                      <Button size="sm" variant="outline" onClick={() => setOpenSlider(isOpen ? null : r.seoFileName)}>
-                        {isOpen ? "Hide" : "Compare"}
-                      </Button>
-                      <Button size="sm" variant="outline" onClick={() => handleCopyShare(r)}>
-                        {copiedId === r.seoFileName ? (<><Check className="mr-1 h-3.5 w-3.5 text-green-500" /> Copied</>) : (<><Link2 className="mr-1 h-3.5 w-3.5" /> Share</>)}
-                      </Button>
-                      <Button size="sm" onClick={() => downloadResult(r)} className="bg-primary text-primary-foreground shadow-[var(--shadow-glow)] hover:bg-primary/90">
-                        <Download className="mr-1 h-3.5 w-3.5" /> Download
-                      </Button>
-                    </div>
-                  </div>
-                  {isOpen && (
-                    <BeforeAfterSlider
-                      beforeImage={r.beforeUrl}
-                      afterImage={r.url}
-                      title="Original vs Optimized"
-                      description={`Drag to compare — ${formatBytes(r.originalSize)} → ${formatBytes(r.optimizedSize)}`}
-                    />
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </Card>
+        <OptimizationResultDashboard
+          results={results}
+          destinationLabel={destination?.label}
+          onReset={handleReset}
+        />
       )}
     </div>
   );

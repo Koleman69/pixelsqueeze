@@ -31,6 +31,7 @@ import weddingBefore from "@/assets/wedding-before.jpg";
 import weddingAfter from "@/assets/wedding-after.jpg";
 import manBefore from "@/assets/man-before.jpg";
 import manAfter from "@/assets/man-after.jpg";
+import SEO from "@/components/SEO";
 
 const Landing = () => {
   useUtmTracking();
@@ -42,6 +43,23 @@ const Landing = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <SEO
+        title="PixelSqueeze — AI Image Optimizer for Speed & SEO"
+        description="Compress and optimize images with AI. Cut file sizes up to 70%, boost Core Web Vitals, and auto-format for every platform. Free to start."
+        path="/"
+        schema={{
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: "PixelSqueeze",
+          url: "https://pixelsqueeze.app",
+          potentialAction: {
+            "@type": "SearchAction",
+            target: "https://pixelsqueeze.app/blog?q={search_term_string}",
+            "query-input": "required name=search_term_string",
+          },
+        }}
+      />
+
       {/* Navigation */}
       <nav className="sticky top-0 z-50 backdrop-blur-xl bg-background/70 border-b border-border/50" aria-label="Main navigation">
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">

@@ -19,6 +19,10 @@ import {
   Palette,
   Zap,
   Shield,
+  ThumbsUp,
+  ThumbsDown,
+  X,
+  Check,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 const BeforeAfterSlider = lazy(() =>

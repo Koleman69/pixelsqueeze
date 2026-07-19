@@ -14,8 +14,8 @@ export default defineConfig(({ mode }) => ({
     rollupOptions: {
       output: {
         manualChunks: {
-          vendor: ["react", "react-dom", "react-router-dom"],
-          ui: [
+          "react-vendor": ["react", "react-dom", "react-router-dom"],
+          "ui-radix": [
             "@radix-ui/react-dialog",
             "@radix-ui/react-accordion",
             "@radix-ui/react-tabs",
@@ -23,9 +23,11 @@ export default defineConfig(({ mode }) => ({
             "@radix-ui/react-select",
             "@radix-ui/react-popover",
           ],
-          charts: ["recharts"],
-          query: ["@tanstack/react-query"],
-          motion: ["framer-motion"],
+          "icons": ["lucide-react"],
+          "charts": ["recharts"],
+          "query": ["@tanstack/react-query"],
+          "motion": ["framer-motion"],
+          "supabase": ["@supabase/supabase-js"],
         },
       },
     },

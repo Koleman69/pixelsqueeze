@@ -42,20 +42,51 @@ serve(async (req) => {
 
     logStep('Analyzing competitor', { url, competitorId, competitorName });
 
-    // Fetch the website content
-    let websiteContent = '';
-    let fetchError = null;
-    
+    // Validate URL: only public http(s), block private/loopback/link-local hosts
+    let parsed: URL;
     try {
-      const response = await fetch(url, {
+      parsed = new URL(url);
+    } catch {
+      throw new Error('Invalid URL');
+    }
+    if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+      throw new Error('Only http(s) URLs are allowed');
+    }
+    const host = parsed.hostname.toLowerCase();
+    const isBlockedHost =
+      host === 'localhost' ||
+      host.endsWith('.local') ||
+      host.endsWith('.internal') ||
+      /^(0|10|127|169\.254|192\.168|172\.(1[6-9]|2\d|3[01]))\./.test(host) ||
+      /^\[?(::1|fc[0-9a-f]{2}:|fd[0-9a-f]{2}:|fe80:)/i.test(host) ||
+      host === '::1' ||
+      host === '169.254.169.254';
+    if (isBlockedHost) {
+      throw new Error('Target host is not allowed');
+    }
+
+    // Fetch the website content with a timeout and size cap
+    let websiteContent = '';
+    let fetchError: string | null = null;
+
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 8000);
+      const response = await fetch(parsed.toString(), {
+        redirect: 'follow',
+        signal: controller.signal,
         headers: {
           'User-Agent': 'Mozilla/5.0 (compatible; CompetitorAnalyzer/1.0)',
-          'Accept': 'text/html,application/xhtml+xml'
-        }
+          'Accept': 'text/html,application/xhtml+xml',
+        },
       });
-      
+      clearTimeout(timeoutId);
+
       if (response.ok) {
-        websiteContent = await response.text();
+        const buf = await response.arrayBuffer();
+        // Cap at 2 MB
+        const slice = buf.byteLength > 2 * 1024 * 1024 ? buf.slice(0, 2 * 1024 * 1024) : buf;
+        websiteContent = new TextDecoder('utf-8', { fatal: false }).decode(slice);
         logStep('Website content fetched', { contentLength: websiteContent.length });
       } else {
         fetchError = `HTTP ${response.status}`;

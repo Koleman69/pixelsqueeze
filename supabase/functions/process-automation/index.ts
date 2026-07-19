@@ -349,6 +349,10 @@ async function syncShopify(
     throw new Error("Missing Shopify credentials (store URL and access token)");
 
   const cleanUrl = store_url.replace(/^https?:\/\//, "").replace(/\/$/, "");
+  // Only allow real Shopify-hosted stores
+  if (!/^[a-z0-9][a-z0-9-]*\.myshopify\.com$/i.test(cleanUrl)) {
+    throw new Error("Invalid Shopify store URL — must be *.myshopify.com");
+  }
   logStep("Syncing Shopify", { store: cleanUrl });
 
   // Fetch products with images
@@ -363,8 +367,10 @@ async function syncShopify(
   );
 
   if (!productsRes.ok) {
-    const err = await productsRes.text();
-    throw new Error(`Shopify API error: ${err}`);
+    // Log details server-side only; return generic error to client
+    const errText = await productsRes.text().catch(() => "");
+    logStep("Shopify API error", { status: productsRes.status, body: errText.slice(0, 500) });
+    throw new Error(`Shopify API request failed (${productsRes.status})`);
   }
 
   const productsData = await productsRes.json();

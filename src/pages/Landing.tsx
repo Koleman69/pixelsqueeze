@@ -46,24 +46,151 @@ const Landing = () => {
     beforeAfterRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
+  // ---- Content that drives BOTH the visible UI and the rich-result schemas ----
+  const RATING = { value: "4.9", count: 2847, best: "5", worst: "1" };
+
+  const REVIEWS = [
+    { name: "Sarah Jenkins", role: "E-com Director", rating: 5, quote: "The Amazon preset alone saved our team 12 hours a week. It's the standard for our workflow now." },
+    { name: "Marcus Chen", role: "Photographer", rating: 5, quote: "AI upscale is unreal. I've stopped paying for two other tools since switching to PixelSqueeze." },
+    { name: "Elena Rossi", role: "Boutique Owner", rating: 5, quote: "My product photos load faster and look better. Sales pages feel professional again." },
+  ];
+
+  const TIERS = [
+    { name: "Free",     price: 0,  cadence: "/forever", tagline: "Try every core tool.",       cta: "Start free",    features: ["25 images / month", "Basic optimization", "No watermark", "Web-ready exports"] },
+    { name: "Creator",  price: 9,  cadence: "/month",   tagline: "For creators & freelancers.", cta: "Start Creator", features: ["500 images / month", "AI Enhance", "Batch processing", "Social exports"], popular: true },
+    { name: "Pro",      price: 24, cadence: "/month",   tagline: "For studios & agencies.",     cta: "Go Pro",        features: ["Unlimited images", "Print Ready (400 DPI)", "API access", "Priority processing"] },
+    { name: "Business", price: 79, cadence: "/month",   tagline: "For growing teams.",          cta: "Contact sales", features: ["Everything in Pro", "Teams & white label", "Brand presets", "Analytics", "Enterprise support"] },
+  ];
+
+  const FAQS = [
+    { q: "How is PixelSqueeze different from a normal compressor?", a: "PixelSqueeze uses AI to enhance, upscale, and optimize — not just shrink. Pick a destination and we auto-select format, dimensions, and compression." },
+    { q: "Can I really use it for free?", a: "Yes. The free plan includes every core AI tool. Pro removes the daily cap and unlocks batch, cloud storage, and priority processing." },
+    { q: "Where are my images processed?", a: "Free plan processes in-browser. Paid plans use encrypted storage that auto-deletes after 30 days. Files are never shared, sold, or used for training." },
+    { q: "What formats are supported?", a: "JPEG, PNG, WebP, AVIF, GIF and SVG in — WebP or AVIF out, sized correctly for your chosen destination." },
+    { q: "Can I cancel anytime?", a: "One click in your account. You keep Pro access until the end of your billing period." },
+  ];
+
+  const HOWTO_STEPS = [
+    { name: "Upload your image",   text: "Drag any JPG, PNG, HEIC, WebP or AVIF into PixelSqueeze. Up to 5 files at once on Free." },
+    { name: "Pick a destination",  text: "Choose Website, Instagram, Amazon, Shopify or Print — AI auto-selects format, size and compression." },
+    { name: "Let AI optimize",     text: "PixelSqueeze enhances, compresses and converts to WebP or AVIF in seconds — no settings required." },
+    { name: "Download the pack",   text: "Get an optimized file (or a full multi-size pack) with alt text and SEO-friendly filenames included." },
+  ];
+
+  const PROS = [
+    "One-click AI enhance, upscale, compress and background removal",
+    "Auto WebP + AVIF export sized for every platform",
+    "Free tier with every core tool — no credit card",
+    "Batch processing and Shopify / Amazon / Instagram presets",
+    "Processes in-browser on Free — files never leave your device",
+  ];
+  const CONS = [
+    "Free plan capped at 25 images / month",
+    "API access requires the Pro plan",
+    "No native desktop app (PWA + web only)",
+  ];
+
+  // ---- Rich-result JSON-LD stack ----
+  const softwareSchema = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: "PixelSqueeze",
+    applicationCategory: "MultimediaApplication",
+    applicationSubCategory: "Image Optimization",
+    operatingSystem: "Web, iOS, Android",
+    url: "https://pixelsqueeze.app",
+    image: "https://pixelsqueeze.app/og-image.png",
+    description:
+      "AI image optimizer that compresses, upscales, enhances and auto-converts photos to WebP and AVIF for every platform.",
+    offers: TIERS.map((t) => ({
+      "@type": "Offer",
+      name: t.name,
+      price: String(t.price),
+      priceCurrency: "USD",
+      category: t.price === 0 ? "Free" : "Subscription",
+      availability: "https://schema.org/InStock",
+      url: "https://pixelsqueeze.app/pricing",
+    })),
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue: RATING.value,
+      reviewCount: String(RATING.count),
+      bestRating: RATING.best,
+      worstRating: RATING.worst,
+    },
+    review: REVIEWS.map((r) => ({
+      "@type": "Review",
+      author: { "@type": "Person", name: r.name },
+      reviewRating: { "@type": "Rating", ratingValue: r.rating, bestRating: 5 },
+      reviewBody: r.quote,
+    })),
+    featureList: [
+      "AI image upscaler (2x / 4x)",
+      "Automatic WebP and AVIF conversion",
+      "Batch image compression",
+      "Background removal",
+      "Platform-aware presets (Instagram, Shopify, Amazon, Print)",
+      "SEO alt text and filename generation",
+    ],
+  };
+
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: FAQS.map(({ q, a }) => ({
+      "@type": "Question",
+      name: q,
+      acceptedAnswer: { "@type": "Answer", text: a },
+    })),
+  };
+
+  const howToSchema = {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    name: "How to optimize an image with PixelSqueeze",
+    description: "Compress, upscale and convert any photo to WebP or AVIF in four steps.",
+    totalTime: "PT1M",
+    supply: [{ "@type": "HowToSupply", name: "JPG, PNG, HEIC, WebP or AVIF image" }],
+    tool: [{ "@type": "HowToTool", name: "PixelSqueeze" }],
+    step: HOWTO_STEPS.map((s, i) => ({
+      "@type": "HowToStep",
+      position: i + 1,
+      name: s.name,
+      text: s.text,
+      url: `https://pixelsqueeze.app/#step-${i + 1}`,
+    })),
+  };
+
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://pixelsqueeze.app/" },
+      { "@type": "ListItem", position: 2, name: "Pricing", item: "https://pixelsqueeze.app/pricing" },
+    ],
+  };
+
+  const websiteSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "PixelSqueeze",
+    url: "https://pixelsqueeze.app",
+    potentialAction: {
+      "@type": "SearchAction",
+      target: "https://pixelsqueeze.app/blog?q={search_term_string}",
+      "query-input": "required name=search_term_string",
+    },
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SEO
         title="PixelSqueeze — AI Image Optimizer for Speed & SEO"
         description="Compress and optimize images with AI. Cut file sizes up to 70%, boost Core Web Vitals, and auto-format for every platform. Free to start."
         path="/"
-        schema={{
-          "@context": "https://schema.org",
-          "@type": "WebSite",
-          name: "PixelSqueeze",
-          url: "https://pixelsqueeze.app",
-          potentialAction: {
-            "@type": "SearchAction",
-            target: "https://pixelsqueeze.app/blog?q={search_term_string}",
-            "query-input": "required name=search_term_string",
-          },
-        }}
+        schema={[softwareSchema, faqSchema, howToSchema, breadcrumbSchema, websiteSchema]}
       />
+
 
       {/* Navigation */}
       <nav className="sticky top-0 z-50 backdrop-blur-xl bg-background/70 border-b border-border/50" aria-label="Main navigation">

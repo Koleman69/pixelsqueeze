@@ -1,332 +1,287 @@
-import { useEffect } from 'react';
-import { useParams, Link, Navigate } from 'react-router-dom';
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Calendar, Clock, ArrowLeft, Share2 } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { useEffect, useState } from "react";
+import { useParams, Link, Navigate } from "react-router-dom";
+import DOMPurify from "dompurify";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Calendar, Clock, ArrowLeft, ArrowRight, Share2, Loader2, Sparkles } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import SEO from "@/components/SEO";
+import NewsletterSignup from "@/components/NewsletterSignup";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
-const blogArticles = [
-  {
-    id: 'best-image-compression-tools-2025',
-    title: 'Best Image Compression Tools in 2025: Complete Guide',
-    description: 'Discover the top image compression tools that maintain quality while reducing file sizes by up to 80%. Compare features, pricing, and performance.',
-    content: `
-      <p>Image compression is essential for modern web development, digital marketing, and content creation. With websites loading 53% of mobile users abandoning sites that take longer than 3 seconds to load, optimizing your images is no longer optional.</p>
-      
-      <h2>Why Image Compression Matters</h2>
-      <p>Large image files significantly impact website performance, SEO rankings, and user experience. Proper image compression can reduce file sizes by 60-80% while maintaining visual quality, leading to faster page loads and better conversion rates.</p>
-      
-      <h2>Top Image Compression Techniques</h2>
-      <p><strong>Lossy Compression:</strong> Achieves higher compression ratios by removing some image data. Perfect for web images where slight quality reduction is acceptable. Tools like JPEG optimization can reduce file sizes by 70-90%.</p>
-      
-      <p><strong>Lossless Compression:</strong> Reduces file size without quality loss by removing metadata and optimizing encoding. Ideal for professional photography and archival purposes.</p>
-      
-      <h2>Professional Image Optimization Tools</h2>
-      <p>Modern compression tools offer AI-powered optimization that intelligently balances quality and file size. Features to look for include batch processing, custom DPI settings, dimension control, and format conversion.</p>
-      
-      <h2>Best Practices for Web Images</h2>
-      <ul>
-        <li>Use WebP format for modern browsers (30% smaller than JPEG)</li>
-        <li>Optimize images to exact display dimensions</li>
-        <li>Set DPI to 72 for web use (screen resolution)</li>
-        <li>Compress images before uploading to your website</li>
-        <li>Enable lazy loading for below-the-fold images</li>
-      </ul>
-      
-      <h2>Impact on SEO and Core Web Vitals</h2>
-      <p>Google's Core Web Vitals include Largest Contentful Paint (LCP), which is heavily influenced by image optimization. Compressed images improve LCP scores, directly affecting search rankings and user experience metrics.</p>
-    `,
-    publishDate: '2025-01-15',
-    readTime: '8 min read',
-    category: 'Tools & Software',
-    keywords: ['image compression', 'web optimization', 'SEO', 'page speed'],
-  },
-  {
-    id: 'reduce-photo-size-without-losing-quality',
-    title: 'How to Reduce Photo Size Without Losing Quality: Expert Guide',
-    description: 'Learn professional techniques to compress photos while maintaining stunning visual quality. Step-by-step guide with real examples and results.',
-    content: `
-      <p>Reducing photo size without sacrificing quality is a critical skill for photographers, web developers, and content creators. This comprehensive guide covers proven techniques and tools for optimal image compression.</p>
-      
-      <h2>Understanding Image Quality vs File Size</h2>
-      <p>The key to successful compression is finding the sweet spot between visual quality and file size. Human perception studies show that JPEG quality settings of 75-85% produce visually identical results to 100% quality while reducing file size by 50-70%.</p>
-      
-      <h2>Smart Compression Techniques</h2>
-      <p><strong>Quality Settings:</strong> For web use, 80-85% quality provides excellent results. For print materials, use 90-95% quality. Social media platforms automatically compress images, so using 75-80% quality before upload prevents double compression artifacts.</p>
-      
-      <p><strong>Resolution Optimization:</strong> Match image dimensions to display size. A 1920x1080 image displayed at 960x540 wastes bandwidth and storage. Resize images to their actual display dimensions for optimal performance.</p>
-      
-      <h2>Advanced Compression Methods</h2>
-      <p>AI-powered compression analyzes each image to determine optimal settings. These tools identify areas where quality can be reduced without visible impact, achieving up to 80% compression while maintaining perceived quality.</p>
-      
-      <h2>Format Selection for Best Results</h2>
-      <p><strong>JPEG:</strong> Best for photographs and complex images with gradients. Excellent compression for web use.</p>
-      <p><strong>PNG:</strong> Ideal for graphics, logos, and images with transparency. Lossless compression maintains exact quality.</p>
-      <p><strong>WebP:</strong> Modern format with 25-35% better compression than JPEG. Supported by all major browsers since 2020.</p>
-      
-      <h2>Bulk Photo Compression Workflow</h2>
-      <p>Professional workflows involve batch processing with consistent settings. Set up presets for different use cases: web thumbnails, full-size web images, social media posts, and email attachments. This ensures consistency and saves time.</p>
-      
-      <h2>Testing and Validation</h2>
-      <p>Always compare compressed images side-by-side with originals. Check for compression artifacts like banding, blockiness, or color shifts. Validate file size reductions and maintain backup copies of originals.</p>
-    `,
-    publishDate: '2025-01-10',
-    readTime: '10 min read',
-    category: 'Tutorial',
-    keywords: ['photo compression', 'image quality', 'reduce file size', 'photography'],
-  },
-  {
-    id: 'jpeg-vs-png-vs-webp-compression-comparison',
-    title: 'JPEG vs PNG vs WebP: Complete Compression Format Guide',
-    description: 'Comprehensive comparison of image formats. Learn which format to use for maximum compression, quality, and browser compatibility in 2025.',
-    content: `
-      <p>Choosing the right image format dramatically impacts file size, quality, and website performance. This guide compares JPEG, PNG, and WebP formats with real-world examples and recommendations.</p>
-      
-      <h2>JPEG: The Universal Standard</h2>
-      <p>JPEG remains the most widely used format for photographs and complex images. Lossy compression achieves excellent file size reduction while maintaining visual quality. Modern JPEG encoders can reduce file sizes by 70-90% compared to uncompressed images.</p>
-      
-      <p><strong>Best Use Cases:</strong> Photographs, product images, backgrounds, and any image with gradients or complex color patterns. Not suitable for images requiring transparency or sharp text.</p>
-      
-      <h2>PNG: Quality Without Compromise</h2>
-      <p>PNG uses lossless compression, preserving exact image quality. Supports transparency (alpha channel), making it essential for logos, icons, and graphics. File sizes are typically 3-5x larger than equivalent JPEG files.</p>
-      
-      <p><strong>Optimal Applications:</strong> Logos, icons, graphics with text, images requiring transparency, and screenshots. Use PNG-8 for simple graphics and PNG-24 for complex images with transparency.</p>
-      
-      <h2>WebP: The Modern Winner</h2>
-      <p>Developed by Google, WebP provides superior compression compared to both JPEG and PNG. Supports both lossy and lossless compression, plus transparency. Typically 25-35% smaller than JPEG and 26% smaller than PNG for equivalent quality.</p>
-      
-      <p><strong>Why WebP Matters:</strong> Faster page loads, reduced bandwidth costs, better user experience, and improved SEO rankings. All major browsers support WebP as of 2020, with 95%+ global browser compatibility.</p>
-      
-      <h2>Performance Comparison</h2>
-      <p>Real-world testing shows significant differences:</p>
-      <ul>
-        <li>Test photo (3000x2000px): JPEG (450KB), PNG (2.1MB), WebP (320KB)</li>
-        <li>Logo with transparency (800x600px): PNG (85KB), WebP (45KB)</li>
-        <li>Complex graphic (1920x1080px): PNG (1.2MB), WebP (380KB)</li>
-      </ul>
-      
-      <h2>Format Selection Strategy</h2>
-      <p><strong>Use JPEG for:</strong> Photographs, product images, backgrounds, social media posts</p>
-      <p><strong>Use PNG for:</strong> Logos requiring transparency, simple graphics, images with text, screenshots</p>
-      <p><strong>Use WebP for:</strong> Modern websites, progressive web apps, e-commerce product images, blog post images</p>
-      
-      <h2>Implementation Best Practices</h2>
-      <p>Serve WebP with JPEG/PNG fallbacks for maximum compatibility. Use picture elements or server-side detection to deliver optimal format. Always compress images before converting to WebP for best results.</p>
-    `,
-    publishDate: '2025-01-05',
-    readTime: '12 min read',
-    category: 'Technical Guide',
-    keywords: ['image formats', 'JPEG', 'PNG', 'WebP', 'compression comparison'],
-  },
-  {
-    id: 'optimize-images-page-speed-seo',
-    title: 'Optimize Images for Page Speed and SEO: 2025 Complete Guide',
-    description: 'Master image optimization for faster websites and higher search rankings. Proven strategies for Core Web Vitals and SEO success.',
-    content: `
-      <p>Image optimization is crucial for achieving top Google rankings and passing Core Web Vitals. This comprehensive guide covers everything you need to know about optimizing images for maximum page speed and SEO performance.</p>
-      
-      <h2>Core Web Vitals and Image Impact</h2>
-      <p>Google's Core Web Vitals directly affect search rankings. Images impact three critical metrics:</p>
-      <p><strong>Largest Contentful Paint (LCP):</strong> Large hero images significantly affect LCP. Optimize to under 2.5 seconds by compressing images to 200KB or less.</p>
-      <p><strong>Cumulative Layout Shift (CLS):</strong> Always specify image dimensions to prevent layout shifts. Use aspect-ratio CSS property for responsive images.</p>
-      <p><strong>First Input Delay (FID):</strong> Heavy image processing can delay interactivity. Use progressive loading and lazy loading techniques.</p>
-      
-      <h2>SEO Image Optimization Checklist</h2>
-      <ul>
-        <li>Descriptive file names: "red-running-shoes-nike.jpg" vs "IMG_1234.jpg"</li>
-        <li>Alt text with target keywords naturally integrated</li>
-        <li>Compressed file sizes (under 200KB for above-fold, under 500KB total)</li>
-        <li>Responsive images using srcset and sizes attributes</li>
-        <li>Modern formats (WebP) with fallbacks</li>
-        <li>Image sitemaps for better indexing</li>
-      </ul>
-      
-      <h2>Advanced Compression Techniques for SEO</h2>
-      <p>Implement adaptive image serving based on device and connection speed. Use responsive images with multiple resolutions. Compress images at 80-85% quality for web use. Convert to WebP for 25-35% additional size reduction.</p>
-      
-      <h2>Lazy Loading Strategy</h2>
-      <p>Native lazy loading (loading="lazy") defers below-fold images, improving initial page load. Combine with intersection observer for progressive loading. Always eager-load above-fold images for optimal LCP scores.</p>
-      
-      <h2>CDN and Caching Optimization</h2>
-      <p>Serve images through CDN for global performance. Implement browser caching with long expiry times. Use image CDNs with automatic format conversion and responsive image generation.</p>
-      
-      <h2>Mobile-First Image Strategy</h2>
-      <p>With 60% of searches on mobile, optimize for mobile first. Serve smaller images to mobile devices. Use art direction to show different crops on different screen sizes. Test mobile page speed regularly.</p>
-      
-      <h2>Measuring Image Performance</h2>
-      <p>Use Google PageSpeed Insights, WebPageTest, and Chrome DevTools to measure image impact. Monitor Core Web Vitals in Google Search Console. Track page load times and conversion rates after optimization.</p>
-      
-      <h2>Common Mistakes to Avoid</h2>
-      <p>Don't use uncompressed images from cameras or design tools. Avoid serving desktop-sized images to mobile users. Don't forget to specify image dimensions. Never use images where CSS or SVG would work better.</p>
-    `,
-    publishDate: '2024-12-28',
-    readTime: '15 min read',
-    category: 'SEO & Performance',
-    keywords: ['image SEO', 'page speed', 'Core Web Vitals', 'website optimization'],
-  },
-];
+interface Faq { question: string; answer: string; }
+interface Post {
+  id: string;
+  slug: string;
+  title: string;
+  excerpt: string | null;
+  content: string;
+  meta_title: string | null;
+  meta_description: string | null;
+  category: string | null;
+  topic: string | null;
+  tags: string[] | null;
+  reading_time: number | null;
+  word_count: number | null;
+  published_at: string | null;
+  featured_image_url: string | null;
+  faqs: Faq[] | null;
+  related_slugs: string[] | null;
+}
+
+interface RelatedRef { slug: string; title: string; featured_image_url: string | null; reading_time: number | null; topic: string | null; }
 
 const BlogArticle = () => {
-  const { articleId } = useParams();
+  const { id } = useParams<{ id: string }>();
+  const [post, setPost] = useState<Post | null>(null);
+  const [related, setRelated] = useState<RelatedRef[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
   const { toast } = useToast();
-  
-  const article = blogArticles.find(a => a.id === articleId);
 
   useEffect(() => {
-    if (article) {
-      // Set page title and meta description for SEO
-      document.title = `${article.title} | Pixelsqueeze Blog`;
-      
-      const metaDescription = document.querySelector('meta[name="description"]');
-      if (metaDescription) {
-        metaDescription.setAttribute('content', article.description);
+    if (!id) return;
+    (async () => {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("blog_posts")
+        .select("*")
+        .eq("slug", id)
+        .eq("is_published", true)
+        .maybeSingle();
+      if (error || !data) {
+        setNotFound(true);
+      } else {
+        setPost(data as unknown as Post);
+        const relatedSlugs = (data as any).related_slugs ?? [];
+        if (relatedSlugs.length > 0) {
+          const { data: rel } = await supabase
+            .from("blog_posts")
+            .select("slug, title, featured_image_url, reading_time, topic")
+            .in("slug", relatedSlugs)
+            .eq("is_published", true);
+          setRelated((rel ?? []) as RelatedRef[]);
+        } else {
+          const { data: rel } = await supabase
+            .from("blog_posts")
+            .select("slug, title, featured_image_url, reading_time, topic")
+            .neq("slug", id)
+            .eq("is_published", true)
+            .order("published_at", { ascending: false })
+            .limit(3);
+          setRelated((rel ?? []) as RelatedRef[]);
+        }
       }
-
-      // Scroll to top when article loads
+      setLoading(false);
       window.scrollTo(0, 0);
-    }
-  }, [article]);
+    })();
+  }, [id]);
 
-  if (!article) {
-    return <Navigate to="/blog" replace />;
-  }
-
-  const handleShare = () => {
+  const share = async () => {
     const url = window.location.href;
-    navigator.clipboard.writeText(url);
-    toast({
-      title: "Link Copied",
-      description: "Article URL copied to clipboard",
-    });
+    if (navigator.share) {
+      try { await navigator.share({ title: post?.title, url }); } catch { /* cancelled */ }
+    } else {
+      await navigator.clipboard.writeText(url);
+      toast({ title: "Link copied", description: "Article URL copied to clipboard." });
+    }
   };
 
-  // Get related articles (exclude current article)
-  const relatedArticles = blogArticles
-    .filter(a => a.id !== articleId)
-    .slice(0, 2);
+  if (notFound) return <Navigate to="/blog" replace />;
+
+  if (loading || !post) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="w-6 h-6 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  const cleanContent = DOMPurify.sanitize(post.content, { USE_PROFILES: { html: true } });
+  const dateIso = post.published_at ?? new Date().toISOString();
+
+  const articleSchema = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: post.title,
+    description: post.meta_description ?? post.excerpt,
+    image: post.featured_image_url ?? undefined,
+    datePublished: dateIso,
+    dateModified: dateIso,
+    author: { "@type": "Organization", name: "PixelSqueeze" },
+    publisher: {
+      "@type": "Organization",
+      name: "PixelSqueeze",
+      logo: { "@type": "ImageObject", url: "https://pixelsqueeze.app/icon-512.png" },
+    },
+    mainEntityOfPage: `https://pixelsqueeze.app/blog/${post.slug}`,
+    articleSection: post.category ?? post.topic ?? "Optimization",
+    keywords: (post.tags ?? []).join(", "),
+    wordCount: post.word_count ?? undefined,
+  };
+
+  const faqSchema = post.faqs && post.faqs.length > 0
+    ? {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: post.faqs.map((f) => ({
+          "@type": "Question",
+          name: f.question,
+          acceptedAnswer: { "@type": "Answer", text: f.answer },
+        })),
+      }
+    : null;
+
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://pixelsqueeze.app/" },
+      { "@type": "ListItem", position: 2, name: "Blog", item: "https://pixelsqueeze.app/blog" },
+      { "@type": "ListItem", position: 3, name: post.title, item: `https://pixelsqueeze.app/blog/${post.slug}` },
+    ],
+  };
 
   return (
-    <article className="min-h-screen bg-background">
-      {/* Navigation */}
-      <nav className="border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <Link to="/" className="text-2xl font-bold text-foreground hover:text-primary transition-colors">
-            Pixelsqueeze
-          </Link>
-          <div className="flex gap-6">
-            <Link to="/" className="text-foreground/80 hover:text-foreground transition-colors">
-              Home
-            </Link>
-            <Link to="/blog" className="text-foreground hover:text-foreground transition-colors font-medium">
-              Blog
-            </Link>
-            <Link to="/company" className="text-foreground/80 hover:text-foreground transition-colors">
-              Company
-            </Link>
-            <Link to="/account" className="text-foreground/80 hover:text-foreground transition-colors">
-              Account
-            </Link>
-          </div>
-        </div>
-      </nav>
+    <div className="min-h-screen bg-background">
+      <SEO
+        title={post.meta_title ?? post.title}
+        description={post.meta_description ?? post.excerpt ?? post.title}
+        path={`/blog/${post.slug}`}
+        type="article"
+        image={post.featured_image_url ?? undefined}
+        schema={[articleSchema, breadcrumbSchema, ...(faqSchema ? [faqSchema] : [])]}
+      />
 
-      {/* Article Header */}
-      <header className="bg-card border-b border-border py-12 px-6">
-        <div className="max-w-4xl mx-auto">
-          <Link to="/blog" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-6">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Blog
+      {/* Nav */}
+      <div className="border-b border-border">
+        <div className="max-w-4xl mx-auto px-4 py-6 flex items-center justify-between">
+          <Link to="/blog" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+            <ArrowLeft className="w-4 h-4" /> All articles
           </Link>
-          
-          <div className="flex items-center gap-4 mb-4 flex-wrap">
-            <Badge variant="outline">{article.category}</Badge>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Calendar className="w-4 h-4" />
-              {new Date(article.publishDate).toLocaleDateString('en-US', { 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-              })}
-            </div>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Clock className="w-4 h-4" />
-              {article.readTime}
-            </div>
-          </div>
-          
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">
-            {article.title}
-          </h1>
-          
-          <p className="text-xl text-muted-foreground mb-6">
-            {article.description}
-          </p>
-          
-          <div className="flex flex-wrap gap-2 mb-6">
-            {article.keywords.map((keyword, idx) => (
-              <Badge key={idx} variant="secondary">
-                {keyword}
-              </Badge>
-            ))}
-          </div>
-
-          <Button variant="outline" onClick={handleShare}>
-            <Share2 className="w-4 h-4 mr-2" />
-            Share Article
+          <Button variant="ghost" size="sm" onClick={share} aria-label="Share article">
+            <Share2 className="w-4 h-4 mr-1.5" /> Share
           </Button>
         </div>
-      </header>
+      </div>
 
-      {/* Article Content */}
-      <section className="py-12 px-6">
-        <div className="max-w-4xl mx-auto">
-          <Card className="p-8 md:p-12">
-            <div 
-              className="prose prose-lg max-w-none dark:prose-invert
-                prose-headings:font-bold prose-headings:text-foreground
-                prose-h2:text-3xl prose-h2:mt-12 prose-h2:mb-6
-                prose-p:text-muted-foreground prose-p:leading-relaxed prose-p:mb-6
-                prose-strong:text-foreground prose-strong:font-semibold
-                prose-ul:my-6 prose-li:text-muted-foreground prose-li:mb-2
-                prose-a:text-primary prose-a:no-underline hover:prose-a:underline"
-              dangerouslySetInnerHTML={{ __html: article.content }}
-            />
-          </Card>
+      {/* Hero */}
+      <article className="max-w-3xl mx-auto px-4 py-10">
+        <div className="flex items-center gap-2 mb-4 flex-wrap">
+          {post.topic && <Badge>{post.topic}</Badge>}
+          {post.category && post.category !== post.topic && <Badge variant="secondary">{post.category}</Badge>}
+          <span className="text-xs text-muted-foreground flex items-center gap-1">
+            <Calendar className="w-3 h-3" /> {new Date(dateIso).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" })}
+          </span>
+          <span className="text-xs text-muted-foreground flex items-center gap-1">
+            <Clock className="w-3 h-3" /> {post.reading_time ?? 8} min read
+          </span>
         </div>
-      </section>
 
-      {/* Related Articles */}
-      <section className="py-16 px-6 bg-secondary/20">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold mb-8">Related Articles</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {relatedArticles.map((relatedArticle) => (
-              <Card key={relatedArticle.id} className="p-6 hover:shadow-lg transition-shadow">
-                <Badge variant="outline" className="mb-3">{relatedArticle.category}</Badge>
-                
-                <h3 className="text-xl font-bold mb-3 hover:text-primary transition-colors">
-                  <Link to={`/blog/${relatedArticle.id}`}>
-                    {relatedArticle.title}
-                  </Link>
-                </h3>
-                
-                <p className="text-muted-foreground text-sm mb-4">
-                  {relatedArticle.description}
-                </p>
-                
-                <Link to={`/blog/${relatedArticle.id}`}>
-                  <Button variant="outline" size="sm">
-                    Read More →
-                  </Button>
-                </Link>
-              </Card>
+        <h1 className="text-3xl md:text-5xl font-bold tracking-tight mb-4">{post.title}</h1>
+        {post.excerpt && <p className="text-lg text-muted-foreground mb-8">{post.excerpt}</p>}
+
+        {post.featured_image_url && (
+          <img
+            src={post.featured_image_url}
+            alt={post.title}
+            width={1600}
+            height={900}
+            className="w-full rounded-2xl mb-10 aspect-[16/9] object-cover"
+          />
+        )}
+
+        {/* Content */}
+        <div
+          className="prose prose-neutral dark:prose-invert max-w-none prose-headings:scroll-mt-20 prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4 prose-h3:text-xl prose-p:leading-relaxed prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-img:rounded-2xl prose-table:text-sm prose-blockquote:border-primary prose-blockquote:not-italic"
+          dangerouslySetInnerHTML={{ __html: cleanContent }}
+        />
+
+        {/* Tags */}
+        {post.tags && post.tags.length > 0 && (
+          <div className="flex flex-wrap gap-2 mt-10 pt-6 border-t border-border">
+            {post.tags.map((t) => (
+              <Badge key={t} variant="outline">#{t}</Badge>
             ))}
           </div>
+        )}
+
+        {/* FAQs */}
+        {post.faqs && post.faqs.length > 0 && (
+          <section className="mt-14" id="faqs">
+            <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-primary" />
+              Frequently asked questions
+            </h2>
+            <Accordion type="single" collapsible className="border border-border rounded-2xl bg-card divide-y divide-border">
+              {post.faqs.map((f, i) => (
+                <AccordionItem key={i} value={`faq-${i}`} className="border-0 px-5">
+                  <AccordionTrigger className="text-left font-semibold hover:no-underline">
+                    {f.question}
+                  </AccordionTrigger>
+                  <AccordionContent className="text-muted-foreground leading-relaxed">
+                    {f.answer}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </section>
+        )}
+
+        {/* CTA */}
+        <section className="mt-14 rounded-3xl bg-gradient-to-br from-primary via-primary/90 to-accent p-8 md:p-10 text-primary-foreground">
+          <h3 className="text-2xl md:text-3xl font-bold mb-3">Put this into practice in 60 seconds</h3>
+          <p className="opacity-90 mb-6 max-w-xl">
+            PixelSqueeze applies every tactic in this article automatically — compress, upscale, enhance, or prep for
+            print with one click. No account required to try.
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <Button asChild size="lg" variant="secondary">
+              <Link to="/">Optimize an image free →</Link>
+            </Button>
+            <Button asChild size="lg" variant="outline" className="bg-transparent border-primary-foreground/40 text-primary-foreground hover:bg-primary-foreground/10">
+              <Link to="/pricing">See pricing</Link>
+            </Button>
+          </div>
+        </section>
+
+        {/* Newsletter */}
+        <div className="mt-14">
+          <NewsletterSignup source={`blog-post:${post.slug}`} />
         </div>
-      </section>
-    </article>
+
+        {/* Related */}
+        {related.length > 0 && (
+          <section className="mt-16">
+            <h2 className="text-2xl font-bold mb-6">Keep reading</h2>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {related.map((r) => (
+                <Link key={r.slug} to={`/blog/${r.slug}`} className="group">
+                  <Card className="overflow-hidden h-full border-border hover:border-primary/40 transition">
+                    <div className="aspect-[16/9] bg-muted overflow-hidden">
+                      {r.featured_image_url ? (
+                        <img src={r.featured_image_url} alt={r.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition" />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-primary/20 to-accent/20" />
+                      )}
+                    </div>
+                    <div className="p-4">
+                      {r.topic && <Badge variant="secondary" className="text-xs mb-2">{r.topic}</Badge>}
+                      <h3 className="font-semibold leading-snug group-hover:text-primary transition line-clamp-2">{r.title}</h3>
+                      <span className="text-xs text-muted-foreground mt-2 inline-flex items-center gap-1">
+                        Read <ArrowRight className="w-3 h-3" />
+                      </span>
+                    </div>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+      </article>
+    </div>
   );
 };
 

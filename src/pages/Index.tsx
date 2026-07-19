@@ -340,7 +340,8 @@ const Index = () => {
   const currentTool = toolTitles[activeTool];
 
   return (
-    <div className="min-h-screen bg-background flex" role="application" aria-label="PixelSqueeze Dashboard">
+    <div className="min-h-screen bg-background flex overflow-x-hidden" role="application" aria-label="PixelSqueeze Dashboard">
+
       <OnboardingFlow onComplete={() => setShowWelcome(true)} />
 
       <label htmlFor="file-upload" className="sr-only">Upload images</label>

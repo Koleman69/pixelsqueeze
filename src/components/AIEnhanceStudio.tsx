@@ -1,4 +1,5 @@
 import { useCallback, useRef, useState, type ChangeEvent, type DragEvent, type ElementType } from "react";
+import { useToolQuota } from "@/components/FreeToolGate";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Upload,

@@ -29,6 +29,8 @@ const ImageEnhancer = lazy(() => import("./pages/tools/ImageEnhancer"));
 const PhotoOptimizer = lazy(() => import("./pages/tools/PhotoOptimizer"));
 const WebsiteImageCompression = lazy(() => import("./pages/tools/WebsiteImageCompression"));
 const PrintReadyImages = lazy(() => import("./pages/tools/PrintReadyImages"));
+const SolutionsIndex = lazy(() => import("./pages/SolutionsIndex"));
+const IndustryLanding = lazy(() => import("./pages/IndustryLanding"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -128,6 +130,8 @@ const App = () => (
                 <Route path="/tools/photo-optimizer" element={<PhotoOptimizer />} />
                 <Route path="/tools/website-image-compression" element={<WebsiteImageCompression />} />
                 <Route path="/tools/print-ready-images" element={<PrintReadyImages />} />
+                <Route path="/for" element={<SolutionsIndex />} />
+                <Route path="/for/:slug" element={<IndustryLanding />} />
                 <Route path="/share/:shareCode" element={<SharedFile />} />
                 <Route path="/account" element={
                   <ProtectedRoute>

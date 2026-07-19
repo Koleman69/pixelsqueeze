@@ -119,6 +119,11 @@ const toolTitles: Record<ToolCategory, { title: string; description: string; gra
     description: "Auto-resize images for Instagram, YouTube, Twitter & more",
     gradient: "from-teal-500/10 via-emerald-500/5 to-transparent",
   },
+  "social-studio": {
+    title: "Social Studio",
+    description: "One image, every platform — instant social pack",
+    gradient: "from-fuchsia-500/10 via-pink-500/5 to-transparent",
+  },
   "analytics": {
     title: "Analytics Dashboard",
     description: "Track your optimization history and storage savings",

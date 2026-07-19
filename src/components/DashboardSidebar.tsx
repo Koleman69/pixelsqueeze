@@ -23,6 +23,7 @@ import {
   LayoutDashboard,
   Send,
   Zap,
+  Gauge,
 } from "lucide-react";
 import {
   Sidebar,

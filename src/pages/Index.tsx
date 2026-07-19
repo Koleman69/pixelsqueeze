@@ -240,6 +240,8 @@ const Index = () => {
           return <DashboardOverview isSubscribed={subscription.subscribed} onQuickAction={(t) => setActiveTool(t as any)} />;
         case "magic-optimize":
           return <MagicOptimize isSubscribed={subscription.subscribed} />;
+        case "ai-enhance":
+          return <AIEnhanceStudio />;
         case "quick-optimize":
           return <QuickOptimize isSubscribed={subscription.subscribed} />;
         case "compress-image":

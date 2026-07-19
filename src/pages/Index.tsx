@@ -57,6 +57,11 @@ const toolTitles: Record<ToolCategory, { title: string; description: string; gra
     description: "Your optimization performance at a glance",
     gradient: "from-blue-500/10 via-cyan-500/5 to-transparent",
   },
+  files: {
+    title: "Files",
+    description: "Folders, favorites, collections, tags, archive & trash — all synced to your account",
+    gradient: "from-blue-500/10 via-cyan-500/5 to-transparent",
+  },
   "magic-optimize": {
     title: "Magic Optimize",
     description: "Pick a destination and we'll optimize automatically — Apple-level simple",

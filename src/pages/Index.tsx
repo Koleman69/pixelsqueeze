@@ -304,6 +304,8 @@ const Index = () => {
           return <BatchOptimizer />;
         case "batch-studio":
           return <BatchProcessingStudio />;
+        case "files":
+          return <FilesSection />;
         case "pro-optimize":
           return <ProfessionalOptimizer />;
         case "print-prep":

@@ -329,6 +329,8 @@ const Index = () => {
           );
         case "social-export":
           return <SocialMediaExporter />;
+        case "social-studio":
+          return <SocialStudio />;
         case "analytics":
           return <BatchAnalyticsDashboard />;
         case "competitor":

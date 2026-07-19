@@ -279,11 +279,12 @@ export type Database = {
       }
       blog_posts: {
         Row: {
-          author_id: string
+          author_id: string | null
           category: string | null
           content: string
           created_at: string
           excerpt: string | null
+          faqs: Json
           featured_image_url: string | null
           id: string
           is_published: boolean
@@ -291,17 +292,21 @@ export type Database = {
           meta_title: string | null
           published_at: string | null
           reading_time: number | null
+          related_slugs: string[]
           slug: string
           tags: string[] | null
           title: string
+          topic: string | null
           updated_at: string
+          word_count: number
         }
         Insert: {
-          author_id?: string
+          author_id?: string | null
           category?: string | null
           content: string
           created_at?: string
           excerpt?: string | null
+          faqs?: Json
           featured_image_url?: string | null
           id?: string
           is_published?: boolean
@@ -309,17 +314,21 @@ export type Database = {
           meta_title?: string | null
           published_at?: string | null
           reading_time?: number | null
+          related_slugs?: string[]
           slug: string
           tags?: string[] | null
           title: string
+          topic?: string | null
           updated_at?: string
+          word_count?: number
         }
         Update: {
-          author_id?: string
+          author_id?: string | null
           category?: string | null
           content?: string
           created_at?: string
           excerpt?: string | null
+          faqs?: Json
           featured_image_url?: string | null
           id?: string
           is_published?: boolean
@@ -327,10 +336,13 @@ export type Database = {
           meta_title?: string | null
           published_at?: string | null
           reading_time?: number | null
+          related_slugs?: string[]
           slug?: string
           tags?: string[] | null
           title?: string
+          topic?: string | null
           updated_at?: string
+          word_count?: number
         }
         Relationships: []
       }

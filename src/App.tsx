@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -92,6 +92,25 @@ const PublicRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
+// Warm up likely-next route chunks during browser idle time to make
+// navigations feel instant without hurting initial LCP.
+const IdleRoutePrefetcher = () => {
+  useEffect(() => {
+    const idle = (window as any).requestIdleCallback || ((cb: () => void) => setTimeout(cb, 1500));
+    const handle = idle(() => {
+      import("./pages/Pricing");
+      import("./pages/Auth");
+      import("./pages/Scanner");
+      import("./pages/Index");
+    });
+    return () => {
+      const cancel = (window as any).cancelIdleCallback;
+      if (cancel && handle) cancel(handle);
+    };
+  }, []);
+  return null;
+};
+
 const App = () => (
   <ErrorBoundary>
     <QueryClientProvider client={queryClient}>
@@ -100,6 +119,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
+            <IdleRoutePrefetcher />
             <Suspense fallback={<PageLoader />}>
               <Routes>
                 {/* Public landing page */}

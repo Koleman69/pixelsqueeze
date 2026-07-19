@@ -24,7 +24,8 @@ import {
   Send,
   Zap,
   Gauge,
-} from "lucide-react";
+  Layers,
+
 import {
   Sidebar,
   SidebarContent,

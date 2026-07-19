@@ -17,7 +17,6 @@ const EmailCapturePopup = () => {
   const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
-    // Don't show if user dismissed recently
     const dismissed = localStorage.getItem(DISMISS_KEY);
     if (dismissed) {
       const dismissedAt = new Date(dismissed);
@@ -25,13 +24,33 @@ const EmailCapturePopup = () => {
       if (daysSince < DISMISS_DAYS) return;
     }
 
-    // Don't show to logged-in users
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    let armed = false;
+
+    const trigger = () => {
+      if (armed) return;
+      armed = true;
+      setOpen(true);
+      if (timer) clearTimeout(timer);
+      document.removeEventListener("mouseout", onMouseOut);
+    };
+
+    // Exit-intent: mouse leaves toward the top of the viewport
+    const onMouseOut = (e: MouseEvent) => {
+      if (e.relatedTarget || (e as any).toElement) return;
+      if (e.clientY <= 0) trigger();
+    };
+
     supabase.auth.getSession().then(({ data }) => {
       if (data.session) return;
-
-      const timer = setTimeout(() => setOpen(true), SHOW_DELAY_MS);
-      return () => clearTimeout(timer);
+      timer = setTimeout(trigger, SHOW_DELAY_MS);
+      document.addEventListener("mouseout", onMouseOut);
     });
+
+    return () => {
+      if (timer) clearTimeout(timer);
+      document.removeEventListener("mouseout", onMouseOut);
+    };
   }, []);
 
   const handleDismiss = () => {

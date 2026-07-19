@@ -58,6 +58,11 @@ const toolTitles: Record<ToolCategory, { title: string; description: string; gra
     description: "Pick a destination and we'll optimize automatically — Apple-level simple",
     gradient: "from-primary/20 via-accent/10 to-transparent",
   },
+  "ai-enhance": {
+    title: "AI Enhance Studio",
+    description: "Upscale, sharpen, denoise, remove backgrounds & more — one click each",
+    gradient: "from-indigo-500/20 via-purple-500/10 to-transparent",
+  },
   "quick-optimize": {
     title: "Quick Optimize",
     description: "Upload images, pick a goal, and get optimized files instantly",

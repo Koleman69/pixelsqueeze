@@ -12,8 +12,25 @@ const ENCRYPTION_PREFIX = "enc::";
 async function getEncryptionKey(): Promise<CryptoKey> {
   const secret = Deno.env.get("CREDENTIALS_ENCRYPTION_KEY");
   if (!secret) throw new Error("Encryption key not configured");
-  const keyData = new TextEncoder().encode(secret.padEnd(32, "0").slice(0, 32));
-  return await crypto.subtle.importKey("raw", keyData, "AES-GCM", false, ["decrypt"]);
+  const material = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(secret),
+    "HKDF",
+    false,
+    ["deriveKey"],
+  );
+  return await crypto.subtle.deriveKey(
+    {
+      name: "HKDF",
+      hash: "SHA-256",
+      salt: new TextEncoder().encode("pixelsqueeze.automation.v1"),
+      info: new TextEncoder().encode("aes-gcm-credentials-key"),
+    },
+    material,
+    { name: "AES-GCM", length: 256 },
+    false,
+    ["encrypt", "decrypt"],
+  );
 }
 
 async function decryptValue(val: string): Promise<string> {

@@ -86,6 +86,11 @@ const toolTitles: Record<ToolCategory, { title: string; description: string; gra
     description: "Process multiple images at once with GPU acceleration",
     gradient: "from-amber-500/10 via-orange-500/5 to-transparent",
   },
+  "batch-studio": {
+    title: "Batch Studio",
+    description: "Folders, ZIPs, hundreds of images — pause, resume, retry, download as ZIP",
+    gradient: "from-amber-500/15 via-orange-500/10 to-transparent",
+  },
   "pro-optimize": {
     title: "Professional Optimizer",
     description: "Maximum fidelity with minimal file size for web & print",

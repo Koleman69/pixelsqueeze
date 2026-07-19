@@ -123,6 +123,11 @@ const App = () => (
                 <Route path="/promote" element={<Promote />} />
                 <Route path="/pricing" element={<Pricing />} />
                 <Route path="/scanner" element={<Scanner />} />
+                <Route path="/tools/ai-image-upscaler" element={<AIImageUpscaler />} />
+                <Route path="/tools/image-enhancer" element={<ImageEnhancer />} />
+                <Route path="/tools/photo-optimizer" element={<PhotoOptimizer />} />
+                <Route path="/tools/website-image-compression" element={<WebsiteImageCompression />} />
+                <Route path="/tools/print-ready-images" element={<PrintReadyImages />} />
                 <Route path="/share/:shareCode" element={<SharedFile />} />
                 <Route path="/account" element={
                   <ProtectedRoute>

@@ -415,7 +415,11 @@ const Index = () => {
         )}
 
         {/* Tool Content Area */}
-        <main id="main-content" className="flex-1 p-6 overflow-auto" aria-label={currentTool.title}>
+        <main
+          id="main-content"
+          className="flex-1 overflow-x-hidden overflow-y-auto p-3 sm:p-4 lg:p-6 pb-24 lg:pb-6"
+          aria-label={currentTool.title}
+        >
           <div className="max-w-5xl mx-auto">
             {/* Tool Header with gradient */}
             <AnimatePresence mode="wait">
@@ -425,14 +429,14 @@ const Index = () => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -12 }}
                 transition={{ duration: 0.2, ease: "easeOut" }}
-                className="mb-6"
+                className="mb-4 sm:mb-6"
               >
-                <div className={`relative mb-2 overflow-hidden rounded-2xl border border-border/40 bg-gradient-to-r ${currentTool.gradient} p-6 backdrop-blur-xl`}>
+                <div className={`relative mb-2 overflow-hidden rounded-2xl border border-border/40 bg-gradient-to-r ${currentTool.gradient} p-4 sm:p-6 backdrop-blur-xl`}>
                   <div className="absolute inset-0 bg-[linear-gradient(135deg,hsl(var(--background)/0.35),transparent_55%)]" />
                   <div className="absolute -right-12 top-0 h-36 w-36 rounded-full bg-primary/10 blur-3xl" />
                   <div className="absolute bottom-0 left-1/3 h-28 w-28 rounded-full bg-accent/10 blur-2xl" />
-                  <h1 className="text-2xl font-bold mb-1 relative">{currentTool.title}</h1>
-                  <p className="text-muted-foreground relative">{currentTool.description}</p>
+                  <h1 className="text-xl sm:text-2xl font-bold mb-1 relative">{currentTool.title}</h1>
+                  <p className="text-sm sm:text-base text-muted-foreground relative">{currentTool.description}</p>
                 </div>
               </motion.div>
             </AnimatePresence>
@@ -455,5 +459,6 @@ const Index = () => {
     </div>
   );
 };
+
 
 export default Index;

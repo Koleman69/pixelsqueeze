@@ -224,6 +224,7 @@ export const MagicOptimize = ({ isSubscribed = false }: MagicOptimizeProps) => {
     const magic: MagicResult[] = pipelineResults.map((r, idx) => ({
       ...r,
       beforeUrl: uploads[idx]?.previewUrl ?? r.url,
+      originalFile: uploads[idx]?.file,
     }));
     setResults(magic);
     setShowSuccess(true);

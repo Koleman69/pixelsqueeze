@@ -233,7 +233,9 @@ const Install = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
+
 
 export default Install;

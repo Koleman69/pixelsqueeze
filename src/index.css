@@ -150,7 +150,9 @@
     /* Prevent iOS rubber-banding on body */
     overscroll-behavior: none;
     -webkit-tap-highlight-color: transparent;
+    overflow-x: hidden;
   }
+
 
   body {
     @apply bg-background text-foreground antialiased;

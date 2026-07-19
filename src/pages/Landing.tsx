@@ -609,10 +609,65 @@ const Landing = () => {
           </div>
         </section>
 
+        {/* FREE vs PRO COMPARISON TABLE */}
+        <section className="px-6 pb-20" aria-labelledby="compare-heading">
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-8">
+              <p className="text-xs font-bold uppercase tracking-widest text-primary mb-3">Free vs Pro</p>
+              <h2 id="compare-heading" className="font-display text-3xl md:text-4xl font-bold leading-tight">
+                What you get on every plan
+              </h2>
+            </div>
+            <div className="bg-white rounded-3xl border border-border shadow-soft overflow-hidden">
+              <table className="w-full text-sm">
+                <caption className="sr-only">Feature comparison between PixelSqueeze Free and Pro plans</caption>
+                <thead className="bg-muted/40">
+                  <tr>
+                    <th scope="col" className="text-left font-semibold px-5 py-4">Feature</th>
+                    <th scope="col" className="text-center font-semibold px-5 py-4">Free</th>
+                    <th scope="col" className="text-center font-semibold px-5 py-4 text-primary">Pro</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {[
+                    ["Images per month",             "25",             "Unlimited"],
+                    ["AI Enhance & Upscale",         "Basic",          "Advanced (2× / 4×)"],
+                    ["Automatic WebP + AVIF",        true,             true],
+                    ["Batch processing",             false,            true],
+                    ["Print Ready (400 DPI)",        false,            true],
+                    ["API access",                   false,            true],
+                    ["Cloud storage",                "In-browser only", "30-day encrypted"],
+                    ["Priority processing",          false,            true],
+                    ["Watermark",                    "None",           "None"],
+                  ].map(([label, free, pro], i) => (
+                    <tr key={i} className="hover:bg-muted/20">
+                      <th scope="row" className="text-left font-medium px-5 py-3.5 text-foreground/85">{label}</th>
+                      <td className="text-center px-5 py-3.5 text-foreground/70">
+                        {free === true ? <Check className="w-4 h-4 text-emerald-600 inline" aria-label="Included" /> :
+                         free === false ? <X className="w-4 h-4 text-foreground/30 inline" aria-label="Not included" /> :
+                         free}
+                      </td>
+                      <td className="text-center px-5 py-3.5 font-medium text-foreground">
+                        {pro === true ? <Check className="w-4 h-4 text-emerald-600 inline" aria-label="Included" /> :
+                         pro === false ? <X className="w-4 h-4 text-foreground/30 inline" aria-label="Not included" /> :
+                         pro}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
 
         {/* FAQ */}
         <section id="faq" className="px-6 py-20 md:py-28" aria-labelledby="faq-heading">
-          <div className="max-w-3xl mx-auto">
+          <div
+            className="max-w-3xl mx-auto"
+            itemScope
+            itemType="https://schema.org/FAQPage"
+          >
             <div className="text-center mb-10">
               <p className="text-xs font-bold uppercase tracking-widest text-primary mb-3">FAQ</p>
               <h2 id="faq-heading" className="font-display text-4xl md:text-5xl font-bold leading-tight">Questions, answered.</h2>

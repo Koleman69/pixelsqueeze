@@ -126,6 +126,11 @@ const toolTitles: Record<ToolCategory, { title: string; description: string; gra
     description: "One image, every platform — instant social pack",
     gradient: "from-fuchsia-500/10 via-pink-500/5 to-transparent",
   },
+  "image-score": {
+    title: "AI Image Score",
+    description: "Grade any image and apply one-click fixes",
+    gradient: "from-emerald-500/10 via-teal-500/5 to-transparent",
+  },
   "analytics": {
     title: "Analytics Dashboard",
     description: "Track your optimization history and storage savings",

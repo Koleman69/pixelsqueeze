@@ -25,6 +25,8 @@ import {
   Zap,
   Gauge,
   Layers,
+} from "lucide-react";
+
 
 import {
   Sidebar,

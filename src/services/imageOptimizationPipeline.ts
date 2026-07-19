@@ -33,7 +33,12 @@ export type GoalPreset =
   | 'amazon'
   | 'airbnb'
   | 'hotel'
-  | 'linkedin';
+  | 'linkedin'
+  | 'facebook'
+  | 'pinterest'
+  | 'shopify'
+  | 'personal';
+
 
 export interface PipelineOptions {
   /** Target goal preset */
@@ -208,9 +213,42 @@ const GOAL_PRESETS: Record<GoalPreset, GoalConfig> = {
     sharpenAfterResize: true,
     sharpenAmount: 0.35,
   },
+  facebook: {
+    maxDimension: 1200,
+    quality: 85,
+    preferredFormats: ['webp', 'jpeg'],
+    sharpenAfterResize: true,
+    sharpenAmount: 0.3,
+    preserveColorProfile: true,
+  },
+  pinterest: {
+    maxDimension: 1000,
+    quality: 88,
+    preferredFormats: ['webp', 'jpeg'],
+    sharpenAfterResize: true,
+    sharpenAmount: 0.3,
+    preserveColorProfile: true,
+  },
+  shopify: {
+    maxDimension: 2048,
+    quality: 88,
+    preferredFormats: ['webp', 'jpeg'],
+    whiteBackgroundNormalize: true,
+    squareCrop: true,
+    fixedDimensions: { width: 2048, height: 2048 },
+    sharpenAfterResize: true,
+    sharpenAmount: 0.25,
+  },
+  personal: {
+    maxDimension: 2560,
+    quality: 90,
+    preferredFormats: ['jpeg', 'webp'],
+    preserveColorProfile: true,
+  },
 };
 
 // ─── Content Detection ──────────────────────────────────────────────────────
+
 
 function detectContentType(imageData: ImageData): ContentType {
   const { data, width, height } = imageData;

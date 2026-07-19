@@ -25,6 +25,7 @@ import {
   Zap,
   Gauge,
   Layers,
+  Folder,
 } from "lucide-react";
 
 
@@ -51,6 +52,7 @@ import {
 
 export type ToolCategory = 
   | "overview"
+  | "files"
   | "magic-optimize"
   | "quick-optimize"
   | "compress-image"
@@ -85,6 +87,7 @@ const toolCategories = [
     icon: LayoutDashboard,
     tools: [
       { id: "overview" as ToolCategory, label: "Dashboard", icon: LayoutDashboard, description: "Stats & scores" },
+      { id: "files" as ToolCategory, label: "Files", icon: Folder, description: "Folders, collections, tags" },
     ],
   },
   {

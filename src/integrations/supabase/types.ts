@@ -797,7 +797,9 @@ export type Database = {
       }
       shared_files: {
         Row: {
+          collection_id: string | null
           created_at: string | null
+          deleted_at: string | null
           download_count: number | null
           expires_at: string | null
           file_name: string
@@ -806,13 +808,19 @@ export type Database = {
           file_type: string | null
           folder_id: string | null
           id: string
+          is_archived: boolean
           is_favorite: boolean
+          is_pinned: boolean
+          last_viewed_at: string | null
           share_code: string
+          tags: string[]
           updated_at: string | null
           user_id: string
         }
         Insert: {
+          collection_id?: string | null
           created_at?: string | null
+          deleted_at?: string | null
           download_count?: number | null
           expires_at?: string | null
           file_name: string
@@ -821,13 +829,19 @@ export type Database = {
           file_type?: string | null
           folder_id?: string | null
           id?: string
+          is_archived?: boolean
           is_favorite?: boolean
+          is_pinned?: boolean
+          last_viewed_at?: string | null
           share_code?: string
+          tags?: string[]
           updated_at?: string | null
           user_id: string
         }
         Update: {
+          collection_id?: string | null
           created_at?: string | null
+          deleted_at?: string | null
           download_count?: number | null
           expires_at?: string | null
           file_name?: string
@@ -836,12 +850,23 @@ export type Database = {
           file_type?: string | null
           folder_id?: string | null
           id?: string
+          is_archived?: boolean
           is_favorite?: boolean
+          is_pinned?: boolean
+          last_viewed_at?: string | null
           share_code?: string
+          tags?: string[]
           updated_at?: string | null
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "shared_files_collection_id_fkey"
+            columns: ["collection_id"]
+            isOneToOne: false
+            referencedRelation: "user_collections"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "shared_files_folder_id_fkey"
             columns: ["folder_id"]
@@ -983,6 +1008,36 @@ export type Database = {
           updated_at?: string
           user_id?: string
           website_url?: string
+        }
+        Relationships: []
+      }
+      user_collections: {
+        Row: {
+          color: string | null
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }

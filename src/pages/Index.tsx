@@ -18,6 +18,7 @@ const ImageUploader = lazy(() => import("@/components/ImageUploader").then(m => 
 const ImageEditor = lazy(() => import("@/components/ImageEditor").then(m => ({ default: m.ImageEditor })));
 const BatchOptimizer = lazy(() => import("@/components/BatchOptimizer").then(m => ({ default: m.BatchOptimizer })));
 const BatchProcessingStudio = lazy(() => import("@/components/BatchProcessingStudio").then(m => ({ default: m.BatchProcessingStudio })));
+const FilesSection = lazy(() => import("@/components/FilesSection").then(m => ({ default: m.FilesSection })));
 const ProfessionalOptimizer = lazy(() => import("@/components/ProfessionalOptimizer").then(m => ({ default: m.ProfessionalOptimizer })));
 const PrintOptimizer = lazy(() => import("@/components/PrintOptimizer").then(m => ({ default: m.PrintOptimizer })));
 const EnhancedVideoProgress = lazy(() => import("@/components/EnhancedVideoProgress").then(m => ({ default: m.EnhancedVideoProgress })));
@@ -55,6 +56,11 @@ const toolTitles: Record<ToolCategory, { title: string; description: string; gra
   overview: {
     title: "Dashboard",
     description: "Your optimization performance at a glance",
+    gradient: "from-blue-500/10 via-cyan-500/5 to-transparent",
+  },
+  files: {
+    title: "Files",
+    description: "Folders, favorites, collections, tags, archive & trash — all synced to your account",
     gradient: "from-blue-500/10 via-cyan-500/5 to-transparent",
   },
   "magic-optimize": {
@@ -298,6 +304,8 @@ const Index = () => {
           return <BatchOptimizer />;
         case "batch-studio":
           return <BatchProcessingStudio />;
+        case "files":
+          return <FilesSection />;
         case "pro-optimize":
           return <ProfessionalOptimizer />;
         case "print-prep":

@@ -160,6 +160,13 @@ export const MagicOptimize = ({ isSubscribed = false }: MagicOptimizeProps) => {
       return;
     }
 
+    // Free trial quota: charge one credit per image/video added
+    if (quota && !quota.unlimited) {
+      const need = images.length + videos.length;
+      const ok = await quota.consume(need);
+      if (!ok) return;
+    }
+
     setVideoFiles((prev) => [...prev, ...videos]);
 
     // Simulated upload progress (client-side files load instantly, but we surface progress UX)

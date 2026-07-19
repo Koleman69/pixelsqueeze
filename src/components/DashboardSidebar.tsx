@@ -86,6 +86,7 @@ const toolCategories = [
     icon: LayoutDashboard,
     tools: [
       { id: "overview" as ToolCategory, label: "Dashboard", icon: LayoutDashboard, description: "Stats & scores" },
+      { id: "files" as ToolCategory, label: "Files", icon: Folder, description: "Folders, collections, tags" },
     ],
   },
   {

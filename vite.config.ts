@@ -31,7 +31,10 @@ export default defineConfig(({ mode }) => ({
         },
       },
     },
-    target: "esnext",
+    // Do not ship untranspiled ESNext to production. Safari 14+ keeps BigInt
+    // support required by the image engine while avoiding modern syntax blanks.
+    target: ["es2020", "safari14"],
+    cssTarget: "safari14",
     minify: "esbuild",
     sourcemap: false,
     cssMinify: true,

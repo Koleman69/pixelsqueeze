@@ -31,7 +31,10 @@ export default defineConfig(({ mode }) => ({
         },
       },
     },
-    target: "esnext",
+    // Do not ship untranspiled ESNext to production. Older iOS Safari/WebKit
+    // can show a blank screen when it encounters modern syntax in built chunks.
+    target: ["es2019", "safari13"],
+    cssTarget: "safari13",
     minify: "esbuild",
     sourcemap: false,
     cssMinify: true,

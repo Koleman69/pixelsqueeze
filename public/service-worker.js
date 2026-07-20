@@ -1,6 +1,5 @@
-// Kill-switch service worker: evicts previous app-shell PWA registrations
-// and their Workbox/VitePWA caches, then unregisters itself so Safari/Chrome
-// stop serving stale or broken cached HTML.
+// Secondary kill-switch path for any older app-shell worker that registered as
+// /service-worker.js. Keep messaging workers on separate filenames untouched.
 function isAppShellCacheForThisRegistration(name) {
   const scope = self.registration.scope;
   const normalizedScope = scope.endsWith("/") ? scope.slice(0, -1) : scope;
@@ -13,7 +12,6 @@ function isAppShellCacheForThisRegistration(name) {
 self.addEventListener("install", () => self.skipWaiting());
 
 self.addEventListener("fetch", (event) => {
-  // Force network while cleanup is active so stale HTML/chunks are not served.
   if (event.request.method === "GET") {
     event.respondWith(fetch(event.request, { cache: "reload" }).catch(() => Response.error()));
   }

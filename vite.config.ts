@@ -31,10 +31,10 @@ export default defineConfig(({ mode }) => ({
         },
       },
     },
-    // Do not ship untranspiled ESNext to production. Older iOS Safari/WebKit
-    // can show a blank screen when it encounters modern syntax in built chunks.
-    target: ["es2019", "safari13"],
-    cssTarget: "safari13",
+    // Do not ship untranspiled ESNext to production. Safari 14+ keeps BigInt
+    // support required by the image engine while avoiding modern syntax blanks.
+    target: ["es2020", "safari14"],
+    cssTarget: "safari14",
     minify: "esbuild",
     sourcemap: false,
     cssMinify: true,

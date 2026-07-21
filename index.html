@@ -70,6 +70,91 @@
     <link rel="dns-prefetch" href="https://xjqysurmwoukskgkwjjc.supabase.co" />
     <link rel="preconnect" href="https://xjqysurmwoukskgkwjjc.supabase.co" crossorigin />
     <script src="/registerSW.js"></script>
+    <script>
+      (function () {
+        var ua = navigator.userAgent || "";
+        var isSafari = /Safari/i.test(ua) && !/Chrome|Chromium|CriOS|FxiOS|EdgiOS|OPiOS|Android/i.test(ua);
+        if (!isSafari) return;
+
+        var bypassParam = "ps_sw_bypass";
+        var fallbackParam = "ps_static_fallback";
+        var timeoutMs = 6500;
+
+        function hasParam(name) {
+          return new RegExp("[?&]" + name + "=1(?:&|$)").test(window.location.search);
+        }
+
+        function addParam(name) {
+          var url = new URL(window.location.href);
+          url.searchParams.set(name, "1");
+          url.searchParams.set("t", String(Date.now()));
+          return url.toString();
+        }
+
+        function cleanup() {
+          var jobs = [];
+          if ("serviceWorker" in navigator && navigator.serviceWorker.getRegistrations) {
+            jobs.push(
+              navigator.serviceWorker.getRegistrations().then(function (registrations) {
+                return Promise.all(
+                  registrations.map(function (registration) {
+                    return registration.unregister().catch(function () {});
+                  }),
+                );
+              }),
+            );
+          }
+          if ("caches" in window && caches.keys) {
+            jobs.push(
+              caches.keys().then(function (names) {
+                return Promise.all(
+                  names.map(function (name) {
+                    return caches.delete(name).catch(function () {});
+                  }),
+                );
+              }),
+            );
+          }
+          return Promise.all(jobs).catch(function () {});
+        }
+
+        function hydrated() {
+          var root = document.getElementById("root");
+          return document.documentElement.getAttribute("data-pixel-squeeze-hydrated") === "true" || Boolean(root && root.children.length > 0 && root.textContent && root.textContent.trim().length > 20);
+        }
+
+        function showFallback() {
+          var root = document.getElementById("root");
+          if (!root) return;
+          root.innerHTML = '<main style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:#0f172a;color:#f8fafc;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;text-align:center"><section style="max-width:520px"><h1 style="font-size:32px;line-height:1.1;margin:0 0 12px">PixelSqueeze is refreshing Safari</h1><p style="font-size:17px;line-height:1.5;color:#cbd5e1;margin:0 0 24px">Safari held onto an old app cache. Open the clean version below to bypass it.</p><a href="' + addParam(bypassParam) + '" style="display:inline-flex;min-height:48px;align-items:center;justify-content:center;border-radius:14px;background:#3b82f6;color:#020617;font-weight:800;text-decoration:none;padding:0 22px">Open PixelSqueeze</a></section></main>';
+        }
+
+        function recover() {
+          if (hydrated()) return;
+          cleanup().then(function () {
+            if (hasParam(bypassParam)) {
+              if (hasParam(fallbackParam)) {
+                showFallback();
+              } else {
+                window.location.replace(addParam(fallbackParam));
+              }
+            } else {
+              window.location.replace(addParam(bypassParam));
+            }
+          });
+        }
+
+        window.addEventListener("pageshow", function () {
+          window.setTimeout(recover, timeoutMs);
+        });
+        window.addEventListener("error", function () {
+          window.setTimeout(recover, 400);
+        });
+        window.addEventListener("unhandledrejection", function () {
+          window.setTimeout(recover, 400);
+        });
+      })();
+    </script>
 
     
     <!-- JSON-LD Structured Data -->

@@ -12,11 +12,6 @@ import {
   ArrowRight,
   Star,
   CheckCircle,
-  Wand2,
-  Maximize2,
-  Minimize2,
-  Crop,
-  Palette,
   Zap,
   Shield,
   ThumbsUp,
@@ -87,7 +82,6 @@ const Landing = () => {
   const pricingRef = useRef<HTMLDivElement>(null);
   const liveCount = useLiveCounter();
   const heroVariant = useVariant("hero_cta_v1", ["A", "B"]);
-  const HERO_CTA = heroVariant === "A" ? "Optimize a photo — free" : "Try it free — no signup";
 
   const scrollToBeforeAfter = () =>
     beforeAfterRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -96,44 +90,44 @@ const Landing = () => {
   const RATING = { value: "4.9", count: 2847, best: "5", worst: "1" };
 
   const REVIEWS = [
-    { name: "Sarah Jenkins", role: "E-com Director", rating: 5, quote: "The Amazon preset alone saved our team 12 hours a week. It's the standard for our workflow now." },
-    { name: "Marcus Chen", role: "Photographer", rating: 5, quote: "AI upscale is unreal. I've stopped paying for two other tools since switching to PixelSqueeze." },
-    { name: "Elena Rossi", role: "Boutique Owner", rating: 5, quote: "My product photos load faster and look better. Sales pages feel professional again." },
+    { name: "Sarah Jenkins", role: "Realtor", rating: 5, quote: "My phone photos of listings look like they came from a pro photographer. Every single time." },
+    { name: "Marcus Chen", role: "Dad of three", rating: 5, quote: "Rescued years of blurry kid photos in about ten minutes. My wife actually cried." },
+    { name: "Elena Rossi", role: "Boutique Owner", rating: 5, quote: "My product photos went from dull to gorgeous in one click. Sales jumped the same week." },
   ];
 
   const TIERS = [
-    { name: "Free",     price: 0,  cadence: "/forever", tagline: "Try every core tool.",       cta: "Start free",    features: ["25 images / month", "Basic optimization", "No watermark", "Web-ready exports"] },
-    { name: "Creator",  price: 9,  cadence: "/month",   tagline: "For creators & freelancers.", cta: "Start Creator", features: ["500 images / month", "AI Enhance", "Batch processing", "Social exports"], popular: true },
-    { name: "Pro",      price: 24, cadence: "/month",   tagline: "For studios & agencies.",     cta: "Go Pro",        features: ["Unlimited images", "Print Ready (400 DPI)", "API access", "Priority processing"] },
-    { name: "Business", price: 79, cadence: "/month",   tagline: "For growing teams.",          cta: "Contact sales", features: ["Everything in Pro", "Teams & white label", "Brand presets", "Analytics", "Enterprise support"] },
+    { name: "Free",     price: 0,  cadence: "/forever", tagline: "Fix your first photos free.",  cta: "Start free",    features: ["4 photos free per tool", "One-click fix", "No watermark", "No signup for first fix"] },
+    { name: "Creator",  price: 9,  cadence: "/month",   tagline: "For creators & side hustlers.", cta: "Start Creator", features: ["500 photos / month", "AI Enhance & Upscale", "Batch fix multiple photos", "Social-ready exports"], popular: true },
+    { name: "Pro",      price: 24, cadence: "/month",   tagline: "For studios & agencies.",       cta: "Go Pro",        features: ["Unlimited photos", "Print-quality restore", "Priority processing", "Cloud library"] },
+    { name: "Business", price: 79, cadence: "/month",   tagline: "For growing teams.",            cta: "Contact sales", features: ["Everything in Pro", "Teams & white label", "Brand presets", "Analytics", "Enterprise support"] },
   ];
 
   const FAQS = [
-    { q: "How is PixelSqueeze different from a normal compressor?", a: "PixelSqueeze uses AI to enhance, upscale, and optimize — not just shrink. Pick a destination and we auto-select format, dimensions, and compression." },
-    { q: "Can I really use it for free?", a: "Yes. The free plan includes every core AI tool. Pro removes the daily cap and unlocks batch, cloud storage, and priority processing." },
-    { q: "Where are my images processed?", a: "Free plan processes in-browser. Paid plans use encrypted storage that auto-deletes after 30 days. Files are never shared, sold, or used for training." },
-    { q: "What formats are supported?", a: "JPEG, PNG, WebP, AVIF, GIF and SVG in — WebP or AVIF out, sized correctly for your chosen destination." },
-    { q: "Can I cancel anytime?", a: "One click in your account. You keep Pro access until the end of your billing period." },
+    { q: "Can PixelSqueeze really fix a blurry photo?", a: "Yes. Our AI rebuilds sharpness, removes noise, corrects lighting and restores color in one click — even on phone photos, old scans, and low-resolution images." },
+    { q: "Do I need to know photo editing?", a: "No. You upload a photo, we analyze it, and one button fixes everything automatically. No sliders, no settings, no learning curve." },
+    { q: "Is it really free?", a: "Yes. Your first fixes are free with no signup and no credit card. Upgrade only if you want to fix photos in bulk." },
+    { q: "Will my photos stay private?", a: "Always. Free fixes happen in your browser — your photos never leave your device. Paid plans use encrypted storage that auto-deletes after 30 days." },
+    { q: "What kinds of photos work best?", a: "Everything — phone shots, old family photos, product pictures, real estate listings, portraits, screenshots. If it looks blurry, dark, grainy or dull, we can fix it." },
   ];
 
   const HOWTO_STEPS = [
-    { name: "Upload your image",   text: "Drag any JPG, PNG, HEIC, WebP or AVIF into PixelSqueeze. Up to 5 files at once on Free." },
-    { name: "Pick a destination",  text: "Choose Website, Instagram, Amazon, Shopify or Print — AI auto-selects format, size and compression." },
-    { name: "Let AI optimize",     text: "PixelSqueeze enhances, compresses and converts to WebP or AVIF in seconds — no settings required." },
-    { name: "Download the pack",   text: "Get an optimized file (or a full multi-size pack) with alt text and SEO-friendly filenames included." },
+    { name: "Upload your photo",     text: "Drag any photo in — phone shot, old scan, product picture, screenshot. Anything." },
+    { name: "We analyze it instantly", text: "PixelSqueeze scans for blur, noise, low light, dull color and low resolution — and grades your photo." },
+    { name: "Tap 'Fix My Photo'",    text: "One button. AI sharpens, brightens, denoises, restores color and boosts resolution automatically." },
+    { name: "Download and share",    text: "Get your fixed photo in seconds — or a full pack sized for social, web and print." },
   ];
 
   const PROS = [
-    "One-click AI enhance, upscale, compress and background removal",
-    "Auto WebP + AVIF export sized for every platform",
-    "Free tier with every core tool — no credit card",
-    "Batch processing and Shopify / Amazon / Instagram presets",
-    "Processes in-browser on Free — files never leave your device",
+    "One click fixes blur, noise, dark lighting and dull color",
+    "Works on phone photos, old scans, screenshots and product shots",
+    "No sliders, no settings, no editing skills needed",
+    "Free first fixes — no signup, no credit card, no watermark",
+    "Your photos stay on your device on the free plan",
   ];
   const CONS = [
-    "Free plan capped at 25 images / month",
-    "API access requires the Pro plan",
-    "No native desktop app (PWA + web only)",
+    "Free plan limited to 4 photos per tool before upgrade",
+    "Very heavily damaged photos may need a second pass",
+    "Web and mobile only — no desktop app (works great as a PWA)",
   ];
 
   // ---- Rich-result JSON-LD stack (unchanged) ----
@@ -142,12 +136,12 @@ const Landing = () => {
     "@type": "SoftwareApplication",
     name: "PixelSqueeze",
     applicationCategory: "MultimediaApplication",
-    applicationSubCategory: "Image Optimization",
+    applicationSubCategory: "AI Photo Enhancement",
     operatingSystem: "Web, iOS, Android",
     url: "https://pixelsqueeze.app",
     image: "https://pixelsqueeze.app/og-image.png",
     description:
-      "AI image optimizer that compresses, upscales, enhances and auto-converts photos to WebP and AVIF for every platform.",
+      "Fix blurry, dark, noisy and low-quality photos in one click. AI sharpens, brightens, denoises and restores photos instantly.",
     offers: TIERS.map((t) => ({
       "@type": "Offer",
       name: t.name,
@@ -171,12 +165,12 @@ const Landing = () => {
       reviewBody: r.quote,
     })),
     featureList: [
-      "AI image upscaler (2x / 4x)",
-      "Automatic WebP and AVIF conversion",
-      "Batch image compression",
-      "Background removal",
-      "Platform-aware presets (Instagram, Shopify, Amazon, Print)",
-      "SEO alt text and filename generation",
+      "Fix blurry photos in one click",
+      "Sharpen soft or out-of-focus images",
+      "Remove digital noise and grain",
+      "Brighten dark and underexposed photos",
+      "Restore old and faded photos",
+      "Increase photo resolution up to 4×",
     ],
   };
 
@@ -193,10 +187,10 @@ const Landing = () => {
   const howToSchema = {
     "@context": "https://schema.org",
     "@type": "HowTo",
-    name: "How to optimize an image with PixelSqueeze",
-    description: "Compress, upscale and convert any photo to WebP or AVIF in four steps.",
-    totalTime: "PT1M",
-    supply: [{ "@type": "HowToSupply", name: "JPG, PNG, HEIC, WebP or AVIF image" }],
+    name: "How to fix a blurry photo with PixelSqueeze",
+    description: "Turn any blurry, dark, noisy or low-quality photo into a sharp, professional image in one click.",
+    totalTime: "PT30S",
+    supply: [{ "@type": "HowToSupply", name: "Any photo — phone, camera, old scan or screenshot" }],
     tool: [{ "@type": "HowToTool", name: "PixelSqueeze" }],
     step: HOWTO_STEPS.map((s, i) => ({
       "@type": "HowToStep",
@@ -256,8 +250,8 @@ const Landing = () => {
   return (
     <div className="min-h-screen bg-[#0f1424] text-slate-200 font-body selection:bg-[#4ade80] selection:text-[#0f1424]">
       <SEO
-        title="PixelSqueeze — AI Image Optimizer for Speed & SEO"
-        description="Compress and optimize images with AI. Cut file sizes up to 70%, boost Core Web Vitals, and auto-format for every platform. Free to start."
+        title="Fix Blurry Photos Instantly — PixelSqueeze AI Photo Fixer"
+        description="Fix blurry, dark, noisy or low-quality photos in one click. AI sharpens, brightens and restores any photo — phone, print or old scan. Free to start."
         path="/"
         schema={[softwareSchema, faqSchema, howToSchema, breadcrumbSchema, websiteSchema]}
       />
@@ -282,13 +276,13 @@ const Landing = () => {
             <span className="text-xl font-bold tracking-tight font-display text-white">PixelSqueeze</span>
           </Link>
           <div className="hidden md:flex items-center gap-8">
-            <a href="#features" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Features</a>
-            <a href="#reviews" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Reviews</a>
+            <a href="#how" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">How it works</a>
+            <a href="#examples" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Examples</a>
             <a href="#pricing" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Pricing</a>
-            <a href="#faq" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">FAQ</a>
+            <Link to="/blog" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Blog</Link>
             <Link to="/auth">
               <Button variant="ghost" size="sm" className="font-semibold text-slate-300 hover:text-white hover:bg-white/5">
-                Sign in
+                Log in
               </Button>
             </Link>
             <Link to="/auth" onClick={() => trackConversion("nav_get_started", { variant: heroVariant })}>
@@ -296,7 +290,7 @@ const Landing = () => {
                 size="sm"
                 className="rounded-2xl px-5 font-semibold bg-[#4ade80] text-[#0f1424] hover:bg-[#3dbd6d] border-0 shadow-[0_0_24px_rgba(74,222,128,0.25)]"
               >
-                Get started
+                Upload photo
               </Button>
             </Link>
           </div>
@@ -329,22 +323,22 @@ const Landing = () => {
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-[#4ade80]" />
                 </span>
                 <span className="tabular-nums">{liveCount.toLocaleString()}</span>
-                <span className="text-slate-400">images optimized today</span>
+                <span className="text-slate-400">photos fixed today</span>
               </div>
 
               <h1
                 id="hero-heading"
                 className="font-display text-5xl sm:text-6xl md:text-7xl font-extrabold tracking-tight leading-[1.05] text-white"
               >
-                Pixel-perfect{" "}
+                Fix blurry photos{" "}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#4ade80] to-[#a78bfa]">
-                  compression.
+                  instantly.
                 </span>
               </h1>
 
               <p className="text-lg md:text-xl text-slate-400 max-w-xl leading-relaxed">
-                Enhance, upscale, compress and auto-format every image with AI in one click.
-                Cut file size up to 90% — without losing a single visible pixel.
+                Turn blurry, dark, noisy or low-quality photos into sharp, vibrant,
+                professional-quality images in one click. No editing skills needed.
               </p>
 
               <div className="flex flex-wrap gap-3 pt-2">
@@ -354,7 +348,7 @@ const Landing = () => {
                     className="rounded-2xl h-14 px-8 text-base font-bold bg-[#4ade80] text-[#0f1424] hover:bg-[#3dbd6d] border-0 shadow-[0_0_30px_rgba(74,222,128,0.35)] min-w-[220px]"
                   >
                     <Upload className="w-5 h-5 mr-2" />
-                    {HERO_CTA}
+                    Upload your photo
                   </Button>
                 </Link>
                 <Button
@@ -363,7 +357,7 @@ const Landing = () => {
                   onClick={scrollToBeforeAfter}
                   className="rounded-2xl h-14 px-8 text-base font-semibold border-white/15 bg-white/5 text-white hover:bg-white/10 hover:text-white min-w-[200px]"
                 >
-                  See before & after
+                  See real before &amp; after
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </div>
@@ -420,16 +414,16 @@ const Landing = () => {
                     <Upload className="w-8 h-8" />
                   </div>
                   <h2 className="font-display text-2xl font-bold text-white mb-2">
-                    Drop your image
+                    Drop a photo to fix
                   </h2>
                   <p className="text-slate-400 text-sm mb-6">
-                    PNG · JPEG · WebP · AVIF · HEIC · up to 25MB
+                    Blurry · dark · noisy · dull · low-res — we handle it
                   </p>
                   <span className="inline-flex items-center justify-center w-full py-3.5 bg-[#4ade80] hover:bg-[#3dbd6d] text-[#0f1424] font-bold rounded-xl shadow-lg shadow-[#4ade80]/20 transition-all">
-                    Select files — free
+                    Upload photo — free
                   </span>
                   <p className="mt-4 text-[11px] text-slate-500">
-                    In-browser processing · your files never leave your device on Free
+                    First fixes free · no signup · your photo never leaves your device
                   </p>
                 </Link>
               </div>
@@ -441,7 +435,7 @@ const Landing = () => {
                     Live before vs after
                   </span>
                   <span className="text-[10px] font-bold text-[#4ade80] bg-[#4ade80]/10 px-2 py-0.5 rounded-full">
-                    −84% saved
+                    Sharpness +41%
                   </span>
                 </div>
                 <div className="rounded-lg overflow-hidden">
@@ -463,7 +457,7 @@ const Landing = () => {
         <section className="px-6 py-14 border-y border-white/5 relative" aria-label="Customers">
           <div className="max-w-6xl mx-auto text-center">
             <p className="text-[10px] uppercase tracking-[0.3em] font-bold text-slate-500 mb-8">
-              Trusted by 12,000+ creators & teams
+              Trusted by 12,000+ families, creators & small businesses
             </p>
             <div className="flex flex-wrap justify-center items-center gap-x-14 gap-y-6 opacity-60">
               {["Shopify", "Etsy", "Squarespace", "Amazon", "Airbnb", "Webflow"].map((b) => (
@@ -476,14 +470,14 @@ const Landing = () => {
         </section>
 
         {/* BEFORE & AFTER — full comparison */}
-        <section ref={beforeAfterRef} className="px-6 py-24 relative" aria-labelledby="before-after-heading">
+        <section id="examples" ref={beforeAfterRef} className="px-6 py-24 relative" aria-labelledby="before-after-heading">
           <div className="max-w-6xl mx-auto">
             <div className="text-center max-w-2xl mx-auto mb-14">
-              <p className="text-xs font-bold uppercase tracking-widest text-[#4ade80] mb-3">Before & After</p>
+              <p className="text-xs font-bold uppercase tracking-widest text-[#4ade80] mb-3">Real Before &amp; After</p>
               <h2 id="before-after-heading" className="font-display text-4xl md:text-5xl font-bold leading-tight text-white">
-                See the difference AI makes.
+                From blurry to beautiful.
               </h2>
-              <p className="text-lg text-slate-400 mt-4">Drag the slider. Same photo, dramatically better.</p>
+              <p className="text-lg text-slate-400 mt-4">Drag the slider. Same photo — one click later.</p>
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Suspense fallback={<div className="aspect-video bg-white/5 rounded-3xl animate-pulse" />}>
@@ -491,16 +485,16 @@ const Landing = () => {
                   <BeforeAfterSlider
                     beforeImage={weddingBefore}
                     afterImage={weddingAfter}
-                    title="Wedding photo enhanced"
-                    description="Sharper detail, richer color, 70% smaller file"
+                    title="Wedding photo restored"
+                    description="Sharper faces, richer color, brighter lighting"
                   />
                 </div>
                 <div className="bg-white/[0.03] border border-white/10 rounded-3xl p-3 backdrop-blur-xl">
                   <BeforeAfterSlider
                     beforeImage={manBefore}
                     afterImage={manAfter}
-                    title="Portrait upscaled"
-                    description="AI enhancement + smart compression"
+                    title="Blurry portrait fixed"
+                    description="Blur removed · detail restored · noise cleaned up"
                   />
                 </div>
               </Suspense>
@@ -509,34 +503,62 @@ const Landing = () => {
         </section>
 
         {/* FEATURES */}
-        <section id="features" className="px-6 py-24 relative" aria-labelledby="features-heading">
+        <section id="how" className="px-6 py-24 relative" aria-labelledby="how-heading">
           <div className="max-w-6xl mx-auto">
             <div className="text-center max-w-2xl mx-auto mb-14">
-              <p className="text-xs font-bold uppercase tracking-widest text-[#4ade80] mb-3">AI Features</p>
-              <h2 id="features-heading" className="font-display text-4xl md:text-5xl font-bold leading-tight text-white">
-                One app. Every image tool you need.
+              <p className="text-xs font-bold uppercase tracking-widest text-[#4ade80] mb-3">How it works</p>
+              <h2 id="how-heading" className="font-display text-4xl md:text-5xl font-bold leading-tight text-white">
+                Three steps. Zero thinking.
               </h2>
-              <p className="text-lg text-slate-400 mt-4">Powered by AI. Ready in one click.</p>
+              <p className="text-lg text-slate-400 mt-4">Upload. Tap fix. Download.</p>
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {[
-                { icon: Wand2, title: "AI Enhance", desc: "Restore clarity, color and detail automatically." },
-                { icon: Maximize2, title: "AI Upscale", desc: "Up to 4× larger with zero loss in sharpness." },
-                { icon: Minimize2, title: "Smart Compress", desc: "Up to 80% smaller, no visible quality loss." },
-                { icon: Crop, title: "Auto Resize", desc: "Perfect crops for every platform, instantly." },
-                { icon: Palette, title: "Background Removal", desc: "Studio-grade cutouts in seconds." },
-                { icon: Zap, title: "Magic Optimize", desc: "Pick a destination — we handle the rest." },
-              ].map(({ icon: Icon, title, desc }) => (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              {HOWTO_STEPS.slice(0, 3).map((s, i) => (
                 <article
-                  key={title}
-                  className="group p-7 rounded-3xl bg-white/[0.04] border border-white/10 backdrop-blur-xl hover:bg-white/[0.07] hover:border-[#4ade80]/40 hover:-translate-y-1 transition-all duration-300"
+                  key={s.name}
+                  id={`step-${i + 1}`}
+                  className="p-7 rounded-3xl bg-white/[0.04] border border-white/10 backdrop-blur-xl"
                 >
-                  <div className="w-12 h-12 rounded-2xl mb-5 flex items-center justify-center bg-gradient-to-br from-[#4ade80]/20 to-[#a78bfa]/20 border border-white/10 text-[#4ade80]">
-                    <Icon className="w-5 h-5" />
+                  <div className="w-10 h-10 rounded-2xl mb-5 flex items-center justify-center bg-gradient-to-br from-[#4ade80] to-[#a78bfa] text-[#0f1424] font-display font-bold text-lg">
+                    {i + 1}
                   </div>
-                  <h3 className="font-display text-lg font-bold mb-2 text-white">{title}</h3>
-                  <p className="text-sm text-slate-400 leading-relaxed">{desc}</p>
+                  <h3 className="font-display text-lg font-bold mb-2 text-white">{s.name}</h3>
+                  <p className="text-sm text-slate-400 leading-relaxed">{s.text}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* WHO IT'S FOR — benefit cards */}
+        <section id="who" className="px-6 py-24 relative" aria-labelledby="who-heading">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center max-w-2xl mx-auto mb-14">
+              <p className="text-xs font-bold uppercase tracking-widest text-[#4ade80] mb-3">Who uses PixelSqueeze</p>
+              <h2 id="who-heading" className="font-display text-4xl md:text-5xl font-bold leading-tight text-white">
+                For anyone with a photo worth saving.
+              </h2>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+              {[
+                { emoji: "📸", label: "Photographers", benefit: "Rescue soft shots" },
+                { emoji: "🏡", label: "Real Estate", benefit: "Listing photos that sell" },
+                { emoji: "🏨", label: "Hotels", benefit: "Website-ready rooms" },
+                { emoji: "🍽️", label: "Restaurants", benefit: "Menu photos that pop" },
+                { emoji: "🛍️", label: "Small Business", benefit: "Pro-quality on a phone" },
+                { emoji: "🛒", label: "Online Sellers", benefit: "Product shots that convert" },
+                { emoji: "🎬", label: "Creators", benefit: "Feed-perfect every time" },
+                { emoji: "📣", label: "Marketing Agencies", benefit: "Batch-fix client photos" },
+                { emoji: "👨‍👩‍👧", label: "Families", benefit: "Restore old memories" },
+                { emoji: "🎓", label: "Students", benefit: "Sharp shots for projects" },
+              ].map((w) => (
+                <article
+                  key={w.label}
+                  className="p-5 rounded-2xl bg-white/[0.04] border border-white/10 backdrop-blur-xl hover:border-[#4ade80]/40 hover:-translate-y-0.5 transition-all"
+                >
+                  <div className="text-3xl mb-3" aria-hidden>{w.emoji}</div>
+                  <h3 className="font-display text-sm font-bold text-white mb-1">{w.label}</h3>
+                  <p className="text-xs text-slate-400 leading-relaxed">{w.benefit}</p>
                 </article>
               ))}
             </div>
@@ -822,15 +844,15 @@ const Landing = () => {
             <div aria-hidden className="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-96 bg-[#4ade80]/20 blur-3xl" />
             <div className="relative">
               <h2 className="font-display text-4xl md:text-5xl font-bold mb-4 leading-tight text-white">
-                Make every photo look professional.
+                Your next photo will look incredible.
               </h2>
               <p className="text-lg text-slate-300 mb-8 max-w-xl mx-auto">
-                Try PixelSqueeze free. No card, no watermarks, no fine print.
+                Free to start. No card, no watermark, no editing skills.
               </p>
               <Link to="/auth" onClick={() => trackConversion("final_cta", { variant: heroVariant })}>
                 <Button size="lg" className="bg-[#4ade80] text-[#0f1424] hover:bg-[#3dbd6d] rounded-2xl px-8 h-14 font-bold border-0 text-base shadow-[0_0_30px_rgba(74,222,128,0.4)]">
                   <Upload className="w-5 h-5 mr-2" />
-                  Upload your first image
+                  Upload your photo
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </Link>

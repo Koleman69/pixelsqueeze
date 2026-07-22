@@ -474,12 +474,81 @@ export const MagicOptimize = ({ isSubscribed = false }: MagicOptimizeProps) => {
             )}
           </Card>
 
-          {/* Destination picker */}
-          <Card className="overflow-hidden border-border/40 bg-card/70 backdrop-blur-xl">
+          {/* Photo Health Score */}
+          {photoHealth && (
+            <Card className="overflow-hidden border-border/40 bg-card/70 backdrop-blur-xl">
+              <div className="flex flex-col gap-4 p-5 md:flex-row md:items-center">
+                <div className="flex items-center gap-4 md:min-w-[180px]">
+                  <div className="relative flex h-20 w-20 items-center justify-center rounded-full border-4 border-primary/30 bg-primary/5">
+                    <span className="text-2xl font-bold tabular-nums">{photoHealth.score}</span>
+                    <span className="absolute -bottom-1.5 rounded-full bg-primary px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-primary-foreground">/ 100</span>
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Photo quality</p>
+                    <p className="text-base font-semibold">{photoHealth.grade}</p>
+                  </div>
+                </div>
+                <ul className="flex-1 grid grid-cols-1 gap-1.5 sm:grid-cols-2">
+                  {photoHealth.findings.map((f) => (
+                    <li key={f.label} className="flex items-center gap-2 text-xs">
+                      {f.kind === "ok" ? (
+                        <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-500" />
+                      ) : (
+                        <Sparkles className="h-3.5 w-3.5 shrink-0 text-primary" />
+                      )}
+                      <span className="text-muted-foreground">{f.label}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="border-t border-border/40 bg-background/60 p-4">
+                <Button
+                  size="lg"
+                  onClick={() => {
+                    if (!destination) setDestination(DESTINATIONS.find((d) => d.id === "personal") ?? DESTINATIONS[0]);
+                    // defer to next tick so destination state is set before optimize reads it
+                    setTimeout(() => handleOptimize(), 0);
+                  }}
+                  disabled={isProcessing || uploads.length === 0}
+                  className="glow-btn h-14 w-full rounded-xl bg-primary text-base font-semibold text-primary-foreground shadow-[var(--shadow-glow)] hover:bg-primary/90"
+                >
+                  {isProcessing ? (
+                    <>
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                      Fixing your photo… {overallProgress}%
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="mr-2 h-5 w-5" />
+                      Fix My Photo
+                    </>
+                  )}
+                </Button>
+                {isProcessing && <Progress value={overallProgress} className="mt-2 h-1.5" />}
+                <p className="mt-2 text-center text-[11px] text-muted-foreground">
+                  AI picks the best settings automatically. No editing skills needed.
+                </p>
+              </div>
+            </Card>
+          )}
+
+          {/* Destination picker (advanced — pick where it's going) */}
+          <Collapsible>
+            <CollapsibleTrigger asChild>
+              <button className="flex w-full items-center justify-between rounded-xl border border-border/40 bg-card/50 px-5 py-3 text-sm font-medium text-muted-foreground hover:bg-card/70 hover:text-foreground">
+                <span className="flex items-center gap-2">
+                  <Wand2 className="h-3.5 w-3.5" />
+                  Advanced Options — pick a destination or tune settings
+                </span>
+                <ChevronDown className="h-4 w-4" />
+              </button>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+          <Card className="mt-3 overflow-hidden border-border/40 bg-card/70 backdrop-blur-xl">
             <div className="border-b border-border/40 px-5 py-4">
-              <h3 className="text-lg font-semibold tracking-tight">What are you creating?</h3>
+              <h3 className="text-lg font-semibold tracking-tight">Where is this photo going?</h3>
               <p className="mt-0.5 text-xs text-muted-foreground">
-                Pick a destination — we'll auto-tune dimensions, format, and compression.
+                Optional — pick a destination to auto-size for that platform.
               </p>
             </div>
             <div className="grid grid-cols-2 gap-2.5 p-4 sm:grid-cols-3 md:grid-cols-5">

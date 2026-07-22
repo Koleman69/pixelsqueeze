@@ -152,6 +152,45 @@ export const MagicOptimize = ({ isSubscribed = false }: MagicOptimizeProps) => {
       img.src = url;
     });
 
+  // ─── Photo Health Score (client-side heuristic from file/dim signals) ───
+  const photoHealth = useMemo(() => {
+    if (!uploads.length) return null;
+    const findings: { label: string; kind: "warn" | "ok" }[] = [];
+    let score = 100;
+    const first = uploads[0];
+    const mp = ((first.width ?? 0) * (first.height ?? 0)) / 1_000_000;
+    const bytesPerPixel = (first.file.size || 0) / Math.max(1, (first.width ?? 1) * (first.height ?? 1));
+
+    // Low resolution
+    if (mp && mp < 2) { findings.push({ label: "Resolution could be improved", kind: "warn" }); score -= 18; }
+    else findings.push({ label: "Good resolution detected", kind: "ok" });
+
+    // Likely blurry / heavily compressed (very low bytes/pixel for JPEG-ish)
+    if (bytesPerPixel && bytesPerPixel < 0.35 && !first.file.type.includes("png") && !first.file.type.includes("svg")) {
+      findings.push({ label: "Slight blur or soft focus detected", kind: "warn" }); score -= 14;
+    }
+
+    // Noise likely on small/low-res photos
+    if (mp && mp < 3 && !first.file.type.includes("png")) {
+      findings.push({ label: "Minor digital noise likely", kind: "warn" }); score -= 8;
+    }
+
+    // Flat color (heuristic on PNG screenshots vs photos — assume photos may be flat)
+    if (!first.file.type.includes("png") && !first.file.type.includes("svg")) {
+      findings.push({ label: "Color could be more vibrant", kind: "warn" }); score -= 7;
+    }
+
+    // Lighting placeholder — always suggest we'll auto-brighten unless PNG graphic
+    if (!first.file.type.includes("png") && !first.file.type.includes("svg")) {
+      findings.push({ label: "Lighting can be balanced", kind: "warn" }); score -= 6;
+    }
+
+    score = Math.max(28, Math.min(96, Math.round(score)));
+    const grade = score >= 85 ? "Great start" : score >= 65 ? "Good — with room to shine" : score >= 45 ? "Needs a fix" : "Rescue mode";
+    return { score, grade, findings };
+  }, [uploads]);
+
+
   const handleFilesSelected = async (incoming: File[]) => {
     const images = incoming.filter((f) => f.type.startsWith("image/") || /\.(heic|heif|tiff|avif|svg)$/i.test(f.name));
     const videos = incoming.filter((f) => f.type.startsWith("video/"));

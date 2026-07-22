@@ -329,22 +329,22 @@ const Landing = () => {
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-[#4ade80]" />
                 </span>
                 <span className="tabular-nums">{liveCount.toLocaleString()}</span>
-                <span className="text-slate-400">images optimized today</span>
+                <span className="text-slate-400">photos fixed today</span>
               </div>
 
               <h1
                 id="hero-heading"
                 className="font-display text-5xl sm:text-6xl md:text-7xl font-extrabold tracking-tight leading-[1.05] text-white"
               >
-                Pixel-perfect{" "}
+                Fix blurry photos{" "}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#4ade80] to-[#a78bfa]">
-                  compression.
+                  instantly.
                 </span>
               </h1>
 
               <p className="text-lg md:text-xl text-slate-400 max-w-xl leading-relaxed">
-                Enhance, upscale, compress and auto-format every image with AI in one click.
-                Cut file size up to 90% — without losing a single visible pixel.
+                Turn blurry, dark, noisy or low-quality photos into sharp, vibrant,
+                professional-quality images in one click. No editing skills needed.
               </p>
 
               <div className="flex flex-wrap gap-3 pt-2">
@@ -354,7 +354,7 @@ const Landing = () => {
                     className="rounded-2xl h-14 px-8 text-base font-bold bg-[#4ade80] text-[#0f1424] hover:bg-[#3dbd6d] border-0 shadow-[0_0_30px_rgba(74,222,128,0.35)] min-w-[220px]"
                   >
                     <Upload className="w-5 h-5 mr-2" />
-                    {HERO_CTA}
+                    Upload your photo
                   </Button>
                 </Link>
                 <Button
@@ -363,7 +363,7 @@ const Landing = () => {
                   onClick={scrollToBeforeAfter}
                   className="rounded-2xl h-14 px-8 text-base font-semibold border-white/15 bg-white/5 text-white hover:bg-white/10 hover:text-white min-w-[200px]"
                 >
-                  See before & after
+                  See real before &amp; after
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </div>
@@ -420,16 +420,16 @@ const Landing = () => {
                     <Upload className="w-8 h-8" />
                   </div>
                   <h2 className="font-display text-2xl font-bold text-white mb-2">
-                    Drop your image
+                    Drop a photo to fix
                   </h2>
                   <p className="text-slate-400 text-sm mb-6">
-                    PNG · JPEG · WebP · AVIF · HEIC · up to 25MB
+                    Blurry · dark · noisy · dull · low-res — we handle it
                   </p>
                   <span className="inline-flex items-center justify-center w-full py-3.5 bg-[#4ade80] hover:bg-[#3dbd6d] text-[#0f1424] font-bold rounded-xl shadow-lg shadow-[#4ade80]/20 transition-all">
-                    Select files — free
+                    Upload photo — free
                   </span>
                   <p className="mt-4 text-[11px] text-slate-500">
-                    In-browser processing · your files never leave your device on Free
+                    First fixes free · no signup · your photo never leaves your device
                   </p>
                 </Link>
               </div>
@@ -441,7 +441,7 @@ const Landing = () => {
                     Live before vs after
                   </span>
                   <span className="text-[10px] font-bold text-[#4ade80] bg-[#4ade80]/10 px-2 py-0.5 rounded-full">
-                    −84% saved
+                    Sharpness +41%
                   </span>
                 </div>
                 <div className="rounded-lg overflow-hidden">
@@ -463,7 +463,7 @@ const Landing = () => {
         <section className="px-6 py-14 border-y border-white/5 relative" aria-label="Customers">
           <div className="max-w-6xl mx-auto text-center">
             <p className="text-[10px] uppercase tracking-[0.3em] font-bold text-slate-500 mb-8">
-              Trusted by 12,000+ creators & teams
+              Trusted by 12,000+ families, creators & small businesses
             </p>
             <div className="flex flex-wrap justify-center items-center gap-x-14 gap-y-6 opacity-60">
               {["Shopify", "Etsy", "Squarespace", "Amazon", "Airbnb", "Webflow"].map((b) => (

@@ -655,7 +655,10 @@ export const MagicOptimize = ({ isSubscribed = false }: MagicOptimizeProps) => {
               )}
             </div>
           </Card>
+            </CollapsibleContent>
+          </Collapsible>
         </>
+
       )}
 
       {/* ───────────────────── STEP 3 — RESULT DASHBOARD ───────────────────── */}

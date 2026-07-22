@@ -330,15 +330,15 @@ const Landing = () => {
                 id="hero-heading"
                 className="font-display text-5xl sm:text-6xl md:text-7xl font-extrabold tracking-tight leading-[1.05] text-white"
               >
-                Fix blurry photos{" "}
+                Make every photo{" "}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#4ade80] to-[#a78bfa]">
-                  instantly.
+                  look amazing.
                 </span>
               </h1>
 
               <p className="text-lg md:text-xl text-slate-400 max-w-xl leading-relaxed">
-                Turn blurry, dark, noisy or low-quality photos into sharp, vibrant,
-                professional-quality images in one click. No editing skills needed.
+                Upload any photo and PixelSqueeze automatically fixes blur, lighting,
+                color, sharpness, noise, resolution and file size — no editing skills required.
               </p>
 
               <div className="flex flex-wrap gap-3 pt-2">
@@ -348,7 +348,7 @@ const Landing = () => {
                     className="rounded-2xl h-14 px-8 text-base font-bold bg-[#4ade80] text-[#0f1424] hover:bg-[#3dbd6d] border-0 shadow-[0_0_30px_rgba(74,222,128,0.35)] min-w-[220px]"
                   >
                     <Upload className="w-5 h-5 mr-2" />
-                    Upload your photo
+                    Upload a photo
                   </Button>
                 </Link>
                 <Button
@@ -357,7 +357,7 @@ const Landing = () => {
                   onClick={scrollToBeforeAfter}
                   className="rounded-2xl h-14 px-8 text-base font-semibold border-white/15 bg-white/5 text-white hover:bg-white/10 hover:text-white min-w-[200px]"
                 >
-                  See real before &amp; after
+                  See the magic
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </div>

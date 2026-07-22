@@ -193,10 +193,10 @@ const Landing = () => {
   const howToSchema = {
     "@context": "https://schema.org",
     "@type": "HowTo",
-    name: "How to optimize an image with PixelSqueeze",
-    description: "Compress, upscale and convert any photo to WebP or AVIF in four steps.",
-    totalTime: "PT1M",
-    supply: [{ "@type": "HowToSupply", name: "JPG, PNG, HEIC, WebP or AVIF image" }],
+    name: "How to fix a blurry photo with PixelSqueeze",
+    description: "Turn any blurry, dark, noisy or low-quality photo into a sharp, professional image in one click.",
+    totalTime: "PT30S",
+    supply: [{ "@type": "HowToSupply", name: "Any photo — phone, camera, old scan or screenshot" }],
     tool: [{ "@type": "HowToTool", name: "PixelSqueeze" }],
     step: HOWTO_STEPS.map((s, i) => ({
       "@type": "HowToStep",
@@ -256,8 +256,8 @@ const Landing = () => {
   return (
     <div className="min-h-screen bg-[#0f1424] text-slate-200 font-body selection:bg-[#4ade80] selection:text-[#0f1424]">
       <SEO
-        title="PixelSqueeze — AI Image Optimizer for Speed & SEO"
-        description="Compress and optimize images with AI. Cut file sizes up to 70%, boost Core Web Vitals, and auto-format for every platform. Free to start."
+        title="Fix Blurry Photos Instantly — PixelSqueeze AI Photo Fixer"
+        description="Fix blurry, dark, noisy or low-quality photos in one click. AI sharpens, brightens and restores any photo — phone, print or old scan. Free to start."
         path="/"
         schema={[softwareSchema, faqSchema, howToSchema, breadcrumbSchema, websiteSchema]}
       />
@@ -282,13 +282,13 @@ const Landing = () => {
             <span className="text-xl font-bold tracking-tight font-display text-white">PixelSqueeze</span>
           </Link>
           <div className="hidden md:flex items-center gap-8">
-            <a href="#features" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Features</a>
-            <a href="#reviews" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Reviews</a>
+            <a href="#how" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">How it works</a>
+            <a href="#examples" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Examples</a>
             <a href="#pricing" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Pricing</a>
-            <a href="#faq" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">FAQ</a>
+            <Link to="/blog" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Blog</Link>
             <Link to="/auth">
               <Button variant="ghost" size="sm" className="font-semibold text-slate-300 hover:text-white hover:bg-white/5">
-                Sign in
+                Log in
               </Button>
             </Link>
             <Link to="/auth" onClick={() => trackConversion("nav_get_started", { variant: heroVariant })}>
@@ -296,7 +296,7 @@ const Landing = () => {
                 size="sm"
                 className="rounded-2xl px-5 font-semibold bg-[#4ade80] text-[#0f1424] hover:bg-[#3dbd6d] border-0 shadow-[0_0_24px_rgba(74,222,128,0.25)]"
               >
-                Get started
+                Upload photo
               </Button>
             </Link>
           </div>

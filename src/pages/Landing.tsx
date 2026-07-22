@@ -476,14 +476,14 @@ const Landing = () => {
         </section>
 
         {/* BEFORE & AFTER — full comparison */}
-        <section ref={beforeAfterRef} className="px-6 py-24 relative" aria-labelledby="before-after-heading">
+        <section id="examples" ref={beforeAfterRef} className="px-6 py-24 relative" aria-labelledby="before-after-heading">
           <div className="max-w-6xl mx-auto">
             <div className="text-center max-w-2xl mx-auto mb-14">
-              <p className="text-xs font-bold uppercase tracking-widest text-[#4ade80] mb-3">Before & After</p>
+              <p className="text-xs font-bold uppercase tracking-widest text-[#4ade80] mb-3">Real Before &amp; After</p>
               <h2 id="before-after-heading" className="font-display text-4xl md:text-5xl font-bold leading-tight text-white">
-                See the difference AI makes.
+                From blurry to beautiful.
               </h2>
-              <p className="text-lg text-slate-400 mt-4">Drag the slider. Same photo, dramatically better.</p>
+              <p className="text-lg text-slate-400 mt-4">Drag the slider. Same photo — one click later.</p>
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Suspense fallback={<div className="aspect-video bg-white/5 rounded-3xl animate-pulse" />}>
@@ -491,16 +491,16 @@ const Landing = () => {
                   <BeforeAfterSlider
                     beforeImage={weddingBefore}
                     afterImage={weddingAfter}
-                    title="Wedding photo enhanced"
-                    description="Sharper detail, richer color, 70% smaller file"
+                    title="Wedding photo restored"
+                    description="Sharper faces, richer color, brighter lighting"
                   />
                 </div>
                 <div className="bg-white/[0.03] border border-white/10 rounded-3xl p-3 backdrop-blur-xl">
                   <BeforeAfterSlider
                     beforeImage={manBefore}
                     afterImage={manAfter}
-                    title="Portrait upscaled"
-                    description="AI enhancement + smart compression"
+                    title="Blurry portrait fixed"
+                    description="Blur removed · detail restored · noise cleaned up"
                   />
                 </div>
               </Suspense>
@@ -509,34 +509,62 @@ const Landing = () => {
         </section>
 
         {/* FEATURES */}
-        <section id="features" className="px-6 py-24 relative" aria-labelledby="features-heading">
+        <section id="how" className="px-6 py-24 relative" aria-labelledby="how-heading">
           <div className="max-w-6xl mx-auto">
             <div className="text-center max-w-2xl mx-auto mb-14">
-              <p className="text-xs font-bold uppercase tracking-widest text-[#4ade80] mb-3">AI Features</p>
-              <h2 id="features-heading" className="font-display text-4xl md:text-5xl font-bold leading-tight text-white">
-                One app. Every image tool you need.
+              <p className="text-xs font-bold uppercase tracking-widest text-[#4ade80] mb-3">How it works</p>
+              <h2 id="how-heading" className="font-display text-4xl md:text-5xl font-bold leading-tight text-white">
+                Three steps. Zero thinking.
               </h2>
-              <p className="text-lg text-slate-400 mt-4">Powered by AI. Ready in one click.</p>
+              <p className="text-lg text-slate-400 mt-4">Upload. Tap fix. Download.</p>
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {[
-                { icon: Wand2, title: "AI Enhance", desc: "Restore clarity, color and detail automatically." },
-                { icon: Maximize2, title: "AI Upscale", desc: "Up to 4× larger with zero loss in sharpness." },
-                { icon: Minimize2, title: "Smart Compress", desc: "Up to 80% smaller, no visible quality loss." },
-                { icon: Crop, title: "Auto Resize", desc: "Perfect crops for every platform, instantly." },
-                { icon: Palette, title: "Background Removal", desc: "Studio-grade cutouts in seconds." },
-                { icon: Zap, title: "Magic Optimize", desc: "Pick a destination — we handle the rest." },
-              ].map(({ icon: Icon, title, desc }) => (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              {HOWTO_STEPS.slice(0, 3).map((s, i) => (
                 <article
-                  key={title}
-                  className="group p-7 rounded-3xl bg-white/[0.04] border border-white/10 backdrop-blur-xl hover:bg-white/[0.07] hover:border-[#4ade80]/40 hover:-translate-y-1 transition-all duration-300"
+                  key={s.name}
+                  id={`step-${i + 1}`}
+                  className="p-7 rounded-3xl bg-white/[0.04] border border-white/10 backdrop-blur-xl"
                 >
-                  <div className="w-12 h-12 rounded-2xl mb-5 flex items-center justify-center bg-gradient-to-br from-[#4ade80]/20 to-[#a78bfa]/20 border border-white/10 text-[#4ade80]">
-                    <Icon className="w-5 h-5" />
+                  <div className="w-10 h-10 rounded-2xl mb-5 flex items-center justify-center bg-gradient-to-br from-[#4ade80] to-[#a78bfa] text-[#0f1424] font-display font-bold text-lg">
+                    {i + 1}
                   </div>
-                  <h3 className="font-display text-lg font-bold mb-2 text-white">{title}</h3>
-                  <p className="text-sm text-slate-400 leading-relaxed">{desc}</p>
+                  <h3 className="font-display text-lg font-bold mb-2 text-white">{s.name}</h3>
+                  <p className="text-sm text-slate-400 leading-relaxed">{s.text}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* WHO IT'S FOR — benefit cards */}
+        <section id="who" className="px-6 py-24 relative" aria-labelledby="who-heading">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center max-w-2xl mx-auto mb-14">
+              <p className="text-xs font-bold uppercase tracking-widest text-[#4ade80] mb-3">Who uses PixelSqueeze</p>
+              <h2 id="who-heading" className="font-display text-4xl md:text-5xl font-bold leading-tight text-white">
+                For anyone with a photo worth saving.
+              </h2>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+              {[
+                { emoji: "📸", label: "Photographers", benefit: "Rescue soft shots" },
+                { emoji: "🏡", label: "Real Estate", benefit: "Listing photos that sell" },
+                { emoji: "🏨", label: "Hotels", benefit: "Website-ready rooms" },
+                { emoji: "🍽️", label: "Restaurants", benefit: "Menu photos that pop" },
+                { emoji: "🛍️", label: "Small Business", benefit: "Pro-quality on a phone" },
+                { emoji: "🛒", label: "Online Sellers", benefit: "Product shots that convert" },
+                { emoji: "🎬", label: "Creators", benefit: "Feed-perfect every time" },
+                { emoji: "📣", label: "Marketing Agencies", benefit: "Batch-fix client photos" },
+                { emoji: "👨‍👩‍👧", label: "Families", benefit: "Restore old memories" },
+                { emoji: "🎓", label: "Students", benefit: "Sharp shots for projects" },
+              ].map((w) => (
+                <article
+                  key={w.label}
+                  className="p-5 rounded-2xl bg-white/[0.04] border border-white/10 backdrop-blur-xl hover:border-[#4ade80]/40 hover:-translate-y-0.5 transition-all"
+                >
+                  <div className="text-3xl mb-3" aria-hidden>{w.emoji}</div>
+                  <h3 className="font-display text-sm font-bold text-white mb-1">{w.label}</h3>
+                  <p className="text-xs text-slate-400 leading-relaxed">{w.benefit}</p>
                 </article>
               ))}
             </div>
@@ -822,15 +850,15 @@ const Landing = () => {
             <div aria-hidden className="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-96 bg-[#4ade80]/20 blur-3xl" />
             <div className="relative">
               <h2 className="font-display text-4xl md:text-5xl font-bold mb-4 leading-tight text-white">
-                Make every photo look professional.
+                Your next photo will look incredible.
               </h2>
               <p className="text-lg text-slate-300 mb-8 max-w-xl mx-auto">
-                Try PixelSqueeze free. No card, no watermarks, no fine print.
+                Free to start. No card, no watermark, no editing skills.
               </p>
               <Link to="/auth" onClick={() => trackConversion("final_cta", { variant: heroVariant })}>
                 <Button size="lg" className="bg-[#4ade80] text-[#0f1424] hover:bg-[#3dbd6d] rounded-2xl px-8 h-14 font-bold border-0 text-base shadow-[0_0_30px_rgba(74,222,128,0.4)]">
                   <Upload className="w-5 h-5 mr-2" />
-                  Upload your first image
+                  Upload your photo
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </Link>

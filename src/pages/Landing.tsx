@@ -82,7 +82,6 @@ const Landing = () => {
   const pricingRef = useRef<HTMLDivElement>(null);
   const liveCount = useLiveCounter();
   const heroVariant = useVariant("hero_cta_v1", ["A", "B"]);
-  const HERO_CTA = heroVariant === "A" ? "Optimize a photo — free" : "Try it free — no signup";
 
   const scrollToBeforeAfter = () =>
     beforeAfterRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });

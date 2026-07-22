@@ -515,12 +515,12 @@ export const MagicOptimize = ({ isSubscribed = false }: MagicOptimizeProps) => {
                   {isProcessing ? (
                     <>
                       <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                      Fixing your photo… {overallProgress}%
+                      Making your photo amazing… {overallProgress}%
                     </>
                   ) : (
                     <>
                       <Sparkles className="mr-2 h-5 w-5" />
-                      Fix My Photo
+                      ✨ Make My Photo Amazing
                     </>
                   )}
                 </Button>

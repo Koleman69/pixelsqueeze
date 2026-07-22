@@ -96,44 +96,44 @@ const Landing = () => {
   const RATING = { value: "4.9", count: 2847, best: "5", worst: "1" };
 
   const REVIEWS = [
-    { name: "Sarah Jenkins", role: "E-com Director", rating: 5, quote: "The Amazon preset alone saved our team 12 hours a week. It's the standard for our workflow now." },
-    { name: "Marcus Chen", role: "Photographer", rating: 5, quote: "AI upscale is unreal. I've stopped paying for two other tools since switching to PixelSqueeze." },
-    { name: "Elena Rossi", role: "Boutique Owner", rating: 5, quote: "My product photos load faster and look better. Sales pages feel professional again." },
+    { name: "Sarah Jenkins", role: "Realtor", rating: 5, quote: "My phone photos of listings look like they came from a pro photographer. Every single time." },
+    { name: "Marcus Chen", role: "Dad of three", rating: 5, quote: "Rescued years of blurry kid photos in about ten minutes. My wife actually cried." },
+    { name: "Elena Rossi", role: "Boutique Owner", rating: 5, quote: "My product photos went from dull to gorgeous in one click. Sales jumped the same week." },
   ];
 
   const TIERS = [
-    { name: "Free",     price: 0,  cadence: "/forever", tagline: "Try every core tool.",       cta: "Start free",    features: ["25 images / month", "Basic optimization", "No watermark", "Web-ready exports"] },
-    { name: "Creator",  price: 9,  cadence: "/month",   tagline: "For creators & freelancers.", cta: "Start Creator", features: ["500 images / month", "AI Enhance", "Batch processing", "Social exports"], popular: true },
-    { name: "Pro",      price: 24, cadence: "/month",   tagline: "For studios & agencies.",     cta: "Go Pro",        features: ["Unlimited images", "Print Ready (400 DPI)", "API access", "Priority processing"] },
-    { name: "Business", price: 79, cadence: "/month",   tagline: "For growing teams.",          cta: "Contact sales", features: ["Everything in Pro", "Teams & white label", "Brand presets", "Analytics", "Enterprise support"] },
+    { name: "Free",     price: 0,  cadence: "/forever", tagline: "Fix your first photos free.",  cta: "Start free",    features: ["4 photos free per tool", "One-click fix", "No watermark", "No signup for first fix"] },
+    { name: "Creator",  price: 9,  cadence: "/month",   tagline: "For creators & side hustlers.", cta: "Start Creator", features: ["500 photos / month", "AI Enhance & Upscale", "Batch fix multiple photos", "Social-ready exports"], popular: true },
+    { name: "Pro",      price: 24, cadence: "/month",   tagline: "For studios & agencies.",       cta: "Go Pro",        features: ["Unlimited photos", "Print-quality restore", "Priority processing", "Cloud library"] },
+    { name: "Business", price: 79, cadence: "/month",   tagline: "For growing teams.",            cta: "Contact sales", features: ["Everything in Pro", "Teams & white label", "Brand presets", "Analytics", "Enterprise support"] },
   ];
 
   const FAQS = [
-    { q: "How is PixelSqueeze different from a normal compressor?", a: "PixelSqueeze uses AI to enhance, upscale, and optimize — not just shrink. Pick a destination and we auto-select format, dimensions, and compression." },
-    { q: "Can I really use it for free?", a: "Yes. The free plan includes every core AI tool. Pro removes the daily cap and unlocks batch, cloud storage, and priority processing." },
-    { q: "Where are my images processed?", a: "Free plan processes in-browser. Paid plans use encrypted storage that auto-deletes after 30 days. Files are never shared, sold, or used for training." },
-    { q: "What formats are supported?", a: "JPEG, PNG, WebP, AVIF, GIF and SVG in — WebP or AVIF out, sized correctly for your chosen destination." },
-    { q: "Can I cancel anytime?", a: "One click in your account. You keep Pro access until the end of your billing period." },
+    { q: "Can PixelSqueeze really fix a blurry photo?", a: "Yes. Our AI rebuilds sharpness, removes noise, corrects lighting and restores color in one click — even on phone photos, old scans, and low-resolution images." },
+    { q: "Do I need to know photo editing?", a: "No. You upload a photo, we analyze it, and one button fixes everything automatically. No sliders, no settings, no learning curve." },
+    { q: "Is it really free?", a: "Yes. Your first fixes are free with no signup and no credit card. Upgrade only if you want to fix photos in bulk." },
+    { q: "Will my photos stay private?", a: "Always. Free fixes happen in your browser — your photos never leave your device. Paid plans use encrypted storage that auto-deletes after 30 days." },
+    { q: "What kinds of photos work best?", a: "Everything — phone shots, old family photos, product pictures, real estate listings, portraits, screenshots. If it looks blurry, dark, grainy or dull, we can fix it." },
   ];
 
   const HOWTO_STEPS = [
-    { name: "Upload your image",   text: "Drag any JPG, PNG, HEIC, WebP or AVIF into PixelSqueeze. Up to 5 files at once on Free." },
-    { name: "Pick a destination",  text: "Choose Website, Instagram, Amazon, Shopify or Print — AI auto-selects format, size and compression." },
-    { name: "Let AI optimize",     text: "PixelSqueeze enhances, compresses and converts to WebP or AVIF in seconds — no settings required." },
-    { name: "Download the pack",   text: "Get an optimized file (or a full multi-size pack) with alt text and SEO-friendly filenames included." },
+    { name: "Upload your photo",     text: "Drag any photo in — phone shot, old scan, product picture, screenshot. Anything." },
+    { name: "We analyze it instantly", text: "PixelSqueeze scans for blur, noise, low light, dull color and low resolution — and grades your photo." },
+    { name: "Tap 'Fix My Photo'",    text: "One button. AI sharpens, brightens, denoises, restores color and boosts resolution automatically." },
+    { name: "Download and share",    text: "Get your fixed photo in seconds — or a full pack sized for social, web and print." },
   ];
 
   const PROS = [
-    "One-click AI enhance, upscale, compress and background removal",
-    "Auto WebP + AVIF export sized for every platform",
-    "Free tier with every core tool — no credit card",
-    "Batch processing and Shopify / Amazon / Instagram presets",
-    "Processes in-browser on Free — files never leave your device",
+    "One click fixes blur, noise, dark lighting and dull color",
+    "Works on phone photos, old scans, screenshots and product shots",
+    "No sliders, no settings, no editing skills needed",
+    "Free first fixes — no signup, no credit card, no watermark",
+    "Your photos stay on your device on the free plan",
   ];
   const CONS = [
-    "Free plan capped at 25 images / month",
-    "API access requires the Pro plan",
-    "No native desktop app (PWA + web only)",
+    "Free plan limited to 4 photos per tool before upgrade",
+    "Very heavily damaged photos may need a second pass",
+    "Web and mobile only — no desktop app (works great as a PWA)",
   ];
 
   // ---- Rich-result JSON-LD stack (unchanged) ----
@@ -142,12 +142,12 @@ const Landing = () => {
     "@type": "SoftwareApplication",
     name: "PixelSqueeze",
     applicationCategory: "MultimediaApplication",
-    applicationSubCategory: "Image Optimization",
+    applicationSubCategory: "AI Photo Enhancement",
     operatingSystem: "Web, iOS, Android",
     url: "https://pixelsqueeze.app",
     image: "https://pixelsqueeze.app/og-image.png",
     description:
-      "AI image optimizer that compresses, upscales, enhances and auto-converts photos to WebP and AVIF for every platform.",
+      "Fix blurry, dark, noisy and low-quality photos in one click. AI sharpens, brightens, denoises and restores photos instantly.",
     offers: TIERS.map((t) => ({
       "@type": "Offer",
       name: t.name,
@@ -171,12 +171,12 @@ const Landing = () => {
       reviewBody: r.quote,
     })),
     featureList: [
-      "AI image upscaler (2x / 4x)",
-      "Automatic WebP and AVIF conversion",
-      "Batch image compression",
-      "Background removal",
-      "Platform-aware presets (Instagram, Shopify, Amazon, Print)",
-      "SEO alt text and filename generation",
+      "Fix blurry photos in one click",
+      "Sharpen soft or out-of-focus images",
+      "Remove digital noise and grain",
+      "Brighten dark and underexposed photos",
+      "Restore old and faded photos",
+      "Increase photo resolution up to 4×",
     ],
   };
 

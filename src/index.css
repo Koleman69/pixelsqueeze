@@ -185,6 +185,16 @@
     max-width: 100vw;
   }
 
+  #root {
+    max-width: 100%;
+    overflow-x: clip;
+  }
+
+  /* Prevent long words/URLs from forcing horizontal scroll on narrow screens */
+  h1, h2, h3, p, span, a, li, button {
+    overflow-wrap: anywhere;
+  }
+
 
   h1, h2, h3, h4, h5, h6, .font-display {
     font-family: 'Space Grotesk', 'Space Grotesk Fallback', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;

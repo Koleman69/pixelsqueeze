@@ -72,14 +72,14 @@ export const ToolLandingPage = ({
       <SEO title={title} description={description} path={path} schema={schema} />
       <main id="main-content" className="min-h-screen bg-background text-foreground">
         <header className="border-b border-border/40">
-          <nav className="max-w-6xl mx-auto flex items-center justify-between px-6 py-4" aria-label="Primary">
-            <Link to="/" className="font-bold text-lg">PixelSqueeze</Link>
-            <div className="flex items-center gap-6 text-sm">
-              <Link to="/pricing" className="hover:text-primary">Pricing</Link>
-              <Link to="/blog" className="hover:text-primary">Blog</Link>
+          <nav className="max-w-6xl mx-auto flex items-center justify-between gap-3 px-4 sm:px-6 py-3 sm:py-4" aria-label="Primary">
+            <Link to="/" className="font-bold text-base sm:text-lg shrink-0">PixelSqueeze</Link>
+            <div className="flex items-center gap-3 sm:gap-6 text-sm">
+              <Link to="/pricing" className="hover:text-primary hidden xs:inline sm:inline">Pricing</Link>
+              <Link to="/blog" className="hover:text-primary hidden sm:inline">Blog</Link>
               <Link
                 to="/auth"
-                className="px-4 py-2 rounded-full bg-primary text-primary-foreground hover:opacity-90 transition"
+                className="px-3 sm:px-4 py-2 rounded-full bg-primary text-primary-foreground text-xs sm:text-sm hover:opacity-90 transition whitespace-nowrap"
               >
                 Get Started
               </Link>

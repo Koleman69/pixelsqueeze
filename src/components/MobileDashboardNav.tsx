@@ -19,6 +19,7 @@ import {
   Menu,
   Home,
   MoreHorizontal,
+  ArrowLeft,
 } from "lucide-react";
 import { ToolCategory } from "./DashboardSidebar";
 import { useEffect, useRef, useState } from "react";

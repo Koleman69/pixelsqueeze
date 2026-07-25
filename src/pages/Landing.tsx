@@ -957,10 +957,11 @@ const Landing = () => {
         </div>
       </div>
 
-      <Suspense fallback={null}>
+      {/* First-open popups disabled per user request. */}
+      {/* <Suspense fallback={null}>
         <InstallBanner />
         <EmailCapturePopup />
-      </Suspense>
+      </Suspense> */}
     </div>
   );
 };

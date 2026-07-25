@@ -12,13 +12,29 @@ dist
 dist-ssr
 *.local
 
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
+# Capacitor iOS
+ios/App/Pods
+ios/App/Podfile.lock
+ios/App/.build
+ios/App/build
+
+# Xcode
+*.xcodeproj/xcuserdata
+*.xcworkspace/xcuserdata
+*.swiftpm/xcode
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+*.xcworkspace/
 .DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+.AppleDouble
+.LSOverride
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Environment
+.env
+.env.local
+.env.*.local

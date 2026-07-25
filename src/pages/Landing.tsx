@@ -24,8 +24,9 @@ import { Link } from "react-router-dom";
 const BeforeAfterSlider = lazy(() =>
   import("@/components/BeforeAfterSlider").then((m) => ({ default: m.BeforeAfterSlider }))
 );
-const InstallBanner = lazy(() => import("@/components/InstallBanner"));
-const EmailCapturePopup = lazy(() => import("@/components/EmailCapturePopup"));
+// First-open popups disabled: InstallBanner and EmailCapturePopup removed.
+// const InstallBanner = lazy(() => import("@/components/InstallBanner"));
+// const EmailCapturePopup = lazy(() => import("@/components/EmailCapturePopup"));
 import { useUtmTracking } from "@/hooks/useUtmTracking";
 import weddingBefore from "@/assets/wedding-before.jpg";
 import weddingAfter from "@/assets/wedding-after.jpg";

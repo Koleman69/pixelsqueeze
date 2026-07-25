@@ -21,6 +21,7 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import SEO from "@/components/SEO";
 
 const tiers = [
   {
@@ -282,6 +283,11 @@ const Pricing = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Pricing — PixelSqueeze AI Photo Enhancer"
+        description="Simple plans that pay for themselves. Start free with 4 photos per tool, upgrade for unlimited AI enhancement, batch processing, and cloud storage."
+        path="/pricing"
+      />
       {/* Nav */}
       <nav className="border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
@@ -353,7 +359,7 @@ const Pricing = () => {
                         <Icon className={`w-5 h-5 ${tier.highlight ? "text-primary" : "text-foreground"}`} />
                       </div>
                       <div>
-                        <h3 className="font-bold text-foreground">{tier.name}</h3>
+                        <h2 className="font-bold text-foreground">{tier.name}</h2>
                         <p className="text-xs text-muted-foreground">{tier.tagline}</p>
                       </div>
                     </div>

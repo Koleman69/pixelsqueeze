@@ -78,7 +78,7 @@ Download now and start compressing for free!`;
         {/* Header */}
         <div className="flex items-center gap-2 mb-8">
           <Link to="/">
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" aria-label="Back to home">
               <ArrowLeft className="w-5 h-5" />
             </Button>
           </Link>
@@ -147,6 +147,7 @@ Download now and start compressing for free!`;
                   variant="outline" 
                   size="icon"
                   onClick={() => handleCopy(`${window.location.origin}/install`, "Install link")}
+                  aria-label="Copy install link"
                 >
                   {copiedText === "Install link" ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                 </Button>
@@ -178,6 +179,7 @@ Download now and start compressing for free!`;
                   variant="outline" 
                   size="icon"
                   onClick={() => handleCopy(shortDescription, "Short description")}
+                  aria-label="Copy short description"
                 >
                   {copiedText === "Short description" ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                 </Button>

@@ -251,8 +251,8 @@ const Landing = () => {
   return (
     <div className="min-h-screen bg-[#0f1424] text-slate-200 font-body selection:bg-[#4ade80] selection:text-[#0f1424]">
       <SEO
-        title="Make Every Photo Look Amazing — PixelSqueeze AI Photo Enhancer"
-        description="Upload any photo and PixelSqueeze automatically fixes blur, lighting, color, sharpness, noise, resolution and file size — no editing skills required."
+        title="Make Every Photo Look Amazing — PixelSqueeze"
+        description="Fix blur, lighting, color, noise and resolution in one click. Free AI photo enhancer — no editing skills, no signup for your first fix."
         path="/"
         schema={[softwareSchema, faqSchema, howToSchema, breadcrumbSchema, websiteSchema]}
       />

@@ -116,6 +116,11 @@ const Scanner = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Website Image Scanner — PixelSqueeze"
+        description="Scan any website for image optimization issues. Get a free performance grade, SEO score, and size savings estimate in seconds."
+        path="/scanner"
+      />
       {/* Header */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center gap-4">
@@ -179,7 +184,7 @@ const Scanner = () => {
               <Globe className="w-8 h-8 text-primary animate-pulse" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-foreground">Scanning {url}</h3>
+              <h2 className="text-lg font-semibold text-foreground">Scanning {url}</h2>
               <p className="text-sm text-muted-foreground mt-1">
                 Crawling page, detecting images, and analyzing optimization opportunities...
               </p>
@@ -238,7 +243,7 @@ const Scanner = () => {
               <Card className="p-5">
                 <div className="flex items-center gap-3 mb-3">
                   <Shield className="w-5 h-5 text-primary" />
-                  <h3 className="font-semibold text-foreground">SEO Image Score</h3>
+                  <h2 className="font-semibold text-foreground">SEO Image Score</h2>
                 </div>
                 <div className="flex items-center gap-4">
                   <div className="text-3xl font-black text-foreground">{result.seoScore}/100</div>
@@ -252,7 +257,7 @@ const Scanner = () => {
               <Card className="p-5">
                 <div className="flex items-center gap-3 mb-3">
                   <Zap className="w-5 h-5 text-primary" />
-                  <h3 className="font-semibold text-foreground">Size Breakdown</h3>
+                  <h2 className="font-semibold text-foreground">Size Breakdown</h2>
                 </div>
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
@@ -275,7 +280,7 @@ const Scanner = () => {
             <Card className="p-5">
               <div className="flex items-center gap-3 mb-4">
                 <TrendingUp className="w-5 h-5 text-primary" />
-                <h3 className="font-semibold text-foreground">Recommendations</h3>
+                <h2 className="font-semibold text-foreground">Recommendations</h2>
               </div>
               <ul className="space-y-2">
                 {result.recommendations.map((rec, i) => (
@@ -293,9 +298,9 @@ const Scanner = () => {
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-3">
                     <Image className="w-5 h-5 text-primary" />
-                    <h3 className="font-semibold text-foreground">
+                    <h2 className="font-semibold text-foreground">
                       Image Issues ({result.images.length})
-                    </h3>
+                    </h2>
                   </div>
                   <div className="flex gap-2">
                     <Badge variant="destructive" className="text-[10px]">
@@ -366,7 +371,7 @@ const Scanner = () => {
               <Card className="p-5">
                 <div className="flex items-center gap-3 mb-4">
                   <Globe className="w-5 h-5 text-primary" />
-                  <h3 className="font-semibold text-foreground">Page Screenshot</h3>
+                  <h2 className="font-semibold text-foreground">Page Screenshot</h2>
                 </div>
                 <div className="rounded-lg overflow-hidden border border-border">
                   <img
@@ -381,9 +386,9 @@ const Scanner = () => {
 
             {/* CTA */}
             <Card className="p-6 text-center bg-primary/5 border-primary/20">
-              <h3 className="text-lg font-bold text-foreground mb-2">
+              <h2 className="text-lg font-bold text-foreground mb-2">
                 Ready to optimize these images?
-              </h3>
+              </h2>
               <p className="text-sm text-muted-foreground mb-4">
                 Upload them to PixelSqueeze and save {formatBytes(totalSavings)} instantly
               </p>

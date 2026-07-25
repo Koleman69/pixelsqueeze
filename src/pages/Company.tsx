@@ -8,11 +8,31 @@ const Company = () => {
   return (
     <>
       <Helmet>
-        <title>About Pixelsqueeze LLC - Professional Image Compression Company</title>
-        <meta name="description" content="Learn about Pixelsqueeze LLC, founded in 2025 and based in San Antonio, TX. Contact us for inquiries about professional image compression services." />
-        <meta property="og:title" content="About Pixelsqueeze LLC - Professional Image Compression Company" />
-        <meta property="og:description" content="Learn about Pixelsqueeze LLC, founded in 2025 and based in San Antonio, TX. Contact us for inquiries about professional image compression services." />
+        <title>About PixelSqueeze — AI Image Compression Company</title>
+        <meta name="description" content="Pixelsqueeze LLC — founded 2025, San Antonio, TX. Contact us about professional AI-powered image compression and enhancement." />
+        <meta property="og:title" content="About PixelSqueeze — AI Image Compression Company" />
+        <meta property="og:description" content="Pixelsqueeze LLC — founded 2025, San Antonio, TX. Contact us about professional AI-powered image compression and enhancement." />
+        <meta property="og:url" content="https://pixelsqueeze.app/company" />
+        <meta property="og:type" content="website" />
         <link rel="canonical" href="https://pixelsqueeze.app/company" />
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "LocalBusiness",
+          name: "Pixelsqueeze LLC",
+          url: "https://pixelsqueeze.app",
+          email: "inquiry@pixelsqueeze.app",
+          foundingDate: "2025",
+          address: {
+            "@type": "PostalAddress",
+            streetAddress: "12803 West Ave",
+            addressLocality: "San Antonio",
+            addressRegion: "TX",
+            postalCode: "78216",
+            addressCountry: "US",
+          },
+          areaServed: "Worldwide",
+          description: "Professional AI-powered image compression and photo enhancement services.",
+        })}</script>
       </Helmet>
 
       <div className="min-h-screen bg-background">

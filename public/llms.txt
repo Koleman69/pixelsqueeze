@@ -1,0 +1,49 @@
+# PixelSqueeze
+
+> One-click AI photo enhancer. Fix blur, lighting, color, noise, and resolution instantly — free, in your browser, no signup for your first fix.
+
+PixelSqueeze is a web app (also iOS/Android PWA) that automatically enhances photos using AI. Upload any image and PixelSqueeze detects issues (blur, noise, low light, dull color, low resolution, oversized files) and fixes them in a single tap. Ideal for parents, realtors, e-commerce sellers, content creators, and small businesses who need pro-looking photos without editing skills.
+
+## Pages
+
+- [Home](/): Overview, live demo, before/after examples, pricing summary.
+- [Pricing](/pricing): Free, Creator, Pro, Business, and API tiers with feature comparison and ROI calculator.
+- [Blog](/blog): SEO-optimized articles on image compression, AI enhancement, and photo optimization.
+- [Website Scanner](/scanner): Free tool that analyzes any URL for image optimization opportunities.
+- [Install](/install): Install PixelSqueeze as a PWA on iOS, Android, or desktop.
+- [Company](/company): About Pixelsqueeze LLC — company info, contact, and location.
+- [Privacy Policy](/privacy): How we handle your photos and data.
+
+## Tools
+
+- [AI Image Upscaler](/tools/ai-image-upscaler): Upscale photos up to 4× without losing quality.
+- [Image Enhancer](/tools/image-enhancer): One-click sharpen, denoise, and color correction.
+- [Photo Optimizer](/tools/photo-optimizer): Compress and resize photos for social, web, or print.
+- [Website Image Compression](/tools/website-image-compression): Optimize every image on a page in bulk.
+- [Print-Ready Images](/tools/print-ready-images): Resize and upscale to standard print sizes at 300 DPI.
+- [SEO Image Optimizer](/tools/seo-image-optimizer): Auto-generate filenames, alt text, captions, and responsive variants.
+
+## Guides
+
+- [Enhance Photos](/enhance): Hub of enhancement guides.
+- [Sharpen Blurry Photos](/enhance/sharpen-blurry-photos): Fix camera shake and soft focus.
+- [Unblur Image](/enhance/unblur-image): Recover detail from blurred photos.
+- [Denoise Photo](/enhance/denoise-photo): Remove grain and digital noise.
+- [Increase Image Resolution](/enhance/increase-image-resolution): AI upscaling to 2× and 4×.
+- [Restore Old Photos](/enhance/restore-old-photos): Repair faded and damaged scans.
+- [Upscale to 4K](/enhance/upscale-image-4k): High-resolution AI upscaling.
+
+## For Industries
+
+- [Real Estate](/for/real-estate): Fix and brighten phone listing photos.
+- [Wedding Photographers](/for/wedding-photographers): Batch color and sharpness pipelines.
+- [E-commerce](/for/ecommerce): Product photo optimization for stores.
+- [Shopify Stores](/for/shopify-stores): Shopify-sized exports and speed wins.
+- [Amazon Sellers](/for/amazon-sellers): Compliant product image sizing and quality.
+- [Social Media Creators](/for/social-media-creators): Ready-sized exports for Instagram, TikTok, YouTube.
+
+## Optional
+
+- [Blog: Ultimate Image Compression Guide](/blog): Deep articles on formats, compression, SEO.
+- [Sitemap](/sitemap.xml): Full URL list.
+- [Robots](/robots.txt): Crawler policy.

@@ -911,9 +911,22 @@ const Landing = () => {
         </div>
       </footer>
 
-      {/* STICKY BOTTOM CTA — email capture + upgrade */}
-      <div className="fixed bottom-3 left-1/2 -translate-x-1/2 w-[calc(100%-1.5rem)] max-w-3xl px-0 z-40 pb-[env(safe-area-inset-bottom)]">
-        <div className="bg-[#0f1424]/85 backdrop-blur-2xl border border-white/15 rounded-2xl p-3 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shadow-2xl shadow-black/50">
+      {/* STICKY BOTTOM CTA — compact on mobile, email capture on desktop */}
+      <div className="fixed bottom-3 left-1/2 -translate-x-1/2 w-[calc(100%-1rem)] sm:w-[calc(100%-1.5rem)] max-w-3xl z-40 pb-[env(safe-area-inset-bottom)]">
+        {/* Mobile: compact single-button bar */}
+        <div className="sm:hidden bg-[#0f1424]/90 backdrop-blur-2xl border border-white/15 rounded-2xl p-2 flex items-center gap-2 shadow-2xl shadow-black/50">
+          <span className="text-white text-xs font-semibold pl-2 flex-1 truncate">Fix your photos free</span>
+          <Link to="/auth" onClick={() => trackConversion("sticky_upgrade")} className="shrink-0">
+            <Button
+              type="button"
+              className="bg-[#4ade80] hover:bg-[#3dbd6d] text-[#0f1424] font-bold px-4 py-2 rounded-xl text-xs border-0 h-auto whitespace-nowrap"
+            >
+              Try free
+            </Button>
+          </Link>
+        </div>
+        {/* Desktop: full email capture */}
+        <div className="hidden sm:flex bg-[#0f1424]/85 backdrop-blur-2xl border border-white/15 rounded-2xl p-3 flex-col sm:flex-row items-stretch sm:items-center gap-3 shadow-2xl shadow-black/50">
           <div className="hidden sm:flex flex-col pr-4 sm:border-r sm:border-white/10 min-w-0">
             <span className="text-[#4ade80] text-[10px] font-bold uppercase tracking-widest">Free forever</span>
             <span className="text-white text-sm font-semibold truncate">Get weekly optimization tips</span>

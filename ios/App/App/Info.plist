@@ -2,12 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <key>CAPACITOR_DEBUG</key>
+	<key>CAPACITOR_DEBUG</key>
 	<string>$(CAPACITOR_DEBUG)</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-        <string>PixelSqueeze</string>
+	<string>PixelSqueeze</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -47,5 +47,36 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>PixelSqueeze needs camera access so you can capture a photo and optimize it immediately.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>PixelSqueeze needs photo library access so you can pick images to compress and enhance.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>PixelSqueeze saves optimized images back to your photo library when you tap Download.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>PixelSqueeze uses the microphone only when you record a video for compression.</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>PixelSqueeze can use Face ID to keep you signed in securely.</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<false/>
+	</dict>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.pixelsqueeze.app</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>pixelsqueeze</string>
+			</array>
+		</dict>
+	</array>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>https</string>
+		<string>mailto</string>
+	</array>
 </dict>
 </plist>

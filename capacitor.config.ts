@@ -26,6 +26,16 @@ const config: CapacitorConfig = {
     limitsNavigationsToAppBoundDomains: false,
     backgroundColor: '#FAFAFA',
   },
+  android: {
+    // Play Store builds must be release AABs; local device runs use debug.
+    backgroundColor: '#FAFAFA',
+    allowMixedContent: false,
+    captureInput: true,
+    webContentsDebuggingEnabled: false,
+    // Keep the WebView from being treated as a plain browser wrapper.
+    appendUserAgent: 'PixelSqueezeAndroid',
+  },
+
   plugins: {
     SplashScreen: {
       launchShowDuration: 800,

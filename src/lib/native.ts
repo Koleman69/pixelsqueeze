@@ -20,10 +20,18 @@ export async function initNative() {
     const { StatusBar, Style } = await import("@capacitor/status-bar");
     // Light background -> dark content
     await StatusBar.setStyle({ style: Style.Light });
-    await StatusBar.setOverlaysWebView({ overlay: true });
+    if (platform() === "android") {
+      // Android needs an explicit bar color; keep content below it so the
+      // header never sits under the system clock.
+      await StatusBar.setOverlaysWebView({ overlay: false });
+      await StatusBar.setBackgroundColor({ color: "#FAFAFA" });
+    } else {
+      await StatusBar.setOverlaysWebView({ overlay: true });
+    }
   } catch (e) {
     console.warn("[native] StatusBar unavailable", e);
   }
+
 
   try {
     const { SplashScreen } = await import("@capacitor/splash-screen");
@@ -65,9 +73,22 @@ export async function initNative() {
         // Ignore malformed URLs.
       }
     });
+
+    // Android hardware/gesture back button: navigate history, exit at the root.
+    // Play review rejects apps where back does nothing.
+    if (platform() === "android") {
+      App.addListener("backButton", ({ canGoBack }) => {
+        if (canGoBack || window.history.length > 1) {
+          window.history.back();
+        } else {
+          App.exitApp();
+        }
+      });
+    }
   } catch (e) {
     console.warn("[native] App listener unavailable", e);
   }
+
 }
 
 /** Fire a short haptic. No-op on web. */

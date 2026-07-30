@@ -82,3 +82,71 @@ workflows:
             --scheme "App"
     artifacts:
       - build/ios/ipa/*.ipa
+
+  android-playstore:
+    name: PixelSqueeze Android - Play Store (AAB)
+    max_build_duration: 60
+    instance_type: linux_x2
+    environment:
+      android_signing:
+        - pixelsqueeze_keystore
+      groups:
+        - google_play
+      vars:
+        PACKAGE_NAME: "com.pixelsqueeze.app"
+      node: 20.11.1
+      java: 21
+    scripts:
+      - name: Install npm dependencies
+        script: npm ci
+      - name: Build web app
+        script: npm run build
+      - name: Add Android platform if missing
+        script: |
+          if [ ! -d "android/app" ]; then npx cap add android; fi
+      - name: Sync Capacitor
+        script: npx cap sync android
+      - name: Set build number from Play Store
+        script: |
+          LATEST=$(google-play get-latest-build-number --package-name "$PACKAGE_NAME" --tracks internal || echo 0)
+          echo "Latest Play build: $LATEST"
+          cd android
+          sed -i "s/versionCode 1/versionCode $(($LATEST + 1))/" app/build.gradle
+      - name: Build release AAB
+        script: |
+          cd android
+          ./gradlew bundleRelease
+    artifacts:
+      - android/app/build/outputs/**/*.aab
+      - android/app/build/outputs/**/mapping.txt
+    publishing:
+      google_play:
+        credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
+        track: internal
+        submit_as_draft: true
+
+  android-apk:
+    name: PixelSqueeze Android - APK (device test build)
+    max_build_duration: 45
+    instance_type: linux_x2
+    environment:
+      android_signing:
+        - pixelsqueeze_keystore
+      node: 20.11.1
+      java: 21
+    scripts:
+      - name: Install npm dependencies
+        script: npm ci
+      - name: Build web app
+        script: npm run build
+      - name: Add Android platform if missing
+        script: |
+          if [ ! -d "android/app" ]; then npx cap add android; fi
+      - name: Sync Capacitor
+        script: npx cap sync android
+      - name: Build release APK
+        script: |
+          cd android
+          ./gradlew assembleRelease
+    artifacts:
+      - android/app/build/outputs/**/*.apk

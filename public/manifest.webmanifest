@@ -1,0 +1,47 @@
+{
+  "name": "PixelSqueeze — Make Every Photo Look Amazing",
+  "short_name": "PixelSqueeze",
+  "description": "AI photo enhancement and compression: fix blurry photos, brighten, sharpen and shrink images in seconds.",
+  "id": "/",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0B1120",
+  "theme_color": "#3B82F6",
+  "categories": ["photo", "productivity", "utilities"],
+  "lang": "en-US",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "/app-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/app-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/app-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Enhance a photo",
+      "short_name": "Enhance",
+      "url": "/index?source=shortcut"
+    },
+    {
+      "name": "Scan a website",
+      "short_name": "Scanner",
+      "url": "/scanner?source=shortcut"
+    }
+  ]
+}

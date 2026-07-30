@@ -1,5 +1,18 @@
 apply plugin: 'com.android.application'
 
+// Optional release signing. Provide either android/keystore.properties or the
+// env vars PS_KEYSTORE_PATH / PS_KEYSTORE_PASSWORD / PS_KEY_ALIAS / PS_KEY_PASSWORD.
+def keystorePropsFile = rootProject.file("keystore.properties")
+def keystoreProps = new Properties()
+if (keystorePropsFile.exists()) {
+    keystoreProps.load(new FileInputStream(keystorePropsFile))
+}
+def ksPath = keystoreProps['storeFile'] ?: System.getenv('PS_KEYSTORE_PATH')
+def ksPassword = keystoreProps['storePassword'] ?: System.getenv('PS_KEYSTORE_PASSWORD')
+def ksAlias = keystoreProps['keyAlias'] ?: System.getenv('PS_KEY_ALIAS')
+def ksAliasPassword = keystoreProps['keyPassword'] ?: System.getenv('PS_KEY_PASSWORD')
+def hasSigning = ksPath != null && ksPassword != null && ksAlias != null && ksAliasPassword != null
+
 android {
     namespace = "com.pixelsqueeze.app"
     compileSdk = rootProject.ext.compileSdkVersion
@@ -9,6 +22,7 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+        resConfigs "en"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -16,11 +30,36 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    signingConfigs {
+        if (hasSigning) {
+            release {
+                storeFile file(ksPath)
+                storePassword ksPassword
+                keyAlias ksAlias
+                keyPassword ksAliasPassword
+            }
+        }
+    }
     buildTypes {
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            if (hasSigning) {
+                signingConfig signingConfigs.release
+            }
         }
+        debug {
+            minifyEnabled false
+        }
+    }
+    bundle {
+        language { enableSplit = false }
+        density { enableSplit = true }
+        abi { enableSplit = true }
+    }
+    packagingOptions {
+        resources { excludes += ['META-INF/*.kotlin_module'] }
     }
 }
 

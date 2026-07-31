@@ -592,44 +592,27 @@ const Landing = () => {
                 <article
                   key={r.name}
                   className="bg-white/[0.04] border border-white/10 rounded-3xl p-7 backdrop-blur-xl"
-                  itemScope
-                  itemType="https://schema.org/Review"
                 >
-                  <div itemProp="itemReviewed" itemScope itemType="https://schema.org/SoftwareApplication">
-                    <meta itemProp="name" content="PixelSqueeze" />
-                    <meta itemProp="applicationCategory" content="MultimediaApplication" />
-                    <meta itemProp="operatingSystem" content="Web, iOS, Android" />
-                  </div>
-
                   <div
                     className="flex gap-0.5 text-yellow-400 mb-4"
-                    itemProp="reviewRating"
-                    itemScope
-                    itemType="https://schema.org/Rating"
                     aria-label={`${r.rating} out of 5 stars`}
                   >
-                    <meta itemProp="ratingValue" content={String(r.rating)} />
-                    <meta itemProp="bestRating" content="5" />
                     {[...Array(5)].map((_, i) => (
                       <Star key={i} className="w-4 h-4 fill-current" />
                     ))}
                   </div>
-                  <blockquote className="text-base leading-relaxed text-slate-200 mb-6" itemProp="reviewBody">
+                  <blockquote className="text-base leading-relaxed text-slate-200 mb-6">
                     "{r.quote}"
                   </blockquote>
-                  <div
-                    className="flex items-center gap-3"
-                    itemProp="author"
-                    itemScope
-                    itemType="https://schema.org/Person"
-                  >
+                  <div className="flex items-center gap-3">
                     <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[#4ade80] to-[#a78bfa]" aria-hidden />
                     <div>
-                      <p className="font-semibold text-sm text-white" itemProp="name">{r.name}</p>
+                      <p className="font-semibold text-sm text-white">{r.name}</p>
                       <p className="text-xs text-slate-500">{r.role}</p>
                     </div>
                   </div>
                 </article>
+
               ))}
             </div>
           </div>

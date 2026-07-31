@@ -1,7 +1,11 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 
-const FROM = "PixelSqueeze <noreply@pixelsqueeze.app>";
+// Override with the RESEND_FROM secret once a domain is verified in Resend.
+const FROM = Deno.env.get("RESEND_FROM") ?? "PixelSqueeze <noreply@pixelsqueeze.app>";
+// Used only if the primary sender domain is not yet verified in Resend.
+// resend.dev only delivers to the Resend account owner's own address.
+const FALLBACK_FROM = "PixelSqueeze <onboarding@resend.dev>";
 
 const ALLOWED_ORIGINS = [
   "https://pixelsqueeze.app",

@@ -608,7 +608,12 @@ const Landing = () => {
                   itemScope
                   itemType="https://schema.org/Review"
                 >
-                  <meta itemProp="itemReviewed" content="PixelSqueeze" />
+                  <div itemProp="itemReviewed" itemScope itemType="https://schema.org/SoftwareApplication">
+                    <meta itemProp="name" content="PixelSqueeze" />
+                    <meta itemProp="applicationCategory" content="MultimediaApplication" />
+                    <meta itemProp="operatingSystem" content="Web, iOS, Android" />
+                  </div>
+
                   <div
                     className="flex gap-0.5 text-yellow-400 mb-4"
                     itemProp="reviewRating"

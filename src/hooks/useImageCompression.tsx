@@ -376,25 +376,7 @@ export const useImageCompression = () => {
 
   const createCheckout = async () => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        // Not signed in — send them to auth, checkout requires an account
-        window.location.href = '/auth?redirect=/pricing';
-        return;
-      }
-
-      const { data, error } = await supabase.functions.invoke('create-checkout', {
-        headers: { Authorization: `Bearer ${session.access_token}` },
-      });
-      if (error) throw error;
-
-      if (data?.url) {
-        // Popup blockers (esp. iOS/PWA) kill window.open after an await —
-        // redirect in the same tab instead so checkout always opens.
-        window.location.href = data.url;
-      } else {
-        throw new Error('No checkout URL returned');
-      }
+      await startCheckout();
     } catch (error: any) {
       toast({
         title: "Checkout Failed",

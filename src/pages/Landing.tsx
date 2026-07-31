@@ -574,30 +574,17 @@ const Landing = () => {
               <h2 id="reviews-heading" className="font-display text-4xl md:text-5xl font-bold leading-tight text-white">
                 Loved by creators everywhere.
               </h2>
-              <div
-                className="flex items-center justify-center gap-2 mt-6"
-                itemScope
-                itemType="https://schema.org/AggregateRating"
-              >
-                <div itemProp="itemReviewed" itemScope itemType="https://schema.org/SoftwareApplication">
-                  <meta itemProp="name" content="PixelSqueeze" />
-                  <meta itemProp="applicationCategory" content="MultimediaApplication" />
-                  <meta itemProp="operatingSystem" content="Web, iOS, Android" />
-                </div>
-                <meta itemProp="bestRating" content={RATING.best} />
-                <meta itemProp="worstRating" content={RATING.worst} />
-                <meta itemProp="reviewCount" content={String(RATING.count)} />
+              <div className="flex items-center justify-center gap-2 mt-6">
                 <div className="flex gap-0.5 text-yellow-400" aria-label={`${RATING.value} out of 5 stars`}>
                   {[...Array(5)].map((_, i) => (
                     <Star key={i} className="w-5 h-5 fill-current" />
                   ))}
                 </div>
                 <span className="text-sm font-semibold text-slate-300">
-                  <span itemProp="ratingValue">{RATING.value}</span> ·{" "}
-                  {RATING.count.toLocaleString()} reviews
+                  {RATING.value} · {RATING.count.toLocaleString()} reviews
                 </span>
-
               </div>
+
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">

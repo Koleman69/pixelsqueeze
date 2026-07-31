@@ -68,7 +68,10 @@ serve(async (req) => {
       logStep("No existing customer found, will create new");
     }
 
-    const origin = req.headers.get("origin") || "http://localhost:3000";
+    // Capacitor webviews send origin: capacitor://localhost, which Stripe
+    // rejects as a redirect target — prefer the explicit app origin header.
+    const rawOrigin = req.headers.get("x-app-origin") || req.headers.get("origin") || "";
+    const origin = rawOrigin.startsWith("http") ? rawOrigin : "https://pixelsqueeze.app";
     logStep("Creating checkout session", { 
       customerId, 
       customerEmail: customerId ? undefined : user.email,

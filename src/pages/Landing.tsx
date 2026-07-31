@@ -579,9 +579,14 @@ const Landing = () => {
                 itemScope
                 itemType="https://schema.org/AggregateRating"
               >
-                <meta itemProp="itemReviewed" content="PixelSqueeze" />
+                <div itemProp="itemReviewed" itemScope itemType="https://schema.org/SoftwareApplication">
+                  <meta itemProp="name" content="PixelSqueeze" />
+                  <meta itemProp="applicationCategory" content="MultimediaApplication" />
+                  <meta itemProp="operatingSystem" content="Web, iOS, Android" />
+                </div>
                 <meta itemProp="bestRating" content={RATING.best} />
                 <meta itemProp="worstRating" content={RATING.worst} />
+                <meta itemProp="reviewCount" content={String(RATING.count)} />
                 <div className="flex gap-0.5 text-yellow-400" aria-label={`${RATING.value} out of 5 stars`}>
                   {[...Array(5)].map((_, i) => (
                     <Star key={i} className="w-5 h-5 fill-current" />
@@ -589,8 +594,9 @@ const Landing = () => {
                 </div>
                 <span className="text-sm font-semibold text-slate-300">
                   <span itemProp="ratingValue">{RATING.value}</span> ·{" "}
-                  <span itemProp="reviewCount">{RATING.count.toLocaleString()}</span> reviews
+                  {RATING.count.toLocaleString()} reviews
                 </span>
+
               </div>
             </div>
 

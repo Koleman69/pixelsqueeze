@@ -127,7 +127,8 @@ serve(async (req) => {
     logStep("Shared file record created", { shareCode: sharedFile.share_code });
 
     // Generate share URL
-    const baseUrl = req.headers.get("origin") || "https://pixelsqueeze.lovable.app";
+    const rawShareOrigin = req.headers.get("x-app-origin") || req.headers.get("origin") || "";
+    const baseUrl = rawShareOrigin.startsWith("http") ? rawShareOrigin : "https://pixelsqueeze.app";
     const shareUrl = `${baseUrl}/share/${sharedFile.share_code}`;
 
     return new Response(

@@ -94,19 +94,29 @@ Deno.serve(async (req) => {
       return ok();
     }
 
-    const res = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${RESEND_API_KEY}`,
-      },
-      body: JSON.stringify({
-        from: FROM,
-        to: [email],
-        subject: "Reset your PixelSqueeze password",
-        html: emailHtml(data.properties.action_link),
-      }),
-    });
+    const html = emailHtml(data.properties.action_link);
+    const send = (from: string) =>
+      fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${RESEND_API_KEY}`,
+        },
+        body: JSON.stringify({
+          from,
+          to: [email],
+          subject: "Reset your PixelSqueeze password",
+          html,
+        }),
+      });
+
+    let res = await send(FROM);
+
+    if (res.status === 403) {
+      const details = await res.text();
+      console.error(`Resend rejected sender ${FROM} [403]: ${details} — retrying with fallback sender`);
+      res = await send(FALLBACK_FROM);
+    }
 
     if (!res.ok) {
       const details = await res.text();
@@ -116,6 +126,7 @@ Deno.serve(async (req) => {
         { status: res.status, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
+
 
     return ok();
   } catch (e) {

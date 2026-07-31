@@ -4,7 +4,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-app-origin",
 };
 
 const logStep = (step: string, details?: any) => {
@@ -49,7 +49,9 @@ serve(async (req) => {
     const customerId = customers.data[0].id;
     logStep("Found Stripe customer", { customerId });
 
-    const origin = req.headers.get("origin") || "http://localhost:3000";
+    // Capacitor webviews send origin: capacitor://localhost, which Stripe rejects.
+    const rawOrigin = req.headers.get("x-app-origin") || req.headers.get("origin") || "";
+    const origin = rawOrigin.startsWith("http") ? rawOrigin : "https://pixelsqueeze.app";
     const portalSession = await stripe.billingPortal.sessions.create({
       customer: customerId,
       return_url: `${origin}/`,

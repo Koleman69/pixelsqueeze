@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import JSZip from 'jszip';
+import { startCheckout } from '@/lib/checkout';
 
 export interface CompressionSettings {
   quality: number;

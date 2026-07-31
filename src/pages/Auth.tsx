@@ -79,8 +79,8 @@ const Auth = () => {
     
     setIsLoading(true);
 
-    const { error } = await supabase.auth.resetPasswordForEmail(resetEmail.trim(), {
-      redirectTo: `${window.location.origin}/reset-password`,
+    const { error } = await supabase.functions.invoke("send-password-reset", {
+      body: { email: resetEmail.trim(), origin: window.location.origin },
     });
 
     setIsLoading(false);
@@ -88,13 +88,13 @@ const Auth = () => {
     if (error) {
       toast({
         title: "Error",
-        description: error.message,
+        description: "We couldn't send the reset email. Please try again in a moment.",
         variant: "destructive",
       });
     } else {
       toast({
         title: "Check your email",
-        description: "We've sent you a password reset link.",
+        description: "If an account exists for that address, we've sent a password reset link.",
       });
       setShowResetPassword(false);
       setResetEmail("");

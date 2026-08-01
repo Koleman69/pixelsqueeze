@@ -283,19 +283,34 @@ serve(async (req) => {
       });
     }
     
-    // Check if user is authenticated for premium features
+    // Require a valid authenticated user: the free-compression quota can only be
+    // enforced when we can attribute usage to an account.
     let isSubscribed = false;
     let userId: string | null = null;
     let freeCompressionsUsed = 0;
     const authHeader = req.headers.get("Authorization");
-    
-    if (authHeader) {
+
+    const token = authHeader?.replace("Bearer ", "").trim() ?? "";
+    const { data: userData } = token
+      ? await supabase.auth.getUser(token)
+      : { data: null as any };
+
+    if (!userData?.user?.id) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: "Please sign in to compress images.",
+        results: []
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 401
+      });
+    }
+
+    {
       try {
-        const token = authHeader.replace("Bearer ", "");
-        const { data: userData } = await supabase.auth.getUser(token);
-        
-        if (userData?.user?.email) {
+        {
           userId = userData.user.id;
+
           
           // Check subscription status
           const checkSubResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/check-subscription`, {

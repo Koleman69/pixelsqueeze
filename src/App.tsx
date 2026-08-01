@@ -140,6 +140,8 @@ const App = () => (
                     <Index />
                   </ProtectedRoute>
                 } />
+                {/* Legacy alias for old PWA shortcut deep links */}
+                <Route path="/index" element={<Navigate to="/dashboard" replace />} />
                 <Route path="/success" element={
                   <ProtectedRoute>
                     <Success />

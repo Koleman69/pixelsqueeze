@@ -9,6 +9,7 @@ Disallow: /admin
 Disallow: /auth
 Disallow: /success
 Disallow: /share/
+Disallow: /reset-password
 
 User-agent: Googlebot
 Allow: /

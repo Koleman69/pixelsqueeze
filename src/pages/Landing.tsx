@@ -152,19 +152,6 @@ const Landing = () => {
       availability: "https://schema.org/InStock",
       url: "https://pixelsqueeze.app/pricing",
     })),
-    aggregateRating: {
-      "@type": "AggregateRating",
-      ratingValue: RATING.value,
-      reviewCount: String(RATING.count),
-      bestRating: RATING.best,
-      worstRating: RATING.worst,
-    },
-    review: REVIEWS.map((r) => ({
-      "@type": "Review",
-      author: { "@type": "Person", name: r.name },
-      reviewRating: { "@type": "Rating", ratingValue: r.rating, bestRating: 5 },
-      reviewBody: r.quote,
-    })),
     featureList: [
       "Fix blurry photos in one click",
       "Sharpen soft or out-of-focus images",

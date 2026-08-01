@@ -1,10 +1,41 @@
 import { Link } from "react-router-dom";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  BookOpen,
+  Sparkles,
+  GraduationCap,
+  HelpCircle,
+  LineChart,
+  Trophy,
+  GitCompare,
+  Camera,
+  Megaphone,
+  Printer,
+  Search,
+  Calculator,
+} from "lucide-react";
 import SEO from "@/components/SEO";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import * as icons from "lucide-react";
 import { CATEGORIES, ARTICLES, CALCULATORS } from "@/data/authorityCenter";
+
+// Explicit map instead of `import * as icons` — a namespace import pulls the
+// entire lucide-react library (~720 kB) into this route chunk.
+const CATEGORY_ICONS: Record<string, typeof BookOpen> = {
+  BookOpen,
+  Sparkles,
+  GraduationCap,
+  HelpCircle,
+  LineChart,
+  Trophy,
+  GitCompare,
+  Camera,
+  Megaphone,
+  Printer,
+  Search,
+  Calculator,
+};
 
 export default function LearnHub() {
   const featured = ARTICLES.slice(0, 6);
@@ -50,7 +81,7 @@ export default function LearnHub() {
           <h2 id="cats-heading" className="sr-only">Browse by category</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {CATEGORIES.map((c) => {
-              const Icon = (icons as any)[c.icon] ?? icons.BookOpen;
+              const Icon = CATEGORY_ICONS[c.icon] ?? BookOpen;
               const count = c.slug === "calculators" ? CALCULATORS.length : ARTICLES.filter((a) => a.category === c.slug).length;
               return (
                 <Link key={c.slug} to={`/learn/${c.slug}`} className="group">

@@ -53,7 +53,8 @@ chain.
 
 | Chunk | Before | After |
 | --- | --- | --- |
-| icons (all of `lucide-react`, force-bundled) | 779 kB raw / 137 kB gzip | eliminated — icons now tree-shake into the routes that use them |
+| icons (all of `lucide-react`, force-bundled) | 779 kB raw / 137 kB gzip | **eliminated** — icons now tree-shake into the routes that use them |
+| `LearnHub` (`import * as icons` namespace import) | 720.92 kB raw / 130.60 kB gzip | **eliminated** — replaced with an explicit 12-icon map |
 | `react-vendor` | 53 kB gzip | unchanged |
 | `charts` (Admin only, lazy) | 105 kB gzip | unchanged, off the critical path |
 | ONNX runtime / background removal | lazy | lazy |

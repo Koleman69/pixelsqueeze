@@ -115,13 +115,6 @@ export const AIAnswerBlock = ({ path = "/", pageLabel = "Overview" }: AIAnswerBl
         { "@type": "Offer", name: "Pro", price: "24", priceCurrency: "USD" },
         { "@type": "Offer", name: "Business", price: "79", priceCurrency: "USD" },
       ],
-      aggregateRating: {
-        "@type": "AggregateRating",
-        ratingValue: "4.9",
-        ratingCount: "2847",
-        bestRating: "5",
-        worstRating: "1",
-      },
       featureList: benefits.map((b) => b.title),
     },
     {
@@ -137,17 +130,6 @@ export const AIAnswerBlock = ({ path = "/", pageLabel = "Overview" }: AIAnswerBl
         priceCurrency: "USD",
         offerCount: 4,
       },
-      aggregateRating: {
-        "@type": "AggregateRating",
-        ratingValue: "4.9",
-        ratingCount: "2847",
-      },
-      review: reviews.map((r) => ({
-        "@type": "Review",
-        author: { "@type": "Person", name: r.author },
-        reviewRating: { "@type": "Rating", ratingValue: r.rating, bestRating: 5 },
-        reviewBody: r.body,
-      })),
     },
     {
       "@context": "https://schema.org",

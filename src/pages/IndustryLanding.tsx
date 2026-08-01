@@ -43,13 +43,6 @@ const IndustryLanding = () => {
         { "@type": "Offer", name: "Pro", price: "24", priceCurrency: "USD" },
         { "@type": "Offer", name: "Business", price: "79", priceCurrency: "USD" },
       ],
-      aggregateRating: { "@type": "AggregateRating", ratingValue: "4.9", ratingCount: "2847" },
-      review: industry.testimonials.map((t) => ({
-        "@type": "Review",
-        reviewRating: { "@type": "Rating", ratingValue: t.rating ?? 5, bestRating: 5 },
-        author: { "@type": "Person", name: t.name },
-        reviewBody: t.quote,
-      })),
     },
     {
       "@context": "https://schema.org",

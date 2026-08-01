@@ -30,7 +30,6 @@ const EnhanceTopicPage = () => {
       operatingSystem: "Any",
       url: canonicalUrl,
       offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-      aggregateRating: { "@type": "AggregateRating", ratingValue: "4.9", ratingCount: "2847" },
     },
     {
       "@context": "https://schema.org",

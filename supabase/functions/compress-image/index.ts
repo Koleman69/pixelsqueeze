@@ -306,42 +306,38 @@ serve(async (req) => {
       });
     }
 
-    {
-      try {
-        {
-          userId = userData.user.id;
+    userId = userData.user.id;
 
-          
-          // Check subscription status
-          const checkSubResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/check-subscription`, {
-            method: 'POST',
-            headers: {
-              'Authorization': authHeader,
-              'Content-Type': 'application/json'
-            }
-          });
-          
-          if (checkSubResponse.ok) {
-            const subData = await checkSubResponse.json();
-            isSubscribed = subData.subscribed;
-          }
-          
-          // Get current free compressions count
-          const { data: subscriberData } = await supabase
-            .from('subscribers')
-            .select('free_compressions_used, subscribed')
-            .eq('user_id', userId)
-            .single();
-          
-          if (subscriberData) {
-            freeCompressionsUsed = subscriberData.free_compressions_used || 0;
-            isSubscribed = subscriberData.subscribed;
-          }
+    try {
+      // Check subscription status
+      const checkSubResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/check-subscription`, {
+        method: 'POST',
+        headers: {
+          'Authorization': authHeader!,
+          'Content-Type': 'application/json'
         }
-      } catch (error) {
-        console.warn('Failed to check subscription:', error);
+      });
+
+      if (checkSubResponse.ok) {
+        const subData = await checkSubResponse.json();
+        isSubscribed = subData.subscribed;
       }
+
+      // Get current free compressions count
+      const { data: subscriberData } = await supabase
+        .from('subscribers')
+        .select('free_compressions_used, subscribed')
+        .eq('user_id', userId)
+        .single();
+
+      if (subscriberData) {
+        freeCompressionsUsed = subscriberData.free_compressions_used || 0;
+        isSubscribed = subscriberData.subscribed;
+      }
+    } catch (error) {
+      console.warn('Failed to check subscription:', error);
     }
+
 
     // Check free compression limit for non-subscribers
     if (!isSubscribed) {

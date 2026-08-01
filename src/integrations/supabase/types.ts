@@ -610,25 +610,28 @@ export type Database = {
       }
       free_tool_usage: {
         Row: {
+          client_key: string
           count: number
           created_at: string
-          email: string
+          email: string | null
           id: string
           tool_id: string
           updated_at: string
         }
         Insert: {
+          client_key: string
           count?: number
           created_at?: string
-          email: string
+          email?: string | null
           id?: string
           tool_id: string
           updated_at?: string
         }
         Update: {
+          client_key?: string
           count?: number
           created_at?: string
-          email?: string
+          email?: string | null
           id?: string
           tool_id?: string
           updated_at?: string
@@ -1141,7 +1144,7 @@ export type Database = {
         Returns: boolean
       }
       consume_free_tool_usage: {
-        Args: { _amount?: number; _email: string; _tool_id: string }
+        Args: { _amount?: number; _client_token: string; _tool_id: string }
         Returns: number
       }
       count_daily_ai_usage: {
@@ -1170,7 +1173,7 @@ export type Database = {
         }[]
       }
       get_free_tool_usage: {
-        Args: { _email: string; _tool_id: string }
+        Args: { _client_token: string; _tool_id: string }
         Returns: number
       }
       get_my_subscription_status: { Args: never; Returns: Json }

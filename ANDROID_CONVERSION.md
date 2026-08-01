@@ -103,13 +103,14 @@ Version codes auto-increment from the latest Play internal-track build and are
 injected via the `PS_VERSION_CODE` environment variable — `build.gradle` reads
 it, so no file is rewritten by CI.
 
-
 ## 6. Version numbers
 
-`android/app/build.gradle`:
+`android/app/build.gradle` defaults, both overridable by environment variables:
 
-- `versionName` — user-visible ("1.0"), keep in sync with iOS `MARKETING_VERSION`
-- `versionCode` — integer, must strictly increase on every Play upload
+- `versionName` — user-visible ("1.0"), override with `PS_VERSION_NAME`; keep in
+  sync with iOS `MARKETING_VERSION`
+- `versionCode` — integer, override with `PS_VERSION_CODE`; must strictly
+  increase on every Play upload
 
 ## 7. Permissions declared
 

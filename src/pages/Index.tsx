@@ -44,6 +44,8 @@ const PostingWorkflows = lazy(() => import("@/components/PostingWorkflows").then
 // Navigation
 import { DashboardSidebar, ToolCategory } from "@/components/DashboardSidebar";
 import { MobileDashboardNav } from "@/components/MobileDashboardNav";
+import { getFreeToolClientToken } from "@/lib/freeToolToken";
+
 
 const ToolLoader = () => (
   <div className="flex items-center justify-center py-20">

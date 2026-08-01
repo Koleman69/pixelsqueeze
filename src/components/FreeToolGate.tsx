@@ -8,6 +8,8 @@ import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { getFreeToolClientToken } from "@/lib/freeToolToken";
+
 
 export const FREE_TOOL_LIMIT = 4;
 
@@ -64,9 +66,10 @@ export const FreeToolGate: React.FC<Props> = ({ toolId, isSubscribed, children }
       }
       setLoading(true);
       const { data, error } = await supabase.rpc("get_free_tool_usage", {
-        _email: email,
+        _client_token: getFreeToolClientToken(),
         _tool_id: toolId,
       });
+
       if (active) {
         if (!error && typeof data === "number") setUsed(data);
         setLoading(false);
@@ -91,10 +94,11 @@ export const FreeToolGate: React.FC<Props> = ({ toolId, isSubscribed, children }
         return false;
       }
       const { data, error } = await supabase.rpc("consume_free_tool_usage", {
-        _email: email,
+        _client_token: getFreeToolClientToken(),
         _tool_id: toolId,
         _amount: amount,
       });
+
       if (error) {
         toast({ title: "Could not update usage", description: error.message, variant: "destructive" });
         return false;

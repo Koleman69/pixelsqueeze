@@ -117,6 +117,13 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_ANON_KEY') ?? ''
     )
 
+    // Service-role client used only for reading/writing the free-usage counter
+    const supabaseAdmin = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+      { auth: { persistSession: false } }
+    )
+
     const { files, quality = 80, maxWidth = 1920, maxHeight = 1920, dpi = 72, isBulk = false }: CompressionRequest = await req.json()
     
     // Memory-safe limits
@@ -283,50 +290,61 @@ serve(async (req) => {
       });
     }
     
-    // Check if user is authenticated for premium features
+    // Require a valid authenticated user: the free-compression quota can only be
+    // enforced when we can attribute usage to an account.
     let isSubscribed = false;
     let userId: string | null = null;
     let freeCompressionsUsed = 0;
     const authHeader = req.headers.get("Authorization");
-    
-    if (authHeader) {
-      try {
-        const token = authHeader.replace("Bearer ", "");
-        const { data: userData } = await supabase.auth.getUser(token);
-        
-        if (userData?.user?.email) {
-          userId = userData.user.id;
-          
-          // Check subscription status
-          const checkSubResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/check-subscription`, {
-            method: 'POST',
-            headers: {
-              'Authorization': authHeader,
-              'Content-Type': 'application/json'
-            }
-          });
-          
-          if (checkSubResponse.ok) {
-            const subData = await checkSubResponse.json();
-            isSubscribed = subData.subscribed;
-          }
-          
-          // Get current free compressions count
-          const { data: subscriberData } = await supabase
-            .from('subscribers')
-            .select('free_compressions_used, subscribed')
-            .eq('user_id', userId)
-            .single();
-          
-          if (subscriberData) {
-            freeCompressionsUsed = subscriberData.free_compressions_used || 0;
-            isSubscribed = subscriberData.subscribed;
-          }
-        }
-      } catch (error) {
-        console.warn('Failed to check subscription:', error);
-      }
+
+    const token = authHeader?.replace("Bearer ", "").trim() ?? "";
+    const { data: userData } = token
+      ? await supabase.auth.getUser(token)
+      : { data: null as any };
+
+    if (!userData?.user?.id) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: "Please sign in to compress images.",
+        results: []
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 401
+      });
     }
+
+    userId = userData.user.id;
+
+    try {
+      // Check subscription status
+      const checkSubResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/check-subscription`, {
+        method: 'POST',
+        headers: {
+          'Authorization': authHeader!,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (checkSubResponse.ok) {
+        const subData = await checkSubResponse.json();
+        isSubscribed = subData.subscribed;
+      }
+
+      // Get current free compressions count (service role: bypasses RLS)
+      const { data: subscriberData } = await supabaseAdmin
+        .from('subscribers')
+        .select('free_compressions_used, subscribed')
+        .eq('user_id', userId)
+        .single();
+
+      if (subscriberData) {
+        freeCompressionsUsed = subscriberData.free_compressions_used || 0;
+        isSubscribed = subscriberData.subscribed;
+      }
+    } catch (error) {
+      console.warn('Failed to check subscription:', error);
+    }
+
 
     // Check free compression limit for non-subscribers
     if (!isSubscribed) {
@@ -381,12 +399,13 @@ serve(async (req) => {
     if (!isSubscribed && userId && results.some(r => !r.error)) {
       try {
         const successfulCompressions = results.filter(r => !r.error).length;
-        await supabase
+        await supabaseAdmin
           .from('subscribers')
-          .update({ 
-            free_compressions_used: freeCompressionsUsed + successfulCompressions 
-          })
-          .eq('user_id', userId);
+          .upsert({
+            user_id: userId,
+            email: userData.user.email ?? '',
+            free_compressions_used: freeCompressionsUsed + successfulCompressions
+          }, { onConflict: 'user_id' });
         
         console.log(`Updated free compressions: ${freeCompressionsUsed} -> ${freeCompressionsUsed + successfulCompressions}`);
       } catch (error) {

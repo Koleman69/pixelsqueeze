@@ -95,6 +95,19 @@ export const useImageCompression = () => {
     isBulk: boolean = false
   ): Promise<string[]> => {
     const fileArray = Array.from(files);
+
+    // Server-side compression requires a signed-in account so free usage can be tracked
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.access_token) {
+      toast({
+        title: "Sign in required",
+        description: "Please sign in to compress images with the cloud engine.",
+        variant: "destructive",
+      });
+      return [];
+    }
+
+
     
     // If more than MAX_FILES_PER_BATCH, process in batches
     if (fileArray.length > MAX_FILES_PER_BATCH) {

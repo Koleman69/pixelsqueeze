@@ -44,6 +44,8 @@ const PostingWorkflows = lazy(() => import("@/components/PostingWorkflows").then
 // Navigation
 import { DashboardSidebar, ToolCategory } from "@/components/DashboardSidebar";
 import { MobileDashboardNav } from "@/components/MobileDashboardNav";
+import { getFreeToolClientToken } from "@/lib/freeToolToken";
+
 
 const ToolLoader = () => (
   <div className="flex items-center justify-center py-20">
@@ -224,13 +226,15 @@ const Index = () => {
       toast({ title: "Enter your email to unlock free credits", description: "Open the tool page to enter your email and get 4 free credits.", variant: "destructive" });
       return false;
     }
-    const { data: current } = await supabase.rpc("get_free_tool_usage", { _email: email, _tool_id: toolId });
+    const clientToken = getFreeToolClientToken();
+    const { data: current } = await supabase.rpc("get_free_tool_usage", { _client_token: clientToken, _tool_id: toolId });
     const usedNow = typeof current === "number" ? current : 0;
     if (usedNow + amount > FREE_TOOL_LIMIT) {
       toast({ title: "Free limit reached", description: `You've used your ${FREE_TOOL_LIMIT} free credits for this tool. Upgrade for unlimited access.`, variant: "destructive" });
       return false;
     }
-    const { error } = await supabase.rpc("consume_free_tool_usage", { _email: email, _tool_id: toolId, _amount: amount });
+    const { error } = await supabase.rpc("consume_free_tool_usage", { _client_token: clientToken, _tool_id: toolId, _amount: amount });
+
     if (error) {
       toast({ title: "Could not update usage", description: error.message, variant: "destructive" });
       return false;

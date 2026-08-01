@@ -26,46 +26,57 @@ npx cap run android
 
 After **any** web change, re-run `bun run build && npx cap sync android`.
 
-## 3. Signing
+## 3. Signing (automated)
 
-Generate an upload key once:
+Run once, on your own machine, with JDK 21 installed:
 
 ```bash
-keytool -genkey -v -keystore pixelsqueeze-upload.jks \
-  -keyalg RSA -keysize 2048 -validity 10000 -alias upload
+npm run android:keystore
 ```
 
-Then create `android/keystore.properties` (git-ignored):
+This creates `~/.pixelsqueeze/pixelsqueeze-upload.jks` (PKCS12, RSA 4096,
+10000-day validity), writes the git-ignored `android/keystore.properties`, and
+prints the upload certificate's SHA-256 fingerprint. It never regenerates an
+existing keystore and never takes the password on the command line.
 
-```
-storeFile=/absolute/path/to/pixelsqueeze-upload.jks
-storePassword=…
-keyAlias=upload
-keyPassword=…
-```
-
-The release build picks these up automatically. CI can instead supply
-`PS_KEYSTORE_PATH`, `PS_KEYSTORE_PASSWORD`, `PS_KEY_ALIAS`, `PS_KEY_PASSWORD`
-as environment variables. **Never commit the keystore or passwords.**
+The release build picks `android/keystore.properties` up automatically. CI can
+instead supply `PS_KEYSTORE_PATH`, `PS_KEYSTORE_PASSWORD`, `PS_KEY_ALIAS`,
+`PS_KEY_PASSWORD`. **Never commit the keystore or passwords** — `*.jks`,
+`*.keystore` and `keystore.properties` are all git-ignored. Losing this file
+means you can never update the app under the same listing.
 
 Enable **Play App Signing** when you create the app in Play Console — Google
 holds the release key and you only manage the upload key.
+
+### App Links fingerprint
+
+`public/.well-known/assetlinks.json` ships with a placeholder. Once the app
+exists in Play Console, copy the SHA-256 from **Setup → App signing → App
+signing key certificate** and run:
+
+```bash
+npm run android:assetlinks -- <PLAY_SHA256> [UPLOAD_SHA256]
+```
+
+Pass the upload fingerprint as a second argument too if you sideload
+upload-key-signed APKs, otherwise links only verify for Play installs. The
+script validates the input is a real 32-byte SHA-256 and refuses placeholders.
+The Play-Store CI workflow now **fails the build** if the placeholder is still
+present, so a non-verifying App Link can't reach the store.
 
 ## 4. Produce the Play artifact
 
 Play requires an **AAB** (Android App Bundle):
 
 ```bash
-cd android && ./gradlew bundleRelease
-# -> android/app/build/outputs/bundle/release/app-release.aab
+npm run android:aab   # -> android/app/build/outputs/bundle/release/app-release.aab
+npm run android:apk   # -> android/app/build/outputs/apk/release/app-release.apk (sideloading)
 ```
 
-For sideloading onto a test device:
-
-```bash
-cd android && ./gradlew assembleRelease
-# -> android/app/build/outputs/apk/release/app-release.apk
-```
+Both scripts run `vite build`, `npx cap sync android`, then Gradle. They require
+JDK 21 and the Android SDK (Platform 36 + Build Tools 36) with `ANDROID_HOME`
+set — neither is available in the Lovable sandbox, so the AAB must be produced
+locally or by the Codemagic workflow below.
 
 R8 minification + resource shrinking are enabled for release, with keep rules
 for the Capacitor JS bridge in `android/app/proguard-rules.pro`. Upload
@@ -88,7 +99,10 @@ Codemagic setup:
    `GCLOUD_SERVICE_ACCOUNT_CREDENTIALS`.
 3. Trigger `android-playstore`.
 
-Version codes auto-increment from the latest Play internal-track build.
+Version codes auto-increment from the latest Play internal-track build and are
+injected via the `PS_VERSION_CODE` environment variable — `build.gradle` reads
+it, so no file is rewritten by CI.
+
 
 ## 6. Version numbers
 

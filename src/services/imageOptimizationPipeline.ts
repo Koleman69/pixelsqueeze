@@ -542,7 +542,14 @@ export async function runOptimizationPipeline(
   const goalConfig = GOAL_PRESETS[options.goal];
 
   // ── Step 0: Load image ──
-  const bitmap = await createImageBitmap(file);
+  // Honour EXIF orientation so iPhone/DSLR photos are never rotated on output.
+  // `imageOrientation` is ignored by older engines, so fall back gracefully.
+  let bitmap: ImageBitmap;
+  try {
+    bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' });
+  } catch {
+    bitmap = await createImageBitmap(file);
+  }
   const originalWidth = bitmap.width;
   const originalHeight = bitmap.height;
 
@@ -598,7 +605,9 @@ export async function runOptimizationPipeline(
     }
 
     // Center-fit the image on the canvas
-    const scale = Math.min(targetW / originalWidth, targetH / originalHeight);
+    // Never upscale: a fixed-size preset letterboxes small sources instead of
+    // interpolating them, which would only add blur and bytes.
+    const scale = Math.min(targetW / originalWidth, targetH / originalHeight, 1);
     const drawW = Math.round(originalWidth * scale);
     const drawH = Math.round(originalHeight * scale);
     const offsetX = Math.round((targetW - drawW) / 2);
@@ -647,6 +656,16 @@ export async function runOptimizationPipeline(
     }
   }
 
+  // ── Step 5d: Never ship a worse file than the source ──
+  // If every encode attempt ended up larger than the original and no resize or
+  // explicit format change was requested, pass the original bytes through and
+  // report 0% savings rather than inventing a gain.
+  const wasResized = outputCanvas.width !== originalWidth || outputCanvas.height !== originalHeight;
+  const formatChanged = !file.type.includes(finalFormat === 'jpeg' ? 'jpeg' : finalFormat);
+  if (finalBlob.size >= file.size && !wasResized && !options.forceFormat && !formatChanged) {
+    finalBlob = file;
+  }
+
   // ── Step 6: Generate SEO filename ──
   const seoFileName = (options.seoRename !== false)
     ? generateSeoFileName(file.name, contentType, options.seoPrefix, index) + getExtension(finalFormat)
@@ -660,7 +679,8 @@ export async function runOptimizationPipeline(
 
   // ── Step 8: Store performance metrics ──
   const processingTimeMs = Math.round(performance.now() - startTime);
-  const compressionRatio = Math.round((1 - finalBlob.size / file.size) * 100);
+  // Truthful figure: clamped at 0 so a neutral result is never shown as a win.
+  const compressionRatio = Math.max(0, Math.round((1 - finalBlob.size / file.size) * 100));
 
   if (options.storeMetrics !== false && options.userId) {
     // Fire and forget — don't block the pipeline

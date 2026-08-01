@@ -23,7 +23,6 @@ export default defineConfig(({ mode }) => ({
             "@radix-ui/react-select",
             "@radix-ui/react-popover",
           ],
-          "icons": ["lucide-react"],
           "charts": ["recharts"],
           "query": ["@tanstack/react-query"],
           "motion": ["framer-motion"],

@@ -117,6 +117,13 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_ANON_KEY') ?? ''
     )
 
+    // Service-role client used only for reading/writing the free-usage counter
+    const supabaseAdmin = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+      { auth: { persistSession: false } }
+    )
+
     const { files, quality = 80, maxWidth = 1920, maxHeight = 1920, dpi = 72, isBulk = false }: CompressionRequest = await req.json()
     
     // Memory-safe limits
@@ -323,8 +330,8 @@ serve(async (req) => {
         isSubscribed = subData.subscribed;
       }
 
-      // Get current free compressions count
-      const { data: subscriberData } = await supabase
+      // Get current free compressions count (service role: bypasses RLS)
+      const { data: subscriberData } = await supabaseAdmin
         .from('subscribers')
         .select('free_compressions_used, subscribed')
         .eq('user_id', userId)
@@ -392,12 +399,13 @@ serve(async (req) => {
     if (!isSubscribed && userId && results.some(r => !r.error)) {
       try {
         const successfulCompressions = results.filter(r => !r.error).length;
-        await supabase
+        await supabaseAdmin
           .from('subscribers')
-          .update({ 
-            free_compressions_used: freeCompressionsUsed + successfulCompressions 
-          })
-          .eq('user_id', userId);
+          .upsert({
+            user_id: userId,
+            email: userData.user.email ?? '',
+            free_compressions_used: freeCompressionsUsed + successfulCompressions
+          }, { onConflict: 'user_id' });
         
         console.log(`Updated free compressions: ${freeCompressionsUsed} -> ${freeCompressionsUsed + successfulCompressions}`);
       } catch (error) {

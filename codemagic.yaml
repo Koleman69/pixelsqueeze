@@ -106,16 +106,20 @@ workflows:
           if [ ! -d "android/app" ]; then npx cap add android; fi
       - name: Sync Capacitor
         script: npx cap sync android
-      - name: Set build number from Play Store
+      - name: Verify App Links fingerprint is not a placeholder
         script: |
-          LATEST=$(google-play get-latest-build-number --package-name "$PACKAGE_NAME" --tracks internal || echo 0)
-          echo "Latest Play build: $LATEST"
-          cd android
-          sed -i "s/versionCode 1/versionCode $(($LATEST + 1))/" app/build.gradle
+          if grep -q "REPLACE_WITH" public/.well-known/assetlinks.json; then
+            echo "assetlinks.json still contains a placeholder fingerprint."
+            echo "Run: node scripts/android/set-assetlinks-fingerprint.mjs <PLAY_SHA256>"
+            exit 1
+          fi
       - name: Build release AAB
         script: |
+          LATEST=$(google-play get-latest-build-number --package-name "$PACKAGE_NAME" --tracks internal || echo 0)
+          export PS_VERSION_CODE=$(($LATEST + 1))
+          echo "Building versionCode $PS_VERSION_CODE"
           cd android
-          ./gradlew bundleRelease
+          ./gradlew --no-daemon bundleRelease
     artifacts:
       - android/app/build/outputs/**/*.aab
       - android/app/build/outputs/**/mapping.txt

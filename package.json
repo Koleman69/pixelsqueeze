@@ -8,7 +8,11 @@
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "android:keystore": "bash scripts/android/create-keystore.sh",
+    "android:assetlinks": "node scripts/android/set-assetlinks-fingerprint.mjs",
+    "android:aab": "bash scripts/android/build-aab.sh",
+    "android:apk": "bash scripts/android/build-aab.sh apk"
   },
   "dependencies": {
     "@capacitor/android": "^8.0.0",

@@ -13,6 +13,11 @@ def ksAlias = keystoreProps['keyAlias'] ?: System.getenv('PS_KEY_ALIAS')
 def ksAliasPassword = keystoreProps['keyPassword'] ?: System.getenv('PS_KEY_PASSWORD')
 def hasSigning = ksPath != null && ksPassword != null && ksAlias != null && ksAliasPassword != null
 
+// Play requires a strictly increasing versionCode. CI supplies PS_VERSION_CODE
+// (and optionally PS_VERSION_NAME) so the checked-in defaults never need editing.
+def psVersionCode = (System.getenv('PS_VERSION_CODE') ?: '1') as Integer
+def psVersionName = System.getenv('PS_VERSION_NAME') ?: '1.0'
+
 android {
     namespace = "com.pixelsqueeze.app"
     compileSdk = rootProject.ext.compileSdkVersion
@@ -20,8 +25,8 @@ android {
         applicationId "com.pixelsqueeze.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode psVersionCode
+        versionName psVersionName
         resConfigs "en"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {

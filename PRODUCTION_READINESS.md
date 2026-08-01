@@ -63,17 +63,38 @@ network connection.
 Ready in code: `AndroidManifest.xml` declares deep links (`pixelsqueeze://` and
 `https://pixelsqueeze.app` App Links) with `autoVerify`; cleartext traffic
 disabled; release build type is minified, resource-shrunk and non-debuggable;
-`assetlinks.json` published; `codemagic.yaml` builds a signed AAB and uploads to
-the internal track as a draft; hardware back button handled in `src/lib/native.ts`.
+`versionCode`/`versionName` are env-injected (`PS_VERSION_CODE`,
+`PS_VERSION_NAME`) so CI no longer rewrites `build.gradle`; `codemagic.yaml`
+builds a signed AAB and uploads to the internal track as a draft; hardware back
+button handled in `src/lib/native.ts`.
 
-Conditions outside the codebase:
-1. Upload the release keystore to Codemagic as `pixelsqueeze_keystore` and set
+Release tooling added this pass:
+- `npm run android:keystore` — generates the PKCS12 upload keystore (RSA 4096,
+  10000 days), writes the git-ignored `android/keystore.properties`, prints the
+  SHA-256. Password is prompted, never passed via argv, never logged.
+- `npm run android:assetlinks -- <PLAY_SHA256> [UPLOAD_SHA256]` — validates and
+  writes real fingerprints into `public/.well-known/assetlinks.json`; rejects
+  anything that is not a 32-byte SHA-256 and refuses to write placeholders.
+- `npm run android:aab` / `npm run android:apk` — build → `cap sync` → Gradle,
+  with a placeholder-fingerprint warning.
+- The `android-playstore` CI workflow now **hard-fails** if
+  `assetlinks.json` still contains the placeholder.
+
+Conditions that cannot be satisfied from this environment:
+1. **The AAB itself was not produced here.** This sandbox has no JDK, no Android
+   SDK and no Gradle (`java`, `keytool`, `sdkmanager` all absent), so
+   `bundleRelease` cannot run. Execute `npm run android:aab` locally or trigger
+   the `android-playstore` Codemagic workflow.
+2. **The keystore was not generated here** — a private signing key must not be
+   created inside a shared sandbox or committed to the repo. Run
+   `npm run android:keystore` on your machine and back the `.jks` up offline.
+3. **The real assetlinks fingerprint is still a placeholder** — the correct value
+   is the Play App Signing certificate hash, which only exists after the app is
+   created in Play Console. Then run `npm run android:assetlinks -- <sha256>`.
+4. Upload the keystore to Codemagic as `pixelsqueeze_keystore` and set
    `GCLOUD_SERVICE_ACCOUNT_CREDENTIALS`.
-2. Replace the SHA-256 fingerprint placeholder in
-   `public/.well-known/assetlinks.json` with the real signing certificate hash.
-3. Complete the Play Console Data Safety form and store listing.
-4. Run at least one physical-device pass — this sandbox cannot execute
-   Android Studio or Gradle device builds.
+5. Complete the Play Console Data Safety form and store listing.
+6. Run at least one physical-device release-build pass.
 
 ### iOS — **CONDITIONALLY READY**
 

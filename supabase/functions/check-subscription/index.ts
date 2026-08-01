@@ -43,6 +43,31 @@ serve(async (req) => {
     if (!user?.email) throw new Error("User not authenticated or email not available");
     logStep("User authenticated", { userId: user.id, email: user.email });
 
+    // Complimentary (free forever) access is granted server-side only and always
+    // wins over Stripe: no customer or subscription is required.
+    const { data: compRow } = await supabaseClient
+      .from("subscribers")
+      .select("complimentary_access, subscription_tier")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    if (compRow?.complimentary_access === true) {
+      logStep("Complimentary access granted", { userId: user.id });
+      return new Response(JSON.stringify({
+        subscribed: true,
+        is_trialing: false,
+        trial_end: null,
+        product_id: null,
+        subscription_end: null,
+        subscription_tier: compRow.subscription_tier ?? "Pro",
+        complimentary: true,
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
+    }
+
+
     const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
     

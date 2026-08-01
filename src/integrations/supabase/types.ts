@@ -960,6 +960,7 @@ export type Database = {
       subscribers: {
         Row: {
           access_count: number | null
+          complimentary_access: boolean
           created_at: string
           data_classification: string | null
           email: string
@@ -978,6 +979,7 @@ export type Database = {
         }
         Insert: {
           access_count?: number | null
+          complimentary_access?: boolean
           created_at?: string
           data_classification?: string | null
           email: string
@@ -996,6 +998,7 @@ export type Database = {
         }
         Update: {
           access_count?: number | null
+          complimentary_access?: boolean
           created_at?: string
           data_classification?: string | null
           email?: string

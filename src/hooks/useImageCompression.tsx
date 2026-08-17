@@ -401,9 +401,10 @@ export const useImageCompression = () => {
     }
   };
 
-  const createCheckout = async () => {
+  // Routes to Stripe on web and to the App Store / Play Store on native.
+  const createCheckout = async (plan: 'creator' | 'pro' | 'business' = 'pro') => {
     try {
-      await startCheckout();
+      await subscribeToPlan(plan);
     } catch (error: any) {
       toast({
         title: "Checkout Failed",
@@ -413,18 +414,24 @@ export const useImageCompression = () => {
     }
   };
 
+  // Sends the user to whichever billing surface owns their subscription.
   const openCustomerPortal = async () => {
     try {
-      const { data, error } = await supabase.functions.invoke('customer-portal');
-      if (error) throw error;
-      
-      if (data.url) {
-        window.open(data.url, '_blank');
-      }
-    } catch (error) {
+      await manageSubscription({
+        plan: subscription.plan ?? (subscription.subscribed ? 'pro' : 'free'),
+        subscribed: subscription.subscribed,
+        provider: subscription.provider ?? 'stripe',
+        platform: (subscription.platform ?? 'web') as 'web' | 'ios' | 'android',
+        subscriptionEnd: subscription.subscription_end ?? null,
+        isTrialing: Boolean(subscription.is_trialing),
+        trialEnd: subscription.trial_end ?? null,
+        complimentary: Boolean(subscription.complimentary),
+        manageableHere: Boolean(subscription.manageable_here),
+      });
+    } catch (error: any) {
       toast({
         title: "Portal Access Failed",
-        description: error.message,
+        description: error?.message || 'Could not open subscription management.',
         variant: "destructive"
       });
     }

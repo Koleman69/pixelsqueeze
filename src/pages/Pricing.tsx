@@ -244,6 +244,12 @@ const Pricing = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [loadingTier, setLoadingTier] = useState<string | null>(null);
+  const [restoring, setRestoring] = useState(false);
+  const nativeBilling = isNativeBilling();
+
+  // Apple and Google forbid pointing users to outside purchase paths from
+  // inside the app, so the sales-contact tier is web-only.
+  const visibleTiers = nativeBilling ? tiers.filter((t) => t.name !== "API") : tiers;
 
   const handleSelectPlan = async (tierName: string) => {
     if (tierName === "Free") {
@@ -262,7 +268,8 @@ const Pricing = () => {
 
     setLoadingTier(tierName);
     try {
-      await startCheckout();
+      // One call, right rail: Stripe on web, StoreKit on iOS, Play on Android.
+      await subscribeToPlan(tierName.toLowerCase() as "creator" | "pro" | "business");
     } catch (err: any) {
       toast({
         title: "Error",
@@ -273,6 +280,26 @@ const Pricing = () => {
       setLoadingTier(null);
     }
   };
+
+  const handleRestore = async () => {
+    setRestoring(true);
+    try {
+      await restorePurchases();
+      toast({
+        title: "Purchases restored",
+        description: "Any active subscription on this store account is now active here.",
+      });
+    } catch (err: any) {
+      toast({
+        title: "Nothing to restore",
+        description: err.message || "We could not find a previous purchase.",
+        variant: "destructive",
+      });
+    } finally {
+      setRestoring(false);
+    }
+  };
+
 
   return (
     <div className="min-h-screen bg-background">

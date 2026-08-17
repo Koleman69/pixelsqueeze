@@ -428,8 +428,28 @@ const Pricing = () => {
               );
             })}
           </div>
+
+          {nativeBilling && (
+            <div className="mt-8 text-center">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleRestore}
+                disabled={restoring}
+                aria-label="Restore previous purchases"
+              >
+                {restoring ? "Restoring…" : "Restore Purchases"}
+              </Button>
+              <p className="text-xs text-muted-foreground mt-2 max-w-md mx-auto">
+                Already subscribed on another device? Restore brings your plan back.
+                Subscriptions renew automatically and can be cancelled anytime in your
+                store account settings.
+              </p>
+            </div>
+          )}
         </div>
       </section>
+
 
       {/* Savings Estimator */}
       <SavingsEstimator />

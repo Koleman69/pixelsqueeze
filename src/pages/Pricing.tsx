@@ -354,7 +354,7 @@ const Pricing = () => {
       <section className="py-8 md:py-12">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 lg:gap-3 max-w-7xl mx-auto items-stretch">
-            {tiers.map((tier) => {
+            {visibleTiers.map((tier) => {
               const Icon = tier.icon;
               const isLoading = loadingTier === tier.name;
 

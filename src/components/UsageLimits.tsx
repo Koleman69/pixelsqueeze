@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Crown, Image, Video, Zap, Lock, Check, Sparkles } from 'lucide-react';
+import { isNativeBilling } from "@/lib/billing";
 
 interface UsageLimitsProps {
   imageUsed: number;
@@ -164,12 +165,14 @@ export const UsageLimits = ({
               <div>
                 <p className="font-medium">Unlock Unlimited Compressions</p>
                 <p className="text-sm text-muted-foreground">
-                  Start your 3-day free trial • Only $6.95/month after
+                  {isNativeBilling()
+                    ? "See plans — pricing and any free trial are shown by the store."
+                    : "Start your 3-day free trial • Only $6.95/month after"}
                 </p>
               </div>
               <Button onClick={onUpgrade} className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700">
                 <Sparkles className="w-4 h-4 mr-2" />
-                Start Free Trial
+                {isNativeBilling() ? "See Plans" : "Start Free Trial"}
               </Button>
             </div>
           </div>

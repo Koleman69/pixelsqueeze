@@ -23,6 +23,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import SEO from "@/components/SEO";
 import { isNativeBilling, restorePurchases, subscribeToPlan } from "@/lib/billing";
+import type { Plan } from "@/lib/billing";
 
 const tiers = [
   {
@@ -246,6 +247,42 @@ const Pricing = () => {
   const [loadingTier, setLoadingTier] = useState<string | null>(null);
   const [restoring, setRestoring] = useState(false);
   const nativeBilling = isNativeBilling();
+  // Store-truth offer metadata (price + intro/trial length). Never advertise a
+  // free trial inside the app unless the store actually offers one.
+  const [nativeOffers, setNativeOffers] = useState<
+    Record<string, { price: string | null; trialDays: number | null }>
+  >({});
+
+  useEffect(() => {
+    if (!nativeBilling) return;
+    let cancelled = false;
+    (async () => {
+      const { getNativePlanOffer } = await import("@/lib/billing/native");
+      const plans: Plan[] = ["creator", "pro", "business"];
+      const entries = await Promise.all(
+        plans.map(async (plan) => [plan, await getNativePlanOffer(plan)] as const),
+      );
+      if (cancelled) return;
+      setNativeOffers(
+        Object.fromEntries(entries.filter(([, offer]) => offer)) as Record<
+          string,
+          { price: string | null; trialDays: number | null }
+        >,
+      );
+    })().catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [nativeBilling]);
+
+  /** CTA label: web keeps the marketing copy, native mirrors the store. */
+  const ctaLabel = (tier: { name: string; cta: string }) => {
+    if (!nativeBilling) return tier.cta;
+    if (tier.name === "Free") return tier.cta;
+    const offer = nativeOffers[tier.name.toLowerCase()];
+    if (offer?.trialDays) return `Start ${offer.trialDays}-Day Free Trial`;
+    return "Subscribe";
+  };
 
   // Apple and Google forbid pointing users to outside purchase paths from
   // inside the app, so the sales-contact tier is web-only.
@@ -406,7 +443,7 @@ const Pricing = () => {
                     variant={tier.highlight ? "default" : "outline"}
                     size="sm"
                   >
-                    {isLoading ? "Loading..." : tier.cta}
+                    {isLoading ? "Loading..." : ctaLabel(tier)}
                     {!isLoading && <ArrowRight className="w-4 h-4 ml-1" />}
                   </Button>
 
@@ -490,7 +527,10 @@ const Pricing = () => {
             Not sure which plan?
           </h2>
           <p className="text-muted-foreground mb-6">
-            Start free. Upgrade when you need automation, scanning, or team access. All paid plans include a 3-day free trial.
+            Start free. Upgrade when you need automation, scanning, or team access.
+            {nativeBilling
+              ? " Trial availability is shown by the store on each plan."
+              : " All paid plans include a 3-day free trial."}
           </p>
           <Button size="lg" onClick={() => handleSelectPlan("Free")}>
             Get Started Free <ArrowRight className="w-4 h-4 ml-2" />

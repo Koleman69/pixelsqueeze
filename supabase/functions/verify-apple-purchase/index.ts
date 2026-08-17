@@ -17,6 +17,7 @@ import {
 import {
   APPLE_BUNDLE_ID,
   planFromAppleProduct,
+  isEntitled,
   requireUser,
   serviceClient,
   upsertEntitlement,
@@ -112,8 +113,9 @@ serve(async (req) => {
     }
 
     log("Entitlement stored", { plan, status });
+    const periodEnd = state.expiresDate ? new Date(state.expiresDate).toISOString() : null;
     return json({
-      subscribed: ["active", "trialing", "grace_period"].includes(status),
+      subscribed: isEntitled(status, periodEnd),
       plan,
       subscription_tier: titleCasePlan(plan),
       status,

@@ -160,6 +160,8 @@ export async function acknowledgeGooglePurchase(productId: string, purchaseToken
 export function googleStateToLedger(state: string, autoRenew: boolean) {
   switch (state) {
     case "SUBSCRIPTION_STATE_ACTIVE":
+      // Paid through `expiryTime` either way; auto-renew is stored separately
+      // and `canceled` still grants access until that expiry.
       return autoRenew ? "active" : "canceled";
     case "SUBSCRIPTION_STATE_IN_GRACE_PERIOD":
       return "grace_period";

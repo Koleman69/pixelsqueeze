@@ -93,11 +93,53 @@ export function planFromGoogleProduct(
   return STORE_PLAN_BY_PRODUCT[productId] ?? "free";
 }
 
-const PLAN_RANK: Record<Plan, number> = { free: 0, creator: 1, pro: 2, business: 3 };
-const LIVE_STATUSES: Status[] = ["active", "trialing", "grace_period"];
+export const PLAN_RANK: Record<Plan, number> = { free: 0, creator: 1, pro: 2, business: 3 };
 
+/**
+ * Statuses that grant access on their own, independent of the period end.
+ * `grace_period` is included on purpose: the period end has already passed
+ * while the store retries billing, and both Apple and Google require us to
+ * keep serving the customer during that window.
+ */
+const ALWAYS_LIVE: Status[] = ["active", "trialing", "grace_period"];
+
+/**
+ * Statuses that still grant access *until the already-paid period ends*.
+ * Turning auto-renew off does NOT end a subscription — the customer paid for
+ * the current period and keeps everything until `current_period_end`.
+ */
+const LIVE_UNTIL_PERIOD_END: Status[] = ["canceled"];
+
+/** Legacy helper: status-only check. Prefer `isEntitled`. */
 export function isLive(status: Status): boolean {
-  return LIVE_STATUSES.includes(status);
+  return ALWAYS_LIVE.includes(status);
+}
+
+/**
+ * The one place that decides "does this row grant access right now?".
+ * Entitlement is a function of (status, current_period_end) — never of
+ * auto-renew, which only says whether it will renew again.
+ */
+export function isEntitled(
+  status: Status,
+  currentPeriodEnd?: string | null,
+  now: number = Date.now(),
+): boolean {
+  if (ALWAYS_LIVE.includes(status)) {
+    // An "active" row whose paid period has demonstrably lapsed is stale.
+    if (status === "active" && currentPeriodEnd) {
+      return new Date(currentPeriodEnd).getTime() > now;
+    }
+    if (status === "trialing" && currentPeriodEnd) {
+      return new Date(currentPeriodEnd).getTime() > now;
+    }
+    return true;
+  }
+  if (LIVE_UNTIL_PERIOD_END.includes(status)) {
+    return Boolean(currentPeriodEnd) && new Date(currentPeriodEnd!).getTime() > now;
+  }
+  // expired / refunded / on_hold / paused never grant access.
+  return false;
 }
 
 export function titleCasePlan(plan: Plan): string {
@@ -207,8 +249,7 @@ export async function syncSubscribersCache(admin: SupabaseClient, userId: string
 
   for (const row of rows ?? []) {
     const status = row.subscription_status as Status;
-    if (!isLive(status)) continue;
-    if (row.current_period_end && new Date(row.current_period_end).getTime() < now) continue;
+    if (!isEntitled(status, row.current_period_end, now)) continue;
     const plan = row.plan as Plan;
     if (PLAN_RANK[plan] > PLAN_RANK[bestPlan]) {
       bestPlan = plan;
@@ -245,9 +286,22 @@ export function pickBest<T extends { plan: Plan; subscription_status: Status; cu
   const now = Date.now();
   let best: T | null = null;
   for (const row of rows) {
-    if (!isLive(row.subscription_status)) continue;
-    if (row.current_period_end && new Date(row.current_period_end).getTime() < now) continue;
-    if (!best || PLAN_RANK[row.plan] > PLAN_RANK[best.plan]) best = row;
+    if (!isEntitled(row.subscription_status, row.current_period_end, now)) continue;
+    if (!best) {
+      best = row;
+      continue;
+    }
+    if (PLAN_RANK[row.plan] > PLAN_RANK[best.plan]) {
+      best = row;
+      continue;
+    }
+    // Same tier: prefer the one that runs longest, so a canceled-but-paid row
+    // never shadows a renewing one.
+    if (PLAN_RANK[row.plan] === PLAN_RANK[best.plan]) {
+      const a = row.current_period_end ? new Date(row.current_period_end).getTime() : Infinity;
+      const b = best.current_period_end ? new Date(best.current_period_end).getTime() : Infinity;
+      if (a > b) best = row;
+    }
   }
   return best;
 }

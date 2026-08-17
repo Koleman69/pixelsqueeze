@@ -31,6 +31,14 @@ export interface SubscriptionStatus {
   product_id?: string;
   subscription_end?: string;
   free_compressions_used?: number;
+  /** Normalized plan: free | creator | pro | business */
+  plan?: Plan;
+  /** Where the subscription is billed: stripe | apple | google | complimentary */
+  provider?: BillingProvider | null;
+  platform?: string;
+  complimentary?: boolean;
+  /** Only Stripe web subscriptions can be managed inside the app. */
+  manageable_here?: boolean;
 }
 
 export const useImageCompression = () => {

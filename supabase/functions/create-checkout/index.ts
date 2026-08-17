@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { STRIPE_PRICE_BY_PLAN, type Plan } from "../_shared/entitlements.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -11,6 +12,18 @@ const logStep = (step: string, details?: any) => {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
   console.log(`[CREATE-CHECKOUT] ${step}${detailsStr}`);
 };
+
+const PAID_PLANS = ["creator", "pro", "business"] as const;
+
+function parsePlan(value: unknown): Exclude<Plan, "free"> {
+  const normalized = typeof value === "string" ? value.trim().toLowerCase() : "";
+  // Default to Pro so older clients that send nothing keep working.
+  if (!normalized) return "pro";
+  if ((PAID_PLANS as readonly string[]).includes(normalized)) {
+    return normalized as Exclude<Plan, "free">;
+  }
+  throw new Error(`Unsupported plan: ${normalized}`);
+}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -25,7 +38,6 @@ serve(async (req) => {
       logStep("ERROR: STRIPE_SECRET_KEY not found");
       throw new Error("STRIPE_SECRET_KEY is not set");
     }
-    logStep("Stripe key verified");
 
     const supabaseClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
@@ -37,11 +49,10 @@ serve(async (req) => {
       logStep("ERROR: No authorization header");
       throw new Error("No authorization header provided");
     }
-    logStep("Authorization header found");
 
     const token = authHeader.replace("Bearer ", "");
     const { data, error: authError } = await supabaseClient.auth.getUser(token);
-    
+
     if (authError) {
       logStep("ERROR: Authentication failed", { error: authError.message });
       throw new Error(`Authentication error: ${authError.message}`);
@@ -52,61 +63,65 @@ serve(async (req) => {
       logStep("ERROR: User not authenticated or email not available");
       throw new Error("User not authenticated or email not available");
     }
-    logStep("User authenticated", { userId: user.id, email: user.email });
+    logStep("User authenticated", { userId: user.id });
+
+    // Which plan is being bought? Validated against a fixed allow-list so a
+    // client can never inject an arbitrary Stripe price.
+    let plan: Exclude<Plan, "free"> = "pro";
+    try {
+      const body = await req.json();
+      plan = parsePlan(body?.plan);
+    } catch (parseError) {
+      if (parseError instanceof Error && parseError.message.startsWith("Unsupported plan")) {
+        return new Response(JSON.stringify({ error: parseError.message }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 400,
+        });
+      }
+      // No JSON body at all — keep the legacy default.
+    }
+
+    const priceId = STRIPE_PRICE_BY_PLAN[plan];
+    logStep("Plan resolved", { plan, priceId });
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
-    logStep("Stripe client initialized");
 
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
+    const customerId = customers.data.length > 0 ? customers.data[0].id : undefined;
     logStep("Customer lookup complete", { foundCustomers: customers.data.length });
-
-    let customerId;
-    if (customers.data.length > 0) {
-      customerId = customers.data[0].id;
-      logStep("Existing customer found", { customerId });
-    } else {
-      logStep("No existing customer found, will create new");
-    }
 
     // Capacitor webviews send origin: capacitor://localhost, which Stripe
     // rejects as a redirect target — prefer the explicit app origin header.
     const rawOrigin = req.headers.get("x-app-origin") || req.headers.get("origin") || "";
     const origin = rawOrigin.startsWith("http") ? rawOrigin : "https://pixelsqueeze.app";
-    logStep("Creating checkout session", { 
-      customerId, 
-      customerEmail: customerId ? undefined : user.email,
-      successUrl: `${origin}/success`,
-      cancelUrl: `${origin}/`
-    });
 
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       customer_email: customerId ? undefined : user.email,
-      line_items: [
-        {
-          price: "price_1SBnzFQ9sVcox7vkDJ5xezGy",
-          quantity: 1,
-        },
-      ],
+      line_items: [{ price: priceId, quantity: 1 }],
       mode: "subscription",
       subscription_data: {
         trial_period_days: 3,
+        metadata: { supabase_user_id: user.id, plan },
       },
+      metadata: { supabase_user_id: user.id, plan },
+      client_reference_id: user.id,
       payment_method_collection: "always",
-      success_url: `${origin}/success`,
-      cancel_url: `${origin}/`,
+      allow_promotion_codes: true,
+      success_url: `${origin}/success?plan=${plan}`,
+      cancel_url: `${origin}/pricing`,
     });
 
-    logStep("Checkout session created successfully", { sessionId: session.id, url: session.url });
+    logStep("Checkout session created successfully", { sessionId: session.id, plan });
 
-    return new Response(JSON.stringify({ url: session.url }), {
+    return new Response(JSON.stringify({ url: session.url, plan }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    logStep("ERROR in create-checkout", { message: errorMessage, stack: error instanceof Error ? error.stack : undefined });
-    
+    logStep("ERROR in create-checkout", { message: errorMessage });
+
     return new Response(JSON.stringify({ error: errorMessage }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,

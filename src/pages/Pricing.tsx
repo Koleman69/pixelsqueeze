@@ -22,7 +22,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import SEO from "@/components/SEO";
-import { startCheckout } from "@/lib/checkout";
+import { isNativeBilling, restorePurchases, subscribeToPlan } from "@/lib/billing";
 
 const tiers = [
   {
@@ -244,6 +244,12 @@ const Pricing = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [loadingTier, setLoadingTier] = useState<string | null>(null);
+  const [restoring, setRestoring] = useState(false);
+  const nativeBilling = isNativeBilling();
+
+  // Apple and Google forbid pointing users to outside purchase paths from
+  // inside the app, so the sales-contact tier is web-only.
+  const visibleTiers = nativeBilling ? tiers.filter((t) => t.name !== "API") : tiers;
 
   const handleSelectPlan = async (tierName: string) => {
     if (tierName === "Free") {
@@ -262,7 +268,8 @@ const Pricing = () => {
 
     setLoadingTier(tierName);
     try {
-      await startCheckout();
+      // One call, right rail: Stripe on web, StoreKit on iOS, Play on Android.
+      await subscribeToPlan(tierName.toLowerCase() as "creator" | "pro" | "business");
     } catch (err: any) {
       toast({
         title: "Error",
@@ -273,6 +280,26 @@ const Pricing = () => {
       setLoadingTier(null);
     }
   };
+
+  const handleRestore = async () => {
+    setRestoring(true);
+    try {
+      await restorePurchases();
+      toast({
+        title: "Purchases restored",
+        description: "Any active subscription on this store account is now active here.",
+      });
+    } catch (err: any) {
+      toast({
+        title: "Nothing to restore",
+        description: err.message || "We could not find a previous purchase.",
+        variant: "destructive",
+      });
+    } finally {
+      setRestoring(false);
+    }
+  };
+
 
   return (
     <div className="min-h-screen bg-background">
@@ -327,7 +354,7 @@ const Pricing = () => {
       <section className="py-8 md:py-12">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 lg:gap-3 max-w-7xl mx-auto items-stretch">
-            {tiers.map((tier) => {
+            {visibleTiers.map((tier) => {
               const Icon = tier.icon;
               const isLoading = loadingTier === tier.name;
 
@@ -401,8 +428,28 @@ const Pricing = () => {
               );
             })}
           </div>
+
+          {nativeBilling && (
+            <div className="mt-8 text-center">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleRestore}
+                disabled={restoring}
+                aria-label="Restore previous purchases"
+              >
+                {restoring ? "Restoring…" : "Restore Purchases"}
+              </Button>
+              <p className="text-xs text-muted-foreground mt-2 max-w-md mx-auto">
+                Already subscribed on another device? Restore brings your plan back.
+                Subscriptions renew automatically and can be cancelled anytime in your
+                store account settings.
+              </p>
+            </div>
+          )}
         </div>
       </section>
+
 
       {/* Savings Estimator */}
       <SavingsEstimator />

@@ -459,7 +459,7 @@ export const ImageEditor = ({ onComplete }: ImageEditorProps) => {
                 Upload New Image
               </Button>
               {!subscription.subscribed && editorMode === 'ai' && (
-                <Button onClick={createCheckout} size="sm" className="ml-auto bg-gradient-primary">
+                <Button onClick={() => createCheckout("pro")} size="sm" className="ml-auto bg-gradient-primary">
                   <Crown className="w-4 h-4 mr-2" />
                   Upgrade for Unlimited AI
                 </Button>

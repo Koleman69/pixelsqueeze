@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Link, useNavigate } from "react-router-dom";
 import { Loader2, CreditCard, Download, User, Mail, Calendar, Shield, ArrowLeft, Settings } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchEntitlement, manageSubscription, isNativeBilling } from "@/lib/billing";
 
 const Account = () => {
   const { user, signOut } = useAuth();
@@ -38,24 +39,15 @@ const Account = () => {
   const handleManageSubscription = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('customer-portal', {
-        headers: {
-          Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
-        },
-      });
-
-      if (error) throw error;
-
-      if (data?.url) {
-        window.open(data.url, '_blank');
-      } else {
-        throw new Error('No portal URL returned');
-      }
+      // The facade resolves the right surface: Stripe portal on web,
+      // App Store / Play Store subscription settings on native.
+      const entitlement = await fetchEntitlement();
+      await manageSubscription(entitlement);
     } catch (error: any) {
-      console.error('Error accessing customer portal:', error);
+      console.error('Error opening subscription management:', error);
       toast({
         title: "Error",
-        description: error.message || "Failed to open customer portal. Please try again.",
+        description: error.message || "Failed to open subscription management. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -206,9 +198,15 @@ const Account = () => {
                     <div className="flex items-start gap-3 mb-4">
                       <Download className="h-5 w-5 text-primary mt-0.5" />
                       <div>
-                        <p className="font-medium mb-1">Access Stripe Customer Portal</p>
+                        <p className="font-medium mb-1">
+                          {isNativeBilling()
+                            ? "Open store subscription settings"
+                            : "Access Stripe Customer Portal"}
+                        </p>
                         <p className="text-sm text-muted-foreground">
-                          View billing history, download invoices, update payment methods, and manage your subscription
+                          {isNativeBilling()
+                            ? "Your subscription is billed by the app store. Change plan, view receipts, or cancel from your store account."
+                            : "View billing history, download invoices, update payment methods, and manage your subscription"}
                         </p>
                       </div>
                     </div>
@@ -221,7 +219,7 @@ const Account = () => {
                       {loading ? (
                         <>
                           <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Opening Portal...
+                          Opening...
                         </>
                       ) : (
                         <>
@@ -234,8 +232,8 @@ const Account = () => {
 
                   <div className="p-4 border border-dashed border-destructive/50 rounded-lg">
                     <p className="text-sm text-muted-foreground mb-2">
-                      Need to cancel? You can cancel your subscription anytime through the Stripe portal above.
-                      Your access will continue until the end of your billing period.
+                      Need to cancel? Use the button above — subscriptions can be cancelled
+                      anytime, and your access continues until the end of the billing period.
                     </p>
                   </div>
                 </CardContent>

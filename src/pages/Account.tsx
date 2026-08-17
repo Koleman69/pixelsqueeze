@@ -38,24 +38,15 @@ const Account = () => {
   const handleManageSubscription = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('customer-portal', {
-        headers: {
-          Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
-        },
-      });
-
-      if (error) throw error;
-
-      if (data?.url) {
-        window.open(data.url, '_blank');
-      } else {
-        throw new Error('No portal URL returned');
-      }
+      // The facade resolves the right surface: Stripe portal on web,
+      // App Store / Play Store subscription settings on native.
+      const entitlement = await fetchEntitlement();
+      await manageSubscription(entitlement);
     } catch (error: any) {
-      console.error('Error accessing customer portal:', error);
+      console.error('Error opening subscription management:', error);
       toast({
         title: "Error",
-        description: error.message || "Failed to open customer portal. Please try again.",
+        description: error.message || "Failed to open subscription management. Please try again.",
         variant: "destructive",
       });
     } finally {

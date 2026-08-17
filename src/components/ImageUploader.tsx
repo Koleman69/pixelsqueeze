@@ -530,7 +530,7 @@ export const ImageUploader = ({ onUpload }: ImageUploaderProps) => {
               <Badge variant="outline" className="text-xs">
                 {subscription.free_compressions_used || 0}/3 Free Compressions Used
               </Badge>
-              <Button onClick={createCheckout} className="bg-gradient-primary">
+              <Button onClick={() => createCheckout("pro")} className="bg-gradient-primary">
                 <Crown className="w-4 h-4 mr-2" />
                 Start 7-Day Free Trial
               </Button>

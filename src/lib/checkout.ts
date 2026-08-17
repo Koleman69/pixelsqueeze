@@ -19,10 +19,13 @@ export async function openCheckoutUrl(url: string) {
 }
 
 /**
- * Starts a Stripe Checkout session.
+ * Starts a Stripe Checkout session for a specific plan (web / PWA only).
+ * Native builds must use the store rails — see src/lib/billing.
  * Throws with a readable message so callers can toast it.
  */
-export async function startCheckout(): Promise<void> {
+export async function startCheckout(
+  plan: "creator" | "pro" | "business" = "pro",
+): Promise<void> {
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) {
     window.location.href = "/auth";
@@ -35,6 +38,7 @@ export async function startCheckout(): Promise<void> {
     window.location.origin.startsWith("http") ? window.location.origin : WEB_ORIGIN;
 
   const { data, error } = await supabase.functions.invoke("create-checkout", {
+    body: { plan },
     headers: {
       Authorization: `Bearer ${session.access_token}`,
       "x-app-origin": origin,

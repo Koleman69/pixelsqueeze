@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Link, useNavigate } from "react-router-dom";
 import { Loader2, CreditCard, Download, User, Mail, Calendar, Shield, ArrowLeft, Settings } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchEntitlement, manageSubscription, isNativeBilling } from "@/lib/billing";
 
 const Account = () => {
   const { user, signOut } = useAuth();

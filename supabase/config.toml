@@ -50,3 +50,16 @@ verify_jwt = true
 
 [functions.send-password-reset]
 verify_jwt = false
+
+[functions.verify-apple-purchase]
+verify_jwt = true
+
+[functions.verify-google-purchase]
+verify_jwt = true
+
+# Store servers call these directly — no user JWT is present.
+[functions.apple-subscription-webhook]
+verify_jwt = false
+
+[functions.google-subscription-webhook]
+verify_jwt = false

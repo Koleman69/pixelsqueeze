@@ -154,6 +154,9 @@ export async function getAppleSubscriptionState(
 export function appleStatusToLedger(status: number, autoRenew: boolean) {
   switch (status) {
     case 1:
+      // Status 1 means Apple considers the subscription active and paid through
+      // `expiresDate`. Auto-renew being off is recorded separately on the row
+      // (`auto_renew: false`) and must NOT end the entitlement early.
       return autoRenew ? "active" : "canceled";
     case 2:
       return "expired";

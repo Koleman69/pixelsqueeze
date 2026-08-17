@@ -14,6 +14,7 @@ import {
   GoogleConfigError,
 } from "../_shared/playstore.ts";
 import {
+  isEntitled,
   planFromGoogleProduct,
   requireUser,
   serviceClient,
@@ -100,7 +101,7 @@ serve(async (req) => {
 
     log("Entitlement stored", { plan, status });
     return json({
-      subscribed: ["active", "trialing", "grace_period"].includes(status),
+      subscribed: isEntitled(status, state.expiryTime),
       plan,
       subscription_tier: titleCasePlan(plan),
       status,

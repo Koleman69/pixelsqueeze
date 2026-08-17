@@ -18,6 +18,13 @@ export interface PlanDefinition {
   googleBasePlanId?: string;
 }
 
+/**
+ * Legacy Google Play layout: a single `pro.subscription` product carrying one
+ * base plan per tier. Kept as a runtime fallback so builds keep working until
+ * the three-product structure is live in Play Console.
+ */
+export const GOOGLE_LEGACY_PRODUCT_ID = "pro.subscription";
+
 export const PLANS: Record<Plan, PlanDefinition> = {
   free: {
     id: "free",

@@ -10,7 +10,7 @@
  * Apple/Google and writes the entitlement. The app then re-reads its plan.
  */
 import { supabase } from "@/integrations/supabase/client";
-import { PLANS, type Plan } from "./plans";
+import { GOOGLE_LEGACY_PRODUCT_ID, PAID_PLANS, PLANS, type Plan } from "./plans";
 
 /** Minimal shape we rely on from the plugin. */
 type AnyRecord = Record<string, any>;
@@ -44,9 +44,19 @@ export async function initNativeStore(): Promise<void> {
 
     store.verbosity = LogLevel.WARNING;
 
+    const isAndroid = platform === Platform.GOOGLE_PLAY;
+
+    // Final structure: one product per tier (creator/pro/business.subscription).
+    // On Android we also register the legacy single-product layout so a build
+    // works against either Play Console configuration.
+    const productIds = new Set(
+      PAID_PLANS.map((plan) => PLANS[plan].storeProductId as string).filter(Boolean),
+    );
+    if (isAndroid) productIds.add(GOOGLE_LEGACY_PRODUCT_ID);
+
     store.register(
-      (["creator", "pro", "business"] as Plan[]).map((plan) => ({
-        id: PLANS[plan].storeProductId as string,
+      [...productIds].map((id) => ({
+        id,
         type: ProductType.PAID_SUBSCRIPTION,
         platform,
       })),
@@ -124,17 +134,80 @@ async function syncReceiptWithServer(receipt: AnyRecord): Promise<void> {
 }
 
 /** Launch the native purchase sheet for a plan. */
-export async function purchaseNative(plan: Plan): Promise<void> {
+/** Find the offer that matches a plan, across both Play Console layouts. */
+function resolveOffer(store: AnyRecord, plan: Plan): AnyRecord | null {
   const productId = PLANS[plan].storeProductId;
-  if (!productId) throw new Error("This plan cannot be bought in the app.");
+  const basePlanId = PLANS[plan].googleBasePlanId;
+  const isAndroid = (window as AnyRecord).Capacitor?.getPlatform?.() === "android";
+
+  const candidates = [productId, isAndroid ? GOOGLE_LEGACY_PRODUCT_ID : null].filter(
+    Boolean,
+  ) as string[];
+
+  for (const id of candidates) {
+    const product = store.get?.(id);
+    if (!product) continue;
+    const offers: AnyRecord[] = product.offers ?? [];
+
+    // Prefer the base plan that belongs to this tier (legacy layout keeps all
+    // tiers under one product, so the base plan is what identifies the tier).
+    if (basePlanId) {
+      const matched = offers.find(
+        (offer) => offer?.id === basePlanId || String(offer?.id ?? "").includes(basePlanId),
+      );
+      if (matched) return matched;
+    }
+
+    // Dedicated product for this tier: any offer on it is correct.
+    if (id === productId) {
+      const fallback = product.getOffer?.() ?? offers[0];
+      if (fallback) return fallback;
+    }
+  }
+
+  return null;
+}
+
+/** Store metadata for a plan, used to show real trial/pricing copy natively. */
+export async function getNativePlanOffer(
+  plan: Plan,
+): Promise<{ price: string | null; trialDays: number | null } | null> {
+  if (!getStore()) return null;
+  try {
+    await initNativeStore();
+  } catch {
+    return null;
+  }
+  const store = getStore();
+  if (!store) return null;
+  const offer = resolveOffer(store, plan);
+  if (!offer) return null;
+
+  const phases: AnyRecord[] = offer.pricingPhases ?? [];
+  const paid = phases.find((phase) => Number(phase?.priceMicros ?? 1) > 0) ?? phases[0];
+  const freePhase = phases.find((phase) => Number(phase?.priceMicros ?? 1) === 0);
+
+  let trialDays: number | null = null;
+  const period = String(freePhase?.billingPeriod ?? "");
+  const match = /^P(\d+)([DWMY])$/.exec(period);
+  if (match) {
+    const value = Number(match[1]);
+    trialDays =
+      match[2] === "D" ? value : match[2] === "W" ? value * 7 : match[2] === "M" ? value * 30 : value * 365;
+  }
+
+  return { price: paid?.price ?? null, trialDays };
+}
+
+export async function purchaseNative(plan: Plan): Promise<void> {
+  if (!PLANS[plan].storeProductId) throw new Error("This plan cannot be bought in the app.");
 
   await initNativeStore();
   const store = getStore();
-  const product = store?.get(productId);
-  if (!product) throw new Error("This plan is not available in the store right now.");
+  if (!store) throw new Error("In-app purchases are not available on this device.");
 
-  const offer = product.getOffer?.() ?? product.offers?.[0];
-  if (!offer) throw new Error("No purchase option available for this plan.");
+  const offer = resolveOffer(store, plan);
+  if (!offer) throw new Error("This plan is not available in the store right now.");
 
   const error = await offer.order();
   if (error) {

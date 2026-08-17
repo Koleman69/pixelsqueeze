@@ -1017,6 +1017,72 @@ export type Database = {
         }
         Relationships: []
       }
+      subscriptions: {
+        Row: {
+          auto_renew: boolean
+          base_plan_id: string | null
+          created_at: string
+          current_period_end: string | null
+          environment: string
+          id: string
+          is_trial: boolean
+          original_transaction_id: string | null
+          plan: Database["public"]["Enums"]["subscription_plan"]
+          platform: Database["public"]["Enums"]["billing_platform"]
+          product_id: string | null
+          provider: Database["public"]["Enums"]["billing_provider"]
+          purchase_token: string | null
+          raw_payload: Json | null
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          subscription_status: Database["public"]["Enums"]["subscription_state"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          auto_renew?: boolean
+          base_plan_id?: string | null
+          created_at?: string
+          current_period_end?: string | null
+          environment?: string
+          id?: string
+          is_trial?: boolean
+          original_transaction_id?: string | null
+          plan: Database["public"]["Enums"]["subscription_plan"]
+          platform: Database["public"]["Enums"]["billing_platform"]
+          product_id?: string | null
+          provider: Database["public"]["Enums"]["billing_provider"]
+          purchase_token?: string | null
+          raw_payload?: Json | null
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          subscription_status?: Database["public"]["Enums"]["subscription_state"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          auto_renew?: boolean
+          base_plan_id?: string | null
+          created_at?: string
+          current_period_end?: string | null
+          environment?: string
+          id?: string
+          is_trial?: boolean
+          original_transaction_id?: string | null
+          plan?: Database["public"]["Enums"]["subscription_plan"]
+          platform?: Database["public"]["Enums"]["billing_platform"]
+          product_id?: string | null
+          provider?: Database["public"]["Enums"]["billing_provider"]
+          purchase_token?: string | null
+          raw_payload?: Json | null
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          subscription_status?: Database["public"]["Enums"]["subscription_state"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       tracked_competitors: {
         Row: {
           created_at: string
@@ -1179,6 +1245,7 @@ export type Database = {
         Args: { _client_token: string; _tool_id: string }
         Returns: number
       }
+      get_my_effective_plan: { Args: never; Returns: Json }
       get_my_subscription_status: { Args: never; Returns: Json }
       get_safe_subscriber_status: {
         Args: never
@@ -1277,6 +1344,18 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
+      billing_platform: "web" | "ios" | "android"
+      billing_provider: "stripe" | "apple" | "google" | "complimentary"
+      subscription_plan: "free" | "creator" | "pro" | "business"
+      subscription_state:
+        | "active"
+        | "trialing"
+        | "grace_period"
+        | "on_hold"
+        | "paused"
+        | "canceled"
+        | "expired"
+        | "refunded"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1405,6 +1484,19 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user"],
+      billing_platform: ["web", "ios", "android"],
+      billing_provider: ["stripe", "apple", "google", "complimentary"],
+      subscription_plan: ["free", "creator", "pro", "business"],
+      subscription_state: [
+        "active",
+        "trialing",
+        "grace_period",
+        "on_hold",
+        "paused",
+        "canceled",
+        "expired",
+        "refunded",
+      ],
     },
   },
 } as const

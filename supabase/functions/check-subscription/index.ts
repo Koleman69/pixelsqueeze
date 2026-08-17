@@ -137,14 +137,27 @@ async function refreshStripe(admin: any, userId: string, email: string) {
   }
 
   // Expire ledger rows for Stripe subscriptions that no longer exist upstream.
-  const liveIds = live.map((s) => s.id);
-  await admin
+  const liveIds = new Set(live.map((s) => s.id));
+  const { data: stripeRows } = await admin
     .from("subscriptions")
-    .update({ subscription_status: "expired", updated_at: new Date().toISOString() })
+    .select("id,stripe_subscription_id,subscription_status")
     .eq("user_id", userId)
-    .eq("provider", "stripe")
-    .not("stripe_subscription_id", "in", `(${liveIds.map((id) => `"${id}"`).join(",")})`)
-    .in("subscription_status", ["active", "trialing", "grace_period", "canceled"]);
+    .eq("provider", "stripe");
+
+  const staleIds = (stripeRows ?? [])
+    .filter(
+      (row: any) =>
+        !liveIds.has(row.stripe_subscription_id) &&
+        ["active", "trialing", "grace_period", "canceled"].includes(row.subscription_status),
+    )
+    .map((row: any) => row.id);
+
+  if (staleIds.length > 0) {
+    await admin
+      .from("subscriptions")
+      .update({ subscription_status: "expired", updated_at: new Date().toISOString() })
+      .in("id", staleIds);
+  }
 }
 
 async function expireStripeRows(admin: any, userId: string) {

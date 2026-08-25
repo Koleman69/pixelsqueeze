@@ -184,7 +184,9 @@ serve(async (req) => {
     // ---- 1. Complimentary access always wins -------------------------------
     const { data: compRow } = await admin
       .from("subscribers")
-      .select("complimentary_access, subscription_tier")
+      .select(
+        "complimentary_access, subscription_tier, iap_plan, iap_platform, iap_product_id, iap_expires_at, iap_synced_at, iap_auto_renewing",
+      )
       .eq("user_id", user.id)
       .maybeSingle();
 
@@ -203,10 +205,60 @@ serve(async (req) => {
         platform: "web",
         manageable_here: false,
         complimentary: true,
+        subscription_source: "complimentary",
         auto_renew: true,
         cancel_at_period_end: false,
         status: "active",
       });
+    }
+
+    // ---- 1b. Store entitlement (App Store / Google Play) -------------------
+    // The store already unlocked the app on the customer's device, so the
+    // backend must not disagree with it. Checked before Stripe on purpose.
+    // Follow-up: replace this client-reported state with server-side receipt
+    // verification (App Store Server API / Play Developer API).
+    if (compRow?.iap_plan) {
+      const iapPlan = String(compRow.iap_plan).toLowerCase();
+      const expiresAt = compRow.iap_expires_at ? new Date(compRow.iap_expires_at) : null;
+      const syncedAt = compRow.iap_synced_at ? new Date(compRow.iap_synced_at) : null;
+
+      let storeActive = false;
+      if (expiresAt) {
+        // iOS always reports an expiry.
+        storeActive = expiresAt.getTime() > Date.now();
+      } else if (compRow.iap_platform === "android" && syncedAt) {
+        // Play does not expose an expiry to the client; the app re-syncs on every
+        // launch, so a live subscriber stays inside this window.
+        const THIRTY_FIVE_DAYS = 35 * 24 * 60 * 60 * 1000;
+        storeActive = Date.now() - syncedAt.getTime() < THIRTY_FIVE_DAYS;
+      }
+
+      if (storeActive) {
+        logStep("Store entitlement active", {
+          userId: user.id,
+          platform: compRow.iap_platform,
+          plan: iapPlan,
+        });
+        return json({
+          subscribed: true,
+          is_trialing: false,
+          trial_end: null,
+          product_id: compRow.iap_product_id ?? null,
+          subscription_end: compRow.iap_expires_at ?? null,
+          subscription_tier: titleCasePlan(iapPlan as Plan),
+          subscription_source: compRow.iap_platform,
+          auto_renewing: compRow.iap_auto_renewing ?? null,
+          plan: iapPlan,
+          provider: compRow.iap_platform === "ios" ? "apple" : "google",
+          platform: compRow.iap_platform,
+          manageable_here: false,
+          complimentary: false,
+          auto_renew: compRow.iap_auto_renewing !== false,
+          cancel_at_period_end: compRow.iap_auto_renewing === false,
+          status: "active",
+        });
+      }
+      logStep("Store entitlement stale — falling through to Stripe", { userId: user.id });
     }
 
     // ---- 2. Refresh Stripe, then compare every provider fairly -------------

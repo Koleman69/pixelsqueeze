@@ -184,7 +184,9 @@ serve(async (req) => {
     // ---- 1. Complimentary access always wins -------------------------------
     const { data: compRow } = await admin
       .from("subscribers")
-      .select("complimentary_access, subscription_tier")
+      .select(
+        "complimentary_access, subscription_tier, iap_plan, iap_platform, iap_product_id, iap_expires_at, iap_synced_at, iap_auto_renewing",
+      )
       .eq("user_id", user.id)
       .maybeSingle();
 

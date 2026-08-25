@@ -965,6 +965,18 @@ export type Database = {
           data_classification: string | null
           email: string
           free_compressions_used: number
+          iap_auto_renewing: boolean | null
+          iap_base_plan_id: string | null
+          iap_environment: string | null
+          iap_expires_at: string | null
+          iap_original_transaction_id: string | null
+          iap_plan: string | null
+          iap_plan_assumed: boolean
+          iap_platform: string | null
+          iap_product_id: string | null
+          iap_purchase_token: string | null
+          iap_synced_at: string | null
+          iap_transaction_id: string | null
           id: string
           last_accessed: string | null
           obfuscated_email: string | null
@@ -984,6 +996,18 @@ export type Database = {
           data_classification?: string | null
           email: string
           free_compressions_used?: number
+          iap_auto_renewing?: boolean | null
+          iap_base_plan_id?: string | null
+          iap_environment?: string | null
+          iap_expires_at?: string | null
+          iap_original_transaction_id?: string | null
+          iap_plan?: string | null
+          iap_plan_assumed?: boolean
+          iap_platform?: string | null
+          iap_product_id?: string | null
+          iap_purchase_token?: string | null
+          iap_synced_at?: string | null
+          iap_transaction_id?: string | null
           id?: string
           last_accessed?: string | null
           obfuscated_email?: string | null
@@ -1003,6 +1027,18 @@ export type Database = {
           data_classification?: string | null
           email?: string
           free_compressions_used?: number
+          iap_auto_renewing?: boolean | null
+          iap_base_plan_id?: string | null
+          iap_environment?: string | null
+          iap_expires_at?: string | null
+          iap_original_transaction_id?: string | null
+          iap_plan?: string | null
+          iap_plan_assumed?: boolean
+          iap_platform?: string | null
+          iap_product_id?: string | null
+          iap_purchase_token?: string | null
+          iap_synced_at?: string | null
+          iap_transaction_id?: string | null
           id?: string
           last_accessed?: string | null
           obfuscated_email?: string | null

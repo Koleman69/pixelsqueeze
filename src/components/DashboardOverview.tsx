@@ -480,7 +480,7 @@ export function DashboardOverview({ isSubscribed = false, onQuickAction }: Dashb
                       <th className="px-3 py-2 font-medium text-right">Ratio</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-800/70">
+                  <tbody className="divide-y divide-border">
                     {batches.slice(0, 8).map((b) => (
                       <tr key={b.id} className="transition-colors hover:bg-muted/40">
                         <td className="px-3 py-2 text-muted-foreground">{relativeTime(b.processed_at)}</td>
@@ -537,7 +537,7 @@ export function DashboardOverview({ isSubscribed = false, onQuickAction }: Dashb
           <SectionCard title="Storage Usage" icon={<HardDrive className="h-4 w-4 text-cyan-300" />}>
             <div className="space-y-3">
               <div className="flex items-baseline justify-between">
-                <span className="text-2xl font-semibold tracking-tight text-slate-50">
+                <span className="text-2xl font-semibold tracking-tight text-foreground">
                   {formatBytes(totals.storageUsed)}
                 </span>
                 <span className="text-xs text-muted-foreground">
@@ -567,7 +567,7 @@ export function DashboardOverview({ isSubscribed = false, onQuickAction }: Dashb
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs uppercase tracking-wider text-muted-foreground">Current plan</p>
-                  <p className="text-lg font-semibold capitalize text-slate-50">
+                  <p className="text-lg font-semibold capitalize text-foreground">
                     {isSubscribed || subscription?.subscribed ? "Creator+" : "Free"}
                   </p>
                 </div>
@@ -847,7 +847,7 @@ const StatCell = ({
       {icon}
       {label}
     </div>
-    <p className="text-xl font-semibold text-slate-50">{value}</p>
+    <p className="text-xl font-semibold text-foreground">{value}</p>
   </div>
 );
 

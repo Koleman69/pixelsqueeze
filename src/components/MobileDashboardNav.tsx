@@ -81,6 +81,13 @@ const toolCategories = [
 
 export function MobileDashboardNav({ activeTool, onToolChange, isSubscribed }: MobileDashboardNavProps) {
   const [open, setOpen] = useState(false);
+  const { signOut } = useAuth();
+  const isTabScreen = PRIMARY_TABS.some((t) => t.id === activeTool);
+
+  const handleSignOut = async () => {
+    setOpen(false);
+    await signOut();
+  };
 
   const handleToolChange = (tool: ToolCategory) => {
     onToolChange(tool);

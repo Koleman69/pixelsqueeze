@@ -295,24 +295,24 @@ export function DashboardOverview({ isSubscribed = false, onQuickAction }: Dashb
 
   // ─── Render ──────────────────────────────────────────────────────────────
   return (
-    <div className="rounded-2xl md:rounded-3xl bg-slate-950 p-3 sm:p-4 md:p-6 text-slate-100 shadow-[0_30px_80px_-40px_rgba(15,23,42,0.6)] ring-1 ring-slate-800/60 overflow-hidden">
+    <div className="rounded-2xl md:rounded-3xl bg-card p-3 sm:p-4 md:p-6 text-foreground shadow-[0_30px_80px_-40px_rgba(15,23,42,0.6)] ring-1 ring-border overflow-hidden">
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
         {/* ═════════════ FEED ═════════════ */}
         <div className="space-y-5 min-w-0">
           {/* Search + Sort bar */}
           <div className="flex flex-col gap-3 md:flex-row md:items-center">
             <div className="relative flex-1">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search previous images…"
-                className="h-11 border-slate-800 bg-slate-900/70 pl-9 text-slate-100 placeholder:text-slate-500 focus-visible:ring-blue-500"
+                className="h-11 border-border bg-muted/50 pl-9 text-foreground placeholder:text-muted-foreground focus-visible:ring-blue-500"
                 aria-label="Search images"
               />
             </div>
             <Select value={sort} onValueChange={(v) => setSort(v as SortKey)}>
-              <SelectTrigger className="h-11 w-full md:w-52 border-slate-800 bg-slate-900/70 text-slate-100">
+              <SelectTrigger className="h-11 w-full md:w-52 border-border bg-muted/50 text-foreground">
                 <SelectValue placeholder="Sort" />
               </SelectTrigger>
               <SelectContent>
@@ -356,7 +356,7 @@ export function DashboardOverview({ isSubscribed = false, onQuickAction }: Dashb
             ))}
             <Dialog open={newFolderOpen} onOpenChange={setNewFolderOpen}>
               <DialogTrigger asChild>
-                <button className="inline-flex items-center gap-1.5 rounded-full border border-dashed border-slate-700 bg-slate-900/50 px-3 py-1.5 text-xs font-medium text-slate-300 transition-colors hover:border-blue-500/60 hover:text-blue-300">
+                <button className="inline-flex items-center gap-1.5 rounded-full border border-dashed border-border bg-muted/40 px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-blue-500/60 hover:text-blue-300">
                   <FolderPlus className="h-3.5 w-3.5" /> New folder
                 </button>
               </DialogTrigger>
@@ -381,7 +381,7 @@ export function DashboardOverview({ isSubscribed = false, onQuickAction }: Dashb
                         className={cn(
                           "h-8 rounded-full border px-3 text-xs font-medium capitalize transition-all",
                           c.cls,
-                          newFolderColor === c.name && "ring-2 ring-offset-2 ring-blue-500 ring-offset-slate-950"
+                          newFolderColor === c.name && "ring-2 ring-offset-2 ring-blue-500 ring-offset-background"
                         )}
                       >
                         {c.name}
@@ -432,7 +432,7 @@ export function DashboardOverview({ isSubscribed = false, onQuickAction }: Dashb
             {loading ? (
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
                 {Array.from({ length: 8 }).map((_, i) => (
-                  <div key={i} className="aspect-square animate-pulse rounded-xl bg-slate-800/60" />
+                  <div key={i} className="aspect-square animate-pulse rounded-xl bg-muted/60" />
                 ))}
               </div>
             ) : filteredFiles.length === 0 ? (
@@ -469,9 +469,9 @@ export function DashboardOverview({ isSubscribed = false, onQuickAction }: Dashb
                 hint="Every batch you optimize shows up here with savings and quality metrics."
               />
             ) : (
-              <div className="overflow-hidden rounded-xl border border-slate-800/70">
+              <div className="overflow-hidden rounded-xl border border-border">
                 <table className="w-full text-left text-sm">
-                  <thead className="bg-slate-900/70 text-[11px] uppercase tracking-wider text-slate-400">
+                  <thead className="bg-muted/50 text-[11px] uppercase tracking-wider text-muted-foreground">
                     <tr>
                       <th className="px-3 py-2 font-medium">When</th>
                       <th className="px-3 py-2 font-medium">Preset</th>
@@ -482,9 +482,9 @@ export function DashboardOverview({ isSubscribed = false, onQuickAction }: Dashb
                   </thead>
                   <tbody className="divide-y divide-slate-800/70">
                     {batches.slice(0, 8).map((b) => (
-                      <tr key={b.id} className="transition-colors hover:bg-slate-900/60">
-                        <td className="px-3 py-2 text-slate-300">{relativeTime(b.processed_at)}</td>
-                        <td className="px-3 py-2 capitalize text-slate-300">{b.preset_name ?? "custom"}</td>
+                      <tr key={b.id} className="transition-colors hover:bg-muted/40">
+                        <td className="px-3 py-2 text-muted-foreground">{relativeTime(b.processed_at)}</td>
+                        <td className="px-3 py-2 capitalize text-muted-foreground">{b.preset_name ?? "custom"}</td>
                         <td className="px-3 py-2 text-right tabular-nums">{b.image_count}</td>
                         <td className="px-3 py-2 text-right tabular-nums text-emerald-300">
                           {formatBytes(Number(b.total_saved))}
@@ -505,7 +505,7 @@ export function DashboardOverview({ isSubscribed = false, onQuickAction }: Dashb
         <aside className="space-y-4">
           {/* Statistics */}
           <SectionCard title="Statistics" icon={<Gauge className="h-4 w-4 text-blue-300" />} padded={false}>
-            <div className="grid grid-cols-2 gap-px bg-slate-800/60">
+            <div className="grid grid-cols-2 gap-px bg-muted/60">
               <StatCell
                 label="Images processed"
                 value={totals.images.toLocaleString()}
@@ -540,15 +540,15 @@ export function DashboardOverview({ isSubscribed = false, onQuickAction }: Dashb
                 <span className="text-2xl font-semibold tracking-tight text-slate-50">
                   {formatBytes(totals.storageUsed)}
                 </span>
-                <span className="text-xs text-slate-400">
+                <span className="text-xs text-muted-foreground">
                   {storageQuota > 0 ? `of ${formatBytes(storageQuota)}` : "Free plan — no storage"}
                 </span>
               </div>
               <Progress
                 value={storagePct}
-                className="h-2 bg-slate-800 [&>div]:bg-gradient-to-r [&>div]:from-blue-400 [&>div]:to-cyan-300"
+                className="h-2 bg-muted [&>div]:bg-gradient-to-r [&>div]:from-blue-400 [&>div]:to-cyan-300"
               />
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-muted-foreground">
                 {storageQuota > 0
                   ? `${storagePct.toFixed(0)}% used · ${files.length} files stored`
                   : "Upgrade to Creator+ to keep processed files for 30 days."}
@@ -566,7 +566,7 @@ export function DashboardOverview({ isSubscribed = false, onQuickAction }: Dashb
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs uppercase tracking-wider text-slate-400">Current plan</p>
+                  <p className="text-xs uppercase tracking-wider text-muted-foreground">Current plan</p>
                   <p className="text-lg font-semibold capitalize text-slate-50">
                     {isSubscribed || subscription?.subscribed ? "Creator+" : "Free"}
                   </p>
@@ -576,14 +576,14 @@ export function DashboardOverview({ isSubscribed = false, onQuickAction }: Dashb
                     "border",
                     isSubscribed || subscription?.subscribed
                       ? "border-amber-400/30 bg-amber-500/15 text-amber-200"
-                      : "border-slate-700 bg-slate-800/60 text-slate-300"
+                      : "border-border bg-muted/60 text-muted-foreground"
                   )}
                 >
                   {subscription?.is_trialing ? "Trial" : isSubscribed || subscription?.subscribed ? "Active" : "Free"}
                 </Badge>
               </div>
               {subscription?.subscription_end && (
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-muted-foreground">
                   Renews {new Date(subscription.subscription_end).toLocaleDateString()}
                 </p>
               )}
@@ -592,7 +592,7 @@ export function DashboardOverview({ isSubscribed = false, onQuickAction }: Dashb
                   <Button
                     size="sm"
                     variant="outline"
-                    className="flex-1 border-slate-700 bg-slate-900 text-slate-100 hover:bg-slate-800"
+                    className="flex-1 border-border bg-muted text-foreground hover:bg-muted"
                     onClick={() => openCustomerPortal()}
                   >
                     Manage billing
@@ -660,14 +660,14 @@ const SectionCard = ({
   padded?: boolean;
   children: React.ReactNode;
 }) => (
-  <Card className="overflow-hidden border-slate-800/70 bg-slate-900/60 text-slate-100 shadow-none backdrop-blur">
-    <div className="flex items-center justify-between border-b border-slate-800/70 px-4 py-3">
+  <Card className="overflow-hidden border-border bg-muted/40 text-foreground shadow-none backdrop-blur">
+    <div className="flex items-center justify-between border-b border-border px-4 py-3">
       <div className="min-w-0">
-        <div className="flex items-center gap-2 text-sm font-semibold text-slate-100">
+        <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
           {icon}
           <span className="truncate">{title}</span>
         </div>
-        {subtitle && <p className="mt-0.5 truncate text-[11px] text-slate-400">{subtitle}</p>}
+        {subtitle && <p className="mt-0.5 truncate text-[11px] text-muted-foreground">{subtitle}</p>}
       </div>
       {actionLabel && onAction && (
         <button
@@ -710,7 +710,7 @@ const FolderChip = ({
         ? "border-amber-500/30 bg-amber-500/10 text-amber-200 hover:bg-amber-500/20"
         : colorClass
         ? cn("hover:brightness-110", colorClass)
-        : "border-slate-800 bg-slate-900/60 text-slate-300 hover:border-slate-700 hover:text-slate-100"
+        : "border-border bg-muted/40 text-muted-foreground hover:border-border hover:text-foreground"
     )}
   >
     <button onClick={onClick} className="inline-flex items-center gap-1.5">
@@ -749,9 +749,9 @@ const ImageTile = ({
     animate={{ opacity: 1, y: 0 }}
     exit={{ opacity: 0, y: -8 }}
     transition={{ duration: 0.18, ease: "easeOut" }}
-    className="group relative overflow-hidden rounded-xl border border-slate-800/70 bg-slate-950/50 shadow-sm"
+    className="group relative overflow-hidden rounded-xl border border-border bg-card shadow-sm"
   >
-    <div className="aspect-square overflow-hidden bg-slate-900">
+    <div className="aspect-square overflow-hidden bg-muted">
       <img
         src={url}
         alt={file.file_name}
@@ -761,8 +761,8 @@ const ImageTile = ({
       />
     </div>
     <div className="space-y-1 p-2.5">
-      <p className="truncate text-xs font-medium text-slate-100">{file.file_name}</p>
-      <div className="flex items-center justify-between text-[10px] text-slate-400">
+      <p className="truncate text-xs font-medium text-foreground">{file.file_name}</p>
+      <div className="flex items-center justify-between text-[10px] text-muted-foreground">
         <span>{formatBytes(file.file_size ?? 0)}</span>
         <span>{relativeTime(file.created_at)}</span>
       </div>
@@ -817,8 +817,8 @@ const FavoriteTile = ({
   url: string;
   onToggle: () => void;
 }) => (
-  <div className="group relative overflow-hidden rounded-lg border border-slate-800/70 bg-slate-950/50">
-    <div className="aspect-square overflow-hidden bg-slate-900">
+  <div className="group relative overflow-hidden rounded-lg border border-border bg-card">
+    <div className="aspect-square overflow-hidden bg-muted">
       <img src={url} alt={file.file_name} loading="lazy" decoding="async" className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
     </div>
     <button
@@ -842,7 +842,7 @@ const StatCell = ({
   icon: React.ReactNode;
   accent: string;
 }) => (
-  <div className="bg-slate-900/60 p-4">
+  <div className="bg-muted/40 p-4">
     <div className={cn("mb-2 flex items-center gap-1.5 text-[10px] uppercase tracking-wider", accent)}>
       {icon}
       {label}
@@ -862,12 +862,12 @@ const QuickAction = ({
 }) => (
   <button
     onClick={onClick}
-    className="group flex flex-col items-start gap-2 rounded-xl border border-slate-800 bg-slate-950/40 p-3 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-500/60 hover:bg-slate-900/70"
+    className="group flex flex-col items-start gap-2 rounded-xl border border-border bg-card p-3 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-500/60 hover:bg-muted/50"
   >
-    <div className="rounded-lg bg-slate-800/80 p-2 text-blue-300 transition-colors group-hover:bg-blue-500/20">
+    <div className="rounded-lg bg-muted/80 p-2 text-blue-300 transition-colors group-hover:bg-blue-500/20">
       {icon}
     </div>
-    <span className="text-xs font-medium text-slate-100">{label}</span>
+    <span className="text-xs font-medium text-foreground">{label}</span>
   </button>
 );
 
@@ -882,9 +882,9 @@ const EmptyState = ({
   hint: string;
   cta?: { label: string; onClick: () => void };
 }) => (
-  <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-slate-800 bg-slate-950/40 py-10 text-center text-slate-400">
-    <div className="rounded-full bg-slate-900 p-3 text-slate-300">{icon}</div>
-    <p className="text-sm font-medium text-slate-200">{title}</p>
+  <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-card py-10 text-center text-muted-foreground">
+    <div className="rounded-full bg-muted p-3 text-muted-foreground">{icon}</div>
+    <p className="text-sm font-medium text-foreground">{title}</p>
     <p className="max-w-xs text-xs">{hint}</p>
     {cta && (
       <Button size="sm" className="mt-2 bg-blue-500 hover:bg-blue-400" onClick={cta.onClick}>

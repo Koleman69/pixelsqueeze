@@ -20,10 +20,12 @@ import {
   Home,
   MoreHorizontal,
   ArrowLeft,
+  LogOut,
 } from "lucide-react";
 import { ToolCategory } from "./DashboardSidebar";
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAuth } from "@/hooks/useAuth";
 
 interface MobileDashboardNavProps {
   activeTool: ToolCategory;
@@ -123,7 +125,7 @@ export function MobileDashboardNav({ activeTool, onToolChange, isSubscribed }: M
       {/* Compact top bar */}
       <div className="sticky top-0 z-30 flex items-center justify-between border-b border-border/60 bg-background/85 px-3 py-2 backdrop-blur-xl safe-top">
         <div className="flex items-center gap-2 min-w-0">
-          {activeTool !== "overview" && (
+          {!isTabScreen && (
             <Button
               variant="ghost"
               size="icon"
@@ -194,6 +196,17 @@ export function MobileDashboardNav({ activeTool, onToolChange, isSubscribed }: M
                     </div>
                   </div>
                 ))}
+
+                <div className="border-t border-border pt-4">
+                  <button
+                    onClick={handleSignOut}
+                    aria-label="Log out"
+                    className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-medium text-destructive transition-colors min-h-[48px] hover:bg-destructive/10"
+                  >
+                    <LogOut className="h-5 w-5 shrink-0" />
+                    <span>Log out</span>
+                  </button>
+                </div>
               </nav>
             </ScrollArea>
           </SheetContent>

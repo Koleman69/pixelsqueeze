@@ -329,11 +329,11 @@ const Auth = () => {
             </CardHeader>
             <CardContent>
               <Tabs defaultValue="login" className="w-full">
-                <TabsList className="relative grid w-full grid-cols-2 p-1 rounded-full bg-muted overflow-hidden">
-                  <TabsTrigger value="login" className="relative z-10 rounded-full data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground transition-colors">
+                <TabsList className="flex h-auto w-full items-center p-1 rounded-full bg-muted">
+                  <TabsTrigger value="login" className="flex-1 rounded-full py-2.5 text-sm font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm text-muted-foreground transition-all">
                     Login
                   </TabsTrigger>
-                  <TabsTrigger value="signup" className="relative z-10 rounded-full data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground transition-colors">
+                  <TabsTrigger value="signup" className="flex-1 rounded-full py-2.5 text-sm font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm text-muted-foreground transition-all">
                     Sign Up
                   </TabsTrigger>
                 </TabsList>

@@ -329,9 +329,13 @@ const Auth = () => {
             </CardHeader>
             <CardContent>
               <Tabs defaultValue="login" className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="login">Login</TabsTrigger>
-                  <TabsTrigger value="signup">Sign Up</TabsTrigger>
+                <TabsList className="relative grid w-full grid-cols-2 p-1 rounded-full bg-muted overflow-hidden">
+                  <TabsTrigger value="login" className="relative z-10 rounded-full data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground transition-colors">
+                    Login
+                  </TabsTrigger>
+                  <TabsTrigger value="signup" className="relative z-10 rounded-full data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground transition-colors">
+                    Sign Up
+                  </TabsTrigger>
                 </TabsList>
                 
                 <TabsContent value="login">

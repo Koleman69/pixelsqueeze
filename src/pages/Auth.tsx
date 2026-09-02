@@ -256,22 +256,22 @@ const Auth = () => {
         path="/auth"
         noindex
       />
-    <div className="min-h-screen bg-background flex items-center justify-center p-6">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4 sm:p-6">
 
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="flex items-center justify-center mb-6">
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-primary blur-xl opacity-50"></div>
-              <div className="relative flex items-center bg-background/50 backdrop-blur-sm px-6 py-3 rounded-2xl border-2 border-primary/30">
-                <Minimize2 className="w-12 h-12 text-primary mr-3" strokeWidth={2.5} />
-                <h1 className="text-5xl font-bold font-brand bg-gradient-to-r from-primary via-primary to-primary/70 bg-clip-text text-transparent">
-                  Pixelsqueeze
+              <div className="relative flex items-center bg-background/50 backdrop-blur-sm px-4 sm:px-6 py-3 rounded-2xl border-2 border-primary/30">
+                <Minimize2 className="w-10 h-10 sm:w-12 sm:h-12 text-primary mr-2 sm:mr-3 shrink-0" strokeWidth={2.5} />
+                <h1 className="text-4xl sm:text-5xl font-bold font-brand bg-gradient-to-r from-primary via-primary to-primary/70 bg-clip-text text-transparent whitespace-nowrap">
+                  PixelSqueeze
                 </h1>
               </div>
             </div>
           </div>
-          <p className="text-muted-foreground text-lg">
+          <p className="text-muted-foreground text-base sm:text-lg">
             Experience professional-grade image compression
           </p>
         </div>
@@ -329,9 +329,13 @@ const Auth = () => {
             </CardHeader>
             <CardContent>
               <Tabs defaultValue="login" className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="login">Login</TabsTrigger>
-                  <TabsTrigger value="signup">Sign Up</TabsTrigger>
+                <TabsList className="relative grid w-full grid-cols-2 p-1 rounded-full bg-muted overflow-hidden">
+                  <TabsTrigger value="login" className="relative z-10 rounded-full data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground transition-colors">
+                    Login
+                  </TabsTrigger>
+                  <TabsTrigger value="signup" className="relative z-10 rounded-full data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground transition-colors">
+                    Sign Up
+                  </TabsTrigger>
                 </TabsList>
                 
                 <TabsContent value="login">

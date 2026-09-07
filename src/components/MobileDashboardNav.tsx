@@ -21,11 +21,15 @@ import {
   MoreHorizontal,
   ArrowLeft,
   LogOut,
+  Trash2,
+  UserCog,
 } from "lucide-react";
 import { ToolCategory } from "./DashboardSidebar";
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
+import { Link } from "react-router-dom";
+import { DeleteAccountDialog } from "./DeleteAccountDialog";
 
 interface MobileDashboardNavProps {
   activeTool: ToolCategory;

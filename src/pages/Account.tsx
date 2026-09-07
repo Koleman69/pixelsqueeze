@@ -266,6 +266,23 @@ const Account = () => {
                 </Button>
               </CardContent>
             </Card>
+
+            {/* Delete Account */}
+            <Card className="border-destructive/40" id="delete-account">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-destructive">
+                  <Trash2 className="h-5 w-5" />
+                  Delete Account
+                </CardTitle>
+                <CardDescription>
+                  Permanently delete your PixelSqueeze account and all of your data.
+                  This action cannot be undone.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <DeleteAccountDialog />
+              </CardContent>
+            </Card>
           </div>
         </div>
       </main>

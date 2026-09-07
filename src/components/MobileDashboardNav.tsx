@@ -197,7 +197,16 @@ export function MobileDashboardNav({ activeTool, onToolChange, isSubscribed }: M
                   </div>
                 ))}
 
-                <div className="border-t border-border pt-4">
+                <div className="space-y-1 border-t border-border pt-4">
+                  <Link
+                    to="/account"
+                    onClick={() => setOpen(false)}
+                    aria-label="Account settings"
+                    className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-medium transition-colors min-h-[48px] hover:bg-muted"
+                  >
+                    <UserCog className="h-5 w-5 shrink-0" />
+                    <span>Account settings</span>
+                  </Link>
                   <button
                     onClick={handleSignOut}
                     aria-label="Log out"
@@ -206,6 +215,17 @@ export function MobileDashboardNav({ activeTool, onToolChange, isSubscribed }: M
                     <LogOut className="h-5 w-5 shrink-0" />
                     <span>Log out</span>
                   </button>
+                  <DeleteAccountDialog
+                    trigger={
+                      <button
+                        aria-label="Delete account"
+                        className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-medium text-destructive transition-colors min-h-[48px] hover:bg-destructive/10"
+                      >
+                        <Trash2 className="h-5 w-5 shrink-0" />
+                        <span>Delete account</span>
+                      </button>
+                    }
+                  />
                 </div>
               </nav>
             </ScrollArea>

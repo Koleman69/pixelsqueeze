@@ -354,39 +354,47 @@ function SidebarContentArea({ activeTool, onToolChange, isSubscribed }: SidebarC
         ))}
       </SidebarContent>
 
-      {!isSubscribed && !isCollapsed && (
-        <SidebarFooter className="border-t border-sidebar-border">
-            <div className="p-2">
-            <div className="rounded-xl border border-primary/20 bg-gradient-to-br from-primary/10 via-accent/10 to-background/40 p-4 shadow-[var(--shadow-card)] backdrop-blur-xl">
-              <div className="flex items-center gap-2 mb-2">
-                <Crown className="w-5 h-5 text-amber-500" />
-                <span className="font-semibold text-sm">Upgrade to Pro</span>
-              </div>
-              <p className="text-xs text-muted-foreground mb-3">
-                Unlock unlimited compressions, AI video enhancement, and more.
+      <SidebarFooter className="border-t border-sidebar-border">
+        <div className={cn("space-y-3", isCollapsed ? "p-2" : "p-3")}>
+          {!isSubscribed && (
+            <>
+              {isCollapsed ? (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button size="icon" variant="ghost" className="mx-auto w-full text-amber-500">
+                      <Crown className="h-5 w-5" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="right">
+                    Upgrade to Pro
+                  </TooltipContent>
+                </Tooltip>
+              ) : (
+                <div className="rounded-xl border border-primary/20 bg-gradient-to-br from-primary/10 via-accent/10 to-background/40 p-4 shadow-[var(--shadow-card)] backdrop-blur-xl">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Crown className="w-5 h-5 text-amber-500" />
+                    <span className="font-semibold text-sm">Upgrade to Pro</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground mb-3">
+                    Unlock unlimited compressions, AI video enhancement, and more.
+                  </p>
+                  <Button size="sm" className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600">
+                    Start Free Trial
+                  </Button>
+                </div>
+              )}
+            </>
+          )}
+          <div className={cn("border-t border-sidebar-border", !isCollapsed && "pt-2")}>
+            {!isCollapsed && (
+              <p className="px-2 pb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Account
               </p>
-              <Button size="sm" className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600">
-                Start Free Trial
-              </Button>
-            </div>
+            )}
+            <AccountActions isCollapsed={isCollapsed} />
           </div>
-        </SidebarFooter>
-      )}
-
-      {!isSubscribed && isCollapsed && (
-        <SidebarFooter className="border-t border-sidebar-border">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button size="icon" variant="ghost" className="mx-auto my-2 text-amber-500">
-                <Crown className="h-5 w-5" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="right">
-              Upgrade to Pro
-            </TooltipContent>
-          </Tooltip>
-        </SidebarFooter>
-      )}
+        </div>
+      </SidebarFooter>
     </Sidebar>
   );
 }

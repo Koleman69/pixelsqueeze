@@ -26,6 +26,7 @@ import {
   Gauge,
   Layers,
   Folder,
+  Building2,
 } from "lucide-react";
 
 
@@ -73,7 +74,8 @@ export type ToolCategory =
   | "distribute"
   | "workflows"
   | "ai-enhance"
-  | "image-score";
+  | "image-score"
+  | "listing-photos";
 
 interface DashboardSidebarProps {
   activeTool: ToolCategory;
@@ -95,6 +97,7 @@ const toolCategories = [
     icon: Image,
     tools: [
       { id: "magic-optimize" as ToolCategory, label: "Magic Optimize", icon: Sparkles, description: "One-click by destination" },
+      { id: "listing-photos" as ToolCategory, label: "Listing Photos", icon: Building2, description: "Restaurant & hotel photos for booking sites" },
       { id: "ai-enhance" as ToolCategory, label: "AI Enhance", icon: Zap, description: "Upscale, sharpen, denoise & more" },
       { id: "image-score" as ToolCategory, label: "AI Image Score", icon: Gauge, description: "Grade & one-click fixes" },
       { id: "quick-optimize" as ToolCategory, label: "Quick Optimize", icon: Sparkles, description: "Goal-based optimization" },

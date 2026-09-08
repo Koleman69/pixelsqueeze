@@ -23,6 +23,7 @@ const BatchProcessingStudio = lazy(() => import("@/components/BatchProcessingStu
 const FilesSection = lazy(() => import("@/components/FilesSection").then(m => ({ default: m.FilesSection })));
 const ProfessionalOptimizer = lazy(() => import("@/components/ProfessionalOptimizer").then(m => ({ default: m.ProfessionalOptimizer })));
 const PrintOptimizer = lazy(() => import("@/components/PrintOptimizer").then(m => ({ default: m.PrintOptimizer })));
+const ListingPhotoOptimizer = lazy(() => import("@/components/ListingPhotoOptimizer").then(m => ({ default: m.ListingPhotoOptimizer })));
 const EnhancedVideoProgress = lazy(() => import("@/components/EnhancedVideoProgress").then(m => ({ default: m.EnhancedVideoProgress })));
 const AIVideoEnhancer = lazy(() => import("@/components/AIVideoEnhancer").then(m => ({ default: m.AIVideoEnhancer })));
 const AICaptionGenerator = lazy(() => import("@/components/AICaptionGenerator").then(m => ({ default: m.AICaptionGenerator })));
@@ -81,6 +82,11 @@ const toolTitles: Record<ToolCategory, { title: string; description: string; gra
     title: "Quick Optimize",
     description: "Upload images, pick a goal, and get optimized files instantly",
     gradient: "from-emerald-500/10 via-teal-500/5 to-transparent",
+  },
+  "listing-photos": {
+    title: "Listing Photo Optimizer",
+    description: "Turn phone photos into listing-ready images for your website, Expedia & Booking.com",
+    gradient: "from-amber-500/10 via-yellow-500/5 to-transparent",
   },
   "compress-image": {
     title: "Image Compression",
@@ -283,6 +289,8 @@ const Index = () => {
           return <AIEnhanceStudio />;
         case "quick-optimize":
           return <QuickOptimize isSubscribed={subscription.subscribed} />;
+        case "listing-photos":
+          return <ListingPhotoOptimizer />;
         case "compress-image":
           return (
             <div className="space-y-6">

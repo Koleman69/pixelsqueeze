@@ -178,6 +178,98 @@ interface SidebarContentAreaProps {
   isSubscribed?: boolean;
 }
 
+function AccountActions({ isCollapsed }: { isCollapsed: boolean }) {
+  const { signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/auth");
+  };
+
+  return (
+    <div className="space-y-1">
+      {isCollapsed ? (
+        <>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button size="icon" variant="ghost" className="w-full" asChild>
+                <Link to="/account" aria-label="Account settings">
+                  <UserCog className="h-4 w-4" />
+                </Link>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right">Account settings</TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                size="icon"
+                variant="ghost"
+                className="w-full text-muted-foreground hover:text-foreground"
+                onClick={handleSignOut}
+                aria-label="Sign out"
+              >
+                <LogOut className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right">Sign out</TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <DeleteAccountDialog
+                trigger={
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="w-full text-destructive hover:text-destructive hover:bg-destructive/10"
+                    aria-label="Delete account"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                }
+              />
+            </TooltipTrigger>
+            <TooltipContent side="right">Delete account</TooltipContent>
+          </Tooltip>
+        </>
+      ) : (
+        <>
+          <Button
+            variant="ghost"
+            className="w-full justify-start gap-2 rounded-xl text-sm font-medium"
+            asChild
+          >
+            <Link to="/account">
+              <UserCog className="h-4 w-4" />
+              Account settings
+            </Link>
+          </Button>
+          <Button
+            variant="ghost"
+            className="w-full justify-start gap-2 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground"
+            onClick={handleSignOut}
+          >
+            <LogOut className="h-4 w-4" />
+            Sign out
+          </Button>
+          <DeleteAccountDialog
+            trigger={
+              <Button
+                variant="ghost"
+                className="w-full justify-start gap-2 rounded-xl text-sm font-medium text-destructive hover:text-destructive hover:bg-destructive/10"
+              >
+                <Trash2 className="h-4 w-4" />
+                Delete account
+              </Button>
+            }
+          />
+        </>
+      )}
+    </div>
+  );
+}
+
 function SidebarContentArea({ activeTool, onToolChange, isSubscribed }: SidebarContentAreaProps) {
   const { state } = useSidebar();
   const isCollapsed = state === "collapsed";

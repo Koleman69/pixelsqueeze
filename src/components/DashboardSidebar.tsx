@@ -2,6 +2,9 @@ import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/useAuth";
+import { DeleteAccountDialog } from "@/components/DeleteAccountDialog";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Image,
   Video,
@@ -26,6 +29,9 @@ import {
   Gauge,
   Layers,
   Folder,
+  UserCog,
+  LogOut,
+  Trash2,
 } from "lucide-react";
 
 

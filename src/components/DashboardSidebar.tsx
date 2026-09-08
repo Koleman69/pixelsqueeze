@@ -2,6 +2,9 @@ import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/useAuth";
+import { DeleteAccountDialog } from "@/components/DeleteAccountDialog";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Image,
   Video,
@@ -26,6 +29,9 @@ import {
   Gauge,
   Layers,
   Folder,
+  UserCog,
+  LogOut,
+  Trash2,
 } from "lucide-react";
 
 
@@ -172,6 +178,98 @@ interface SidebarContentAreaProps {
   isSubscribed?: boolean;
 }
 
+function AccountActions({ isCollapsed }: { isCollapsed: boolean }) {
+  const { signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/auth");
+  };
+
+  return (
+    <div className="space-y-1">
+      {isCollapsed ? (
+        <>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button size="icon" variant="ghost" className="w-full" asChild>
+                <Link to="/account" aria-label="Account settings">
+                  <UserCog className="h-4 w-4" />
+                </Link>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right">Account settings</TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                size="icon"
+                variant="ghost"
+                className="w-full text-muted-foreground hover:text-foreground"
+                onClick={handleSignOut}
+                aria-label="Sign out"
+              >
+                <LogOut className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right">Sign out</TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <DeleteAccountDialog
+                trigger={
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="w-full text-destructive hover:text-destructive hover:bg-destructive/10"
+                    aria-label="Delete account"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                }
+              />
+            </TooltipTrigger>
+            <TooltipContent side="right">Delete account</TooltipContent>
+          </Tooltip>
+        </>
+      ) : (
+        <>
+          <Button
+            variant="ghost"
+            className="w-full justify-start gap-2 rounded-xl text-sm font-medium"
+            asChild
+          >
+            <Link to="/account">
+              <UserCog className="h-4 w-4" />
+              Account settings
+            </Link>
+          </Button>
+          <Button
+            variant="ghost"
+            className="w-full justify-start gap-2 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground"
+            onClick={handleSignOut}
+          >
+            <LogOut className="h-4 w-4" />
+            Sign out
+          </Button>
+          <DeleteAccountDialog
+            trigger={
+              <Button
+                variant="ghost"
+                className="w-full justify-start gap-2 rounded-xl text-sm font-medium text-destructive hover:text-destructive hover:bg-destructive/10"
+              >
+                <Trash2 className="h-4 w-4" />
+                Delete account
+              </Button>
+            }
+          />
+        </>
+      )}
+    </div>
+  );
+}
+
 function SidebarContentArea({ activeTool, onToolChange, isSubscribed }: SidebarContentAreaProps) {
   const { state } = useSidebar();
   const isCollapsed = state === "collapsed";
@@ -256,39 +354,47 @@ function SidebarContentArea({ activeTool, onToolChange, isSubscribed }: SidebarC
         ))}
       </SidebarContent>
 
-      {!isSubscribed && !isCollapsed && (
-        <SidebarFooter className="border-t border-sidebar-border">
-            <div className="p-2">
-            <div className="rounded-xl border border-primary/20 bg-gradient-to-br from-primary/10 via-accent/10 to-background/40 p-4 shadow-[var(--shadow-card)] backdrop-blur-xl">
-              <div className="flex items-center gap-2 mb-2">
-                <Crown className="w-5 h-5 text-amber-500" />
-                <span className="font-semibold text-sm">Upgrade to Pro</span>
-              </div>
-              <p className="text-xs text-muted-foreground mb-3">
-                Unlock unlimited compressions, AI video enhancement, and more.
+      <SidebarFooter className="border-t border-sidebar-border">
+        <div className={cn("space-y-3", isCollapsed ? "p-2" : "p-3")}>
+          {!isSubscribed && (
+            <>
+              {isCollapsed ? (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button size="icon" variant="ghost" className="mx-auto w-full text-amber-500">
+                      <Crown className="h-5 w-5" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="right">
+                    Upgrade to Pro
+                  </TooltipContent>
+                </Tooltip>
+              ) : (
+                <div className="rounded-xl border border-primary/20 bg-gradient-to-br from-primary/10 via-accent/10 to-background/40 p-4 shadow-[var(--shadow-card)] backdrop-blur-xl">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Crown className="w-5 h-5 text-amber-500" />
+                    <span className="font-semibold text-sm">Upgrade to Pro</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground mb-3">
+                    Unlock unlimited compressions, AI video enhancement, and more.
+                  </p>
+                  <Button size="sm" className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600">
+                    Start Free Trial
+                  </Button>
+                </div>
+              )}
+            </>
+          )}
+          <div className={cn("border-t border-sidebar-border", !isCollapsed && "pt-2")}>
+            {!isCollapsed && (
+              <p className="px-2 pb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Account
               </p>
-              <Button size="sm" className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600">
-                Start Free Trial
-              </Button>
-            </div>
+            )}
+            <AccountActions isCollapsed={isCollapsed} />
           </div>
-        </SidebarFooter>
-      )}
-
-      {!isSubscribed && isCollapsed && (
-        <SidebarFooter className="border-t border-sidebar-border">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button size="icon" variant="ghost" className="mx-auto my-2 text-amber-500">
-                <Crown className="h-5 w-5" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="right">
-              Upgrade to Pro
-            </TooltipContent>
-          </Tooltip>
-        </SidebarFooter>
-      )}
+        </div>
+      </SidebarFooter>
     </Sidebar>
   );
 }

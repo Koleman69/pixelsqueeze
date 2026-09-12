@@ -1,0 +1,92 @@
+# Content pillars for the San Antonio Travel channel.
+# Each pillar defines a recurring video format; `subjects` are the rotating
+# specific angles the script writer picks from (one per video, tracked in
+# state/used_topics.json so subjects don't repeat until the pool is exhausted).
+
+pillars:
+  - id: top10_tips
+    format: "Top 10 Tips"
+    prompt_style: >
+      A punchy, high-energy top-10 countdown video giving practical,
+      specific, non-obvious travel tips. Build suspense toward #1.
+    subjects:
+      - "Top 10 Tips for Visiting the Alamo Without the Crowds"
+      - "Top 10 Tips for Riding the San Antonio River Walk Like a Pro"
+      - "Top 10 Money-Saving Tips for a San Antonio Vacation"
+      - "Top 10 Tips for Visiting San Antonio in the Summer Heat"
+      - "Top 10 First-Timer Mistakes to Avoid in San Antonio"
+      - "Top 10 Tips for Fiesta San Antonio"
+      - "Top 10 Tips for Getting Around San Antonio Without a Car"
+      - "Top 10 Tips for Visiting the San Antonio Missions"
+
+  - id: best_of
+    format: "Best Of"
+    prompt_style: >
+      An enthusiastic showcase-style video ranking or highlighting the best
+      options in a category, with a clear reason each pick earns its spot.
+    subjects:
+      - "Best Tex-Mex Restaurants in San Antonio"
+      - "Best Rooftop Bars in San Antonio"
+      - "Best Neighborhoods to Stay in San Antonio"
+      - "Best Views in San Antonio You Can't Miss"
+      - "Best Brunch Spots in San Antonio"
+      - "Best Breweries in San Antonio"
+      - "Best Family-Friendly Attractions in San Antonio"
+      - "Best Day Trips from San Antonio"
+
+  - id: top5_lists
+    format: "Top 5 List"
+    prompt_style: >
+      A tight, fast-paced top-5 list, more concise than the top-10 format,
+      leading with the most surprising or highest-value pick.
+    subjects:
+      - "5 Hidden Gems in San Antonio Most Tourists Miss"
+      - "5 Free Things to Do in San Antonio"
+      - "5 Best Tacos in San Antonio"
+      - "5 Underrated Historic Sites in San Antonio"
+      - "5 Best Spots to Watch the Sunset in San Antonio"
+      - "5 Things to Do in San Antonio on a Rainy Day"
+
+  - id: travel_like_a_local
+    format: "Travel Like a Local"
+    prompt_style: >
+      An insider, conversational video sharing how a local actually
+      experiences the city — where they eat, what they skip, and habits
+      that save time or money that tourists don't know about.
+    subjects:
+      - "How to Travel San Antonio Like a Local"
+      - "What Locals Actually Eat in San Antonio (Not Tourist Food)"
+      - "How Locals Avoid the River Walk Crowds"
+      - "Where San Antonio Locals Actually Hang Out"
+      - "Local Secrets for Beating the San Antonio Summer Heat"
+
+  - id: budget_guide
+    format: "Budget Guide"
+    prompt_style: >
+      A practical budgeting breakdown video with concrete dollar figures
+      and specific ways to cut costs without cutting the fun.
+    subjects:
+      - "How to Visit San Antonio on a Budget"
+      - "San Antonio on $50 a Day: Is It Possible?"
+      - "Cheap Eats in San Antonio That Don't Feel Cheap"
+
+  - id: common_mistakes
+    format: "Mistakes to Avoid"
+    prompt_style: >
+      A cautionary, helpful video framed around mistakes travelers make,
+      each paired with the fix.
+    subjects:
+      - "Mistakes Tourists Make at the Alamo"
+      - "Mistakes First-Time Visitors Make in San Antonio"
+      - "Mistakes to Avoid When Visiting the River Walk"
+
+  - id: seasonal
+    format: "Seasonal Guide"
+    prompt_style: >
+      A timely seasonal guide tying recommendations to the time of year,
+      weather, and events happening then.
+    subjects:
+      - "Best Things to Do in San Antonio in the Fall"
+      - "San Antonio Christmas Lights on the River Walk: What to Know"
+      - "Visiting San Antonio in the Spring: What to Expect"
+      - "Surviving San Antonio in July and August"

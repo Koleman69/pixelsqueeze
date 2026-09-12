@@ -1,0 +1,87 @@
+name: Publish San Antonio Travel video
+
+on:
+  schedule:
+    # Mondays and Thursdays at 15:00 UTC (~10am US Central).
+    - cron: "0 15 * * 1,4"
+  workflow_dispatch:
+    inputs:
+      topic:
+        description: "Force a specific subject (must match one in data/topics.yaml, or a custom one-off)"
+        required: false
+        default: ""
+      dry_run:
+        description: "Build the video but skip the real YouTube upload"
+        required: false
+        default: "false"
+        type: choice
+        options: ["false", "true"]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: san-antonio-travel-publish
+  cancel-in-progress: false
+
+defaults:
+  run:
+    working-directory: san-antonio-travel-automation
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install ffmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg fonts-dejavu-core
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run pipeline
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+          ELEVENLABS_VOICE_ID: ${{ secrets.ELEVENLABS_VOICE_ID }}
+          YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID }}
+          YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
+          YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
+          YOUTUBE_PRIVACY_STATUS: ${{ vars.YOUTUBE_PRIVACY_STATUS || 'unlisted' }}
+        run: |
+          ARGS=""
+          if [ -n "${{ github.event.inputs.topic }}" ]; then
+            ARGS="$ARGS --topic \"${{ github.event.inputs.topic }}\""
+          fi
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            ARGS="$ARGS --dry-run"
+          fi
+          eval python src/pipeline.py $ARGS
+
+      - name: Upload run artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: run-output
+          path: |
+            san-antonio-travel-automation/output/last_run.json
+            san-antonio-travel-automation/output/current_run/final_video.mp4
+            san-antonio-travel-automation/output/current_run/thumbnail.jpg
+          retention-days: 14
+          if-no-files-found: ignore
+
+      - name: Commit updated topic rotation state
+        run: |
+          git config user.name "san-antonio-travel-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add state/used_topics.json
+          git diff --cached --quiet || git commit -m "Record used topic from automated run"
+          git push

@@ -21,4 +21,4 @@ Anyone can open the app and use photo tools (compress, optimize, enhance, crop, 
 - Verify with Playwright signed-out at iPad size: open app, reach dashboard, compress and download an image with no sign-in prompt.
 
 ## Review note
-Reply to Apple stating photo tools are now available without registration; sign-in is only required for cloud sharing, saved files, and subscriptions.
+Reply to Apple stating photo tools are now available without registration; sign-in is only required for cloud sharing and saved files. In-app subscriptions (App Store / Google Play) can be bought and restored without an account: the purchase unlocks Pro on the device right away, and if the person signs in later it is linked to their account (backend accepts a device token when no login is present).

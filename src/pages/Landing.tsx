@@ -273,7 +273,7 @@ const Landing = () => {
                 Log in
               </Button>
             </Link>
-            <Link to="/auth" onClick={() => trackConversion("nav_get_started", { variant: heroVariant })}>
+            <Link to="/dashboard" onClick={() => trackConversion("nav_get_started", { variant: heroVariant })}>
               <Button
                 size="sm"
                 className="rounded-2xl px-5 font-semibold bg-[#4ade80] text-[#0f1424] hover:bg-[#3dbd6d] border-0 shadow-[0_0_24px_rgba(74,222,128,0.25)]"
@@ -330,7 +330,7 @@ const Landing = () => {
               </p>
 
               <div className="flex flex-wrap gap-3 pt-2">
-                <Link to="/auth" onClick={() => trackConversion("hero_primary", { variant: heroVariant })}>
+                <Link to="/dashboard" onClick={() => trackConversion("hero_primary", { variant: heroVariant })}>
                   <Button
                     size="lg"
                     className="rounded-2xl h-14 px-8 text-base font-bold bg-[#4ade80] text-[#0f1424] hover:bg-[#3dbd6d] border-0 shadow-[0_0_30px_rgba(74,222,128,0.35)] min-w-[220px]"
@@ -818,7 +818,7 @@ const Landing = () => {
               <p className="text-lg text-slate-300 mb-8 max-w-xl mx-auto">
                 Free to start. No card, no watermark, no editing skills.
               </p>
-              <Link to="/auth" onClick={() => trackConversion("final_cta", { variant: heroVariant })}>
+              <Link to="/dashboard" onClick={() => trackConversion("final_cta", { variant: heroVariant })}>
                 <Button size="lg" className="bg-[#4ade80] text-[#0f1424] hover:bg-[#3dbd6d] rounded-2xl px-8 h-14 font-bold border-0 text-base shadow-[0_0_30px_rgba(74,222,128,0.4)]">
                   <Upload className="w-5 h-5 mr-2" />
                   Upload your photo

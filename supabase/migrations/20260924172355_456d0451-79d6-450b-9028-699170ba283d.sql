@@ -1,0 +1,1 @@
+REVOKE ALL ON public.guest_iap_entitlements FROM anon, authenticated;

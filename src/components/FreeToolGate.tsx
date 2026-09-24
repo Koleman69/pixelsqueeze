@@ -50,9 +50,8 @@ export const FreeToolGate: React.FC<Props> = ({ toolId, isSubscribed, children }
     if (user?.email) {
       setEmailState(user.email);
     } else {
-      const stored = localStorage.getItem(EMAIL_KEY);
-      if (stored && emailRe.test(stored)) setEmailState(stored);
-      else setEmailState(null);
+      // Guests don't need to share personal info; usage is tracked per device.
+      setEmailState("guest");
     }
   }, [user]);
 

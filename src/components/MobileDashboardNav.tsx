@@ -87,7 +87,7 @@ const toolCategories = [
 
 export function MobileDashboardNav({ activeTool, onToolChange, isSubscribed }: MobileDashboardNavProps) {
   const [open, setOpen] = useState(false);
-  const { signOut } = useAuth();
+  const { signOut, user } = useAuth();
   const isTabScreen = PRIMARY_TABS.some((t) => t.id === activeTool);
 
   const handleSignOut = async () => {
@@ -201,6 +201,7 @@ export function MobileDashboardNav({ activeTool, onToolChange, isSubscribed }: M
                   </div>
                 ))}
 
+                {user ? (
                 <div className="space-y-1 border-t border-border pt-4">
                   <Link
                     to="/account"
@@ -231,6 +232,13 @@ export function MobileDashboardNav({ activeTool, onToolChange, isSubscribed }: M
                     }
                   />
                 </div>
+                ) : (
+                <div className="space-y-1 border-t border-border pt-4">
+                  <Link to="/auth" onClick={() => setOpen(false)} aria-label="Sign in" className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium min-h-[48px] hover:bg-muted">
+                    <UserCog className="h-5 w-5 shrink-0" /><span>Sign in / Create account</span>
+                  </Link>
+                </div>
+                )}
               </nav>
             </ScrollArea>
           </SheetContent>

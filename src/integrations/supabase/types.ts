@@ -638,6 +638,54 @@ export type Database = {
         }
         Relationships: []
       }
+      guest_iap_entitlements: {
+        Row: {
+          active: boolean
+          auto_renewing: boolean | null
+          base_plan_id: string | null
+          device_token: string
+          environment: string | null
+          expires_at: string | null
+          original_transaction_id: string | null
+          plan: string | null
+          platform: string
+          product_id: string | null
+          purchase_token: string | null
+          synced_at: string
+          transaction_id: string | null
+        }
+        Insert: {
+          active?: boolean
+          auto_renewing?: boolean | null
+          base_plan_id?: string | null
+          device_token: string
+          environment?: string | null
+          expires_at?: string | null
+          original_transaction_id?: string | null
+          plan?: string | null
+          platform: string
+          product_id?: string | null
+          purchase_token?: string | null
+          synced_at?: string
+          transaction_id?: string | null
+        }
+        Update: {
+          active?: boolean
+          auto_renewing?: boolean | null
+          base_plan_id?: string | null
+          device_token?: string
+          environment?: string | null
+          expires_at?: string | null
+          original_transaction_id?: string | null
+          plan?: string | null
+          platform?: string
+          product_id?: string | null
+          purchase_token?: string | null
+          synced_at?: string
+          transaction_id?: string | null
+        }
+        Relationships: []
+      }
       posting_workflows: {
         Row: {
           content_pool_ids: string[] | null

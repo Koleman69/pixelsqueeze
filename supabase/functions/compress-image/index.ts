@@ -124,7 +124,8 @@ serve(async (req) => {
       { auth: { persistSession: false } }
     )
 
-    const { files, quality = 80, maxWidth = 1920, maxHeight = 1920, dpi = 72, isBulk = false }: CompressionRequest = await req.json()
+    const body = await req.json();
+    const { files, quality = 80, maxWidth = 1920, maxHeight = 1920, dpi = 72, isBulk = false }: CompressionRequest = body
     
     // Memory-safe limits
     const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB per file (reduced from 10MB)
@@ -302,17 +303,19 @@ serve(async (req) => {
       ? await supabase.auth.getUser(token)
       : { data: null as any };
 
-    if (!userData?.user?.id) {
-      return new Response(JSON.stringify({
-        success: false,
-        error: "Please sign in to compress images.",
-        results: []
-      }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 401
+    // Guests (no account) may compress using a per-device free quota.
+    const guestToken: string | null = !userData?.user?.id
+      ? (typeof (body as any)?.clientToken === 'string' && /^[A-Za-z0-9_-]{24,}$/.test((body as any).clientToken) ? (body as any).clientToken : null)
+      : null;
+    if (!userData?.user?.id && !guestToken) {
+      return new Response(JSON.stringify({ success: false, error: "Missing device token.", results: [] }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400
       });
     }
-
+    if (guestToken) {
+      const { data: used } = await supabase.rpc('get_free_tool_usage', { _client_token: guestToken, _tool_id: 'compress' });
+      freeCompressionsUsed = typeof used === 'number' ? used : 0;
+    } else {
     userId = userData.user.id;
 
     try {
@@ -343,6 +346,7 @@ serve(async (req) => {
       }
     } catch (error) {
       console.warn('Failed to check subscription:', error);
+    }
     }
 
 
@@ -395,6 +399,10 @@ serve(async (req) => {
       results.push(result);
     }
 
+    if (guestToken && !isSubscribed && results.some((r: any) => !r.error)) {
+      const n = results.filter((r: any) => !r.error).length;
+      await supabase.rpc('consume_free_tool_usage', { _client_token: guestToken, _tool_id: 'compress', _amount: n });
+    }
     // Update free compressions counter for non-subscribers
     if (!isSubscribed && userId && results.some(r => !r.error)) {
       try {

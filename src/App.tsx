@@ -135,11 +135,7 @@ const App = () => (
                   </PublicRoute>
                 } />
                 {/* Protected dashboard */}
-                <Route path="/dashboard" element={
-                  <ProtectedRoute>
-                    <Index />
-                  </ProtectedRoute>
-                } />
+                <Route path="/dashboard" element={<Index />} />
                 {/* Legacy alias for old PWA shortcut deep links */}
                 <Route path="/index" element={<Navigate to="/dashboard" replace />} />
                 <Route path="/success" element={

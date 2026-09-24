@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Minimize2, ArrowLeft, Apple } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Separator } from "@/components/ui/separator";
 import { z } from "zod";
 import SEO from "@/components/SEO";
@@ -326,6 +326,9 @@ const Auth = () => {
               <CardDescription>
                 Sign in to your account or create a new one to get started
               </CardDescription>
+              <Button variant="outline" className="mt-3 w-full" asChild>
+                <Link to="/dashboard">Continue without an account</Link>
+              </Button>
             </CardHeader>
             <CardContent>
               <Tabs defaultValue="login" className="w-full">

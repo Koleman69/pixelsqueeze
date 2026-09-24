@@ -272,6 +272,7 @@ function AccountActions({ isCollapsed }: { isCollapsed: boolean }) {
 
 function SidebarContentArea({ activeTool, onToolChange, isSubscribed }: SidebarContentAreaProps) {
   const { state } = useSidebar();
+  const { user } = useAuth();
   const isCollapsed = state === "collapsed";
 
   return (

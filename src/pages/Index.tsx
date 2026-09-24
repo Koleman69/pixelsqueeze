@@ -220,12 +220,6 @@ const Index = () => {
 
   const checkFreeQuota = async (toolId: string, amount: number): Promise<boolean> => {
     if (subscription.subscribed || subscription.is_trialing) return true;
-    let email = user?.email as string | undefined;
-    if (!email) email = localStorage.getItem("pixelsqueeze_free_email") || undefined;
-    if (!email) {
-      toast({ title: "Enter your email to unlock free credits", description: "Open the tool page to enter your email and get 4 free credits.", variant: "destructive" });
-      return false;
-    }
     const clientToken = getFreeToolClientToken();
     const { data: current } = await supabase.rpc("get_free_tool_usage", { _client_token: clientToken, _tool_id: toolId });
     const usedNow = typeof current === "number" ? current : 0;
@@ -426,9 +420,9 @@ const Index = () => {
             <Link to="/company">
               <Button variant="ghost" size="sm">Company</Button>
             </Link>
-            <Link to="/account">
+            {user && (<Link to="/account">
               <Button variant="ghost" size="sm">Account</Button>
-            </Link>
+            </Link>)}
           </div>
           <div className="flex items-center gap-4">
             {subscription.subscribed && (
@@ -439,8 +433,12 @@ const Index = () => {
             <OnboardingTrigger>
               <Button variant="ghost" size="sm"><HelpCircle className="w-4 h-4 mr-2" />Help</Button>
             </OnboardingTrigger>
-            <span className="text-sm text-muted-foreground">{user?.email}</span>
+            {user ? (<>
+            <span className="text-sm text-muted-foreground">{user.email}</span>
             <Button variant="outline" size="sm" onClick={handleSignOut}><LogOut className="w-4 h-4 mr-2" />Sign Out</Button>
+            </>) : (
+            <Link to="/auth"><Button size="sm">Sign in</Button></Link>
+            )}
           </div>
         </header>
 

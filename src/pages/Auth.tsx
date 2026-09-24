@@ -326,6 +326,9 @@ const Auth = () => {
               <CardDescription>
                 Sign in to your account or create a new one to get started
               </CardDescription>
+              <Button variant="outline" className="mt-3 w-full" asChild>
+                <Link to="/dashboard">Continue without an account</Link>
+              </Button>
             </CardHeader>
             <CardContent>
               <Tabs defaultValue="login" className="w-full">

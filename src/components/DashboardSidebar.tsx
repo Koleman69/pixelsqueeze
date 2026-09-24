@@ -391,7 +391,11 @@ function SidebarContentArea({ activeTool, onToolChange, isSubscribed }: SidebarC
                 Account
               </p>
             )}
-            <AccountActions isCollapsed={isCollapsed} />
+            {user ? <AccountActions isCollapsed={isCollapsed} /> : (
+              <Button variant="default" size={isCollapsed ? "icon" : "sm"} className="w-full rounded-xl" asChild>
+                <Link to="/auth" aria-label="Sign in">{isCollapsed ? <UserCog className="h-4 w-4" /> : "Sign in / Create account"}</Link>
+              </Button>
+            )}
           </div>
         </div>
       </SidebarFooter>

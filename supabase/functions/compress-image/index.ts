@@ -124,7 +124,8 @@ serve(async (req) => {
       { auth: { persistSession: false } }
     )
 
-    const { files, quality = 80, maxWidth = 1920, maxHeight = 1920, dpi = 72, isBulk = false }: CompressionRequest = await req.json()
+    const body = await req.json();
+    const { files, quality = 80, maxWidth = 1920, maxHeight = 1920, dpi = 72, isBulk = false }: CompressionRequest = body
     
     // Memory-safe limits
     const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB per file (reduced from 10MB)

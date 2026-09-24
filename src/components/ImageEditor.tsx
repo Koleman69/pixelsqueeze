@@ -1,3 +1,4 @@
+import { getFreeToolClientToken } from "@/lib/freeToolToken";
 import React, { useState, useCallback, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -116,7 +117,8 @@ export const ImageEditor = ({ onComplete }: ImageEditorProps) => {
         body: {
           imageBase64: base64Data,
           prompt: aiPrompt,
-          editType: 'transform'
+          editType: 'transform',
+          clientToken: getFreeToolClientToken()
         }
       });
 

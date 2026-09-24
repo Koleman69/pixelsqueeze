@@ -25,18 +25,16 @@ serve(async (req) => {
       { auth: { persistSession: false } }
     );
 
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) throw new Error("No authorization header");
-
+    const authHeader = req.headers.get("Authorization") ?? "";
     const token = authHeader.replace("Bearer ", "");
-    const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
-    if (userError) throw new Error(`Authentication error: ${userError.message}`);
-    const user = userData.user;
-    if (!user?.email) throw new Error("User not authenticated");
-
-    logStep("User authenticated", { userId: user.id });
-
-    const { imageBase64, prompt, editType } = await req.json();
+    const { data: userData } = token ? await supabaseClient.auth.getUser(token) : { data: null as any };
+    const user = userData?.user ?? null;
+    const reqBody = await req.json();
+    const { imageBase64, prompt, editType } = reqBody;
+    // Guests (no account) use a per-device free quota.
+    const guestToken: string | null = !user?.id && typeof reqBody.clientToken === "string" && /^[A-Za-z0-9_-]{24,}$/.test(reqBody.clientToken) ? reqBody.clientToken : null;
+    if (!user?.id && !guestToken) throw new Error("Missing device token");
+    logStep(user ? "User authenticated" : "Guest request", { userId: user?.id });
     
     // Input validation constants
     const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -88,7 +86,7 @@ serve(async (req) => {
     });
 
     let isSubscribed = false;
-    if (checkSubResponse.ok) {
+    if (user && checkSubResponse.ok) {
       const subData = await checkSubResponse.json();
       isSubscribed = subData.subscribed;
     }
@@ -100,10 +98,9 @@ serve(async (req) => {
     // Check and enforce usage limits for free tier
     if (!isSubscribed) {
       // Count today's AI usage from database
-      const { data: usageData, error: usageError } = await supabaseClient.rpc(
-        'count_daily_ai_usage',
-        { target_user_id: user.id, feature: 'image_edit' }
-      );
+      const { data: usageData, error: usageError } = user
+        ? await supabaseClient.rpc('count_daily_ai_usage', { target_user_id: user.id, feature: 'image_edit' })
+        : await supabaseClient.rpc('get_free_tool_usage', { _client_token: guestToken, _tool_id: 'ai-edit' });
 
       if (usageError) {
         logStep("Error checking usage", { error: usageError.message });
@@ -186,9 +183,9 @@ serve(async (req) => {
 
     // Record usage for non-subscribed users
     if (!isSubscribed) {
-      const { error: insertError } = await supabaseClient
-        .from('ai_usage')
-        .insert({ user_id: user.id, feature_type: 'image_edit' });
+      const { error: insertError } = user
+        ? await supabaseClient.from('ai_usage').insert({ user_id: user.id, feature_type: 'image_edit' })
+        : await supabaseClient.rpc('consume_free_tool_usage', { _client_token: guestToken, _tool_id: 'ai-edit', _amount: 1 });
       
       if (insertError) {
         logStep("Failed to record usage", { error: insertError.message });
@@ -200,10 +197,9 @@ serve(async (req) => {
     logStep("Image edit successful");
 
     // Get updated usage count
-    const { data: newUsageData } = await supabaseClient.rpc(
-      'count_daily_ai_usage',
-      { target_user_id: user.id, feature: 'image_edit' }
-    );
+    const { data: newUsageData } = user
+      ? await supabaseClient.rpc('count_daily_ai_usage', { target_user_id: user.id, feature: 'image_edit' })
+      : await supabaseClient.rpc('get_free_tool_usage', { _client_token: guestToken, _tool_id: 'ai-edit' });
 
     return new Response(JSON.stringify({
       success: true,

@@ -60,17 +60,47 @@ serve(async (req) => {
   try {
     const authHeader = req.headers.get("Authorization") ?? "";
     const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "";
-    if (!token) {
-      log("Missing Authorization header");
-      return json({ error: "Unauthorized" }, 401);
-    }
-
-    const { data: userData, error: userError } = await admin.auth.getUser(token);
+    const { data: userData } = token ? await admin.auth.getUser(token) : { data: null as any };
     const user = userData?.user;
-    if (userError || !user?.id) {
-      log("Invalid token", { message: userError?.message });
-      return json({ error: "Unauthorized" }, 401);
+    const rawBody = await req.clone().json().catch(() => ({} as Record<string, unknown>));
+    const deviceToken = typeof rawBody.deviceToken === "string" && /^[A-Za-z0-9_-]{24,}$/.test(rawBody.deviceToken)
+      ? rawBody.deviceToken : null;
+
+    // ---- Guest (no account) path: entitlement stored per device ----------------
+    if (!user?.id) {
+      if (!deviceToken) {
+        log("No user and no deviceToken");
+        return json({ error: "Unauthorized" }, 401);
+      }
+      if (rawBody.action === "status") {
+        const { data: g } = await admin.from("guest_iap_entitlements").select("*").eq("device_token", deviceToken).maybeSingle();
+        const live = !!g?.active && (g.expires_at ? new Date(g.expires_at) > new Date()
+          : (Date.now() - new Date(g.synced_at).getTime()) < 35 * 864e5);
+        const tier = live && g?.plan ? TIER_LABEL[g.plan as Plan] : null;
+        return json({ subscribed: live, subscription_tier: tier, subscription_end: g?.expires_at ?? null,
+          subscription_source: live ? g!.platform : null, auto_renewing: g?.auto_renewing ?? null, guest: true });
+      }
+      const gPlatform = rawBody.platform;
+      if (gPlatform !== "ios" && gPlatform !== "android") return json({ error: "platform must be 'ios' or 'android'" }, 400);
+      const gActive = rawBody.active === true;
+      const gPlan = typeof rawBody.plan === "string" ? (rawBody.plan.toLowerCase() as Plan) : null;
+      if (gActive && (!gPlan || !PLANS.includes(gPlan))) return json({ error: "plan must be one of creator, pro, business" }, 400);
+      const s = (v: unknown) => (typeof v === "string" ? v : null);
+      const { error: gErr } = await admin.from("guest_iap_entitlements").upsert({
+        device_token: deviceToken, platform: gPlatform, active: gActive, plan: gActive ? gPlan : null,
+        product_id: s(rawBody.productId), base_plan_id: s(rawBody.basePlanId), transaction_id: s(rawBody.transactionId),
+        original_transaction_id: s(rawBody.originalTransactionId), purchase_token: s(rawBody.purchaseToken),
+        expires_at: s(rawBody.expiresAt), auto_renewing: typeof rawBody.isAutoRenewing === "boolean" ? rawBody.isAutoRenewing : null,
+        environment: s(rawBody.environment), synced_at: new Date().toISOString(),
+      });
+      if (gErr) { log("Guest upsert failed", { message: gErr.message }); return json({ error: gErr.message }, 500); }
+      log("Guest entitlement synced", { active: gActive, plan: gPlan });
+      return json(gActive
+        ? { synced: true, active: true, plan: gPlan, subscription_tier: TIER_LABEL[gPlan!], guest: true }
+        : { synced: true, active: false, kept_access: false, guest: true });
     }
+    // Signed in: a device-level guest purchase is now owned by this account.
+    if (deviceToken) await admin.from("guest_iap_entitlements").delete().eq("device_token", deviceToken);
     log("User authenticated", { userId: user.id });
 
     const body = await req.json().catch(() => ({} as Record<string, unknown>));

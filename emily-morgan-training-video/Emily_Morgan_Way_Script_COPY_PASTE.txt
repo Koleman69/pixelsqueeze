@@ -1,0 +1,1210 @@
+THE EMILY MORGAN WAY - 45-MINUTE SERVICE TRAINING VIDEO
+Presented by Kole Siefken, General Manager
+
+HOW TO READ THIS FILE
+  [NAME]          = the character who speaks. Paste the line below it into that avatar's scene.
+  ON SCREEN:      = a graphic, photo or action beat (no one speaks).
+  SUBTITLE:       = English subtitle to show while the Spanish line plays.
+  [CONFIRM ...]   = fill in from current hotel policy before recording.
+  Graphics are in graphics/, photos in assets/photos/ (P01-P12 listed at the end).
+
+
+======================================================================
+COLD OPEN  -  Welcome to the Emily Morgan
+Time 00:00 to 01:54  (1.9 min)
+======================================================================
+
+----------------------------------------------------------------------
+SCENE: Montage
+----------------------------------------------------------------------
+Setting: Exterior and lobby. Upbeat Tex-Mex acoustic guitar track, builds.
+Visuals: P01 slow push-in on the tower at sunset | P11 gothic detail, slow pan | P02 the Alamo with the tower behind | P05 valet canopy at 705 E. Houston | P03 lobby doors open | GFX title_card
+
+[NARRATOR]
+Nineteen twenty-four. A Gothic Revival tower rises across the plaza from the Alamo.
+
+[NARRATOR]
+It started life as the Medical Arts Building. Today it's one of the most recognizable hotels in Texas.
+
+[NARRATOR]
+Every single day, people from all over the world walk through these doors. And every single day, they decide whether they'll come back.
+
+ON SCREEN: Music hit. Title card: THE EMILY MORGAN WAY. Subtitle: Service Training for Every Department.
+
+
+----------------------------------------------------------------------
+SCENE: Host intro
+----------------------------------------------------------------------
+Setting: Kole avatar, lobby background (P04 softened), lower third.
+Visuals: GFX lower_third_kole
+
+[KOLE]
+Hi everyone, I'm Kole Siefken, General Manager here at the Emily Morgan. Bienvenidos, welcome.
+
+[KOLE]
+Over the next forty-five minutes we're going to talk about how we show up, how we treat guests, how we treat each other, and what we do when something goes wrong. No lectures, no corporate speeches. Real situations, real words you can use on your very next shift.
+
+[KOLE]
+You'll meet some of your fictional teammates along the way. Ana at the front desk, Marcus out front at valet, Rosa running housekeeping, Jake from engineering, Luis behind the bar at Oro, and Hannah, who's new and learning right alongside you.
+
+ON SCREEN: Quick cast montage, 1.5 seconds each, name/title lower thirds. Each character waves or nods. Rosa: "¡Hola!" Luis raises a glass of iced tea.
+
+[KOLE]
+Grab a coffee. Let's get into it.
+
+
+======================================================================
+CHAPTER 1: WHY SERVICE MATTERS  -  The guest's choice
+Time 01:54 to 07:12  (5.3 min)
+======================================================================
+
+ON SCREEN: Chapter card  ->  graphics/ch01_card.jpg  (5 seconds)
+
+----------------------------------------------------------------------
+SCENE: Every job is a guest job
+----------------------------------------------------------------------
+Setting: Kole avatar, split screen with photos.
+Visuals: GFX ch01_card | P07 room | P05 entrance | P12 meeting room
+
+[KOLE]
+Let's start with something simple. Every job in this hotel affects the guest experience. Every one.
+
+[KOLE]
+A guest might remember the person who checked them in. But they're just as likely to remember the housekeeper who said good morning in the hallway, the engineer who fixed the shower fast, the bartender who gave them a great dinner recommendation, or the valet who remembered their name.
+
+[KOLE]
+Think about the last time you felt truly welcome somewhere as a customer. A restaurant, a store, anywhere. What did they actually do?
+
+ON SCREEN: Pause beat. On-screen prompt: "Think of a time you felt truly welcome." 4-second timer animation.
+
+
+----------------------------------------------------------------------
+SCENE: Team voices
+----------------------------------------------------------------------
+Setting: Break room. Quick talking-head interviews, documentary style.
+Visuals: Break room set
+
+[ROSA]
+My first trip to New York, the doorman at the hotel noticed I was nervous. He walked me to the subway entrance himself. Thirty years later, I still remember his face.
+
+[MARCUS]
+A little diner in Fredericksburg. Second time I went in, the waitress said, "Coffee, black, right?" That's it. That's all it took. I've been going back for ten years.
+
+[ANA]
+Mi abuela's pharmacy in Laredo. They always asked about her by name. It's not complicated. They paid attention.
+
+
+----------------------------------------------------------------------
+SCENE: The four things that make people feel welcome
+----------------------------------------------------------------------
+Setting: Kole avatar + animated graphic.
+Visuals: GFX four_welcomes
+
+[KOLE]
+Notice what those stories have in common. Nobody said "they gave me something free." They said: they noticed me. They listened. They followed through. They made it easy.
+
+ON SCREEN: Four icons animate in: NOTICED ME, LISTENED, FOLLOWED THROUGH, MADE IT EASY.
+
+[KOLE]
+Those four things cost nothing, and they are completely in your control.
+
+
+----------------------------------------------------------------------
+SCENE: Our house has a story
+----------------------------------------------------------------------
+Setting: Kole avatar; slow Ken Burns on P11, P02, P01.
+Visuals: P11 gothic detail | P02 Alamo + tower | GFX history_timeline
+
+[KOLE]
+Before we go further, take a second to appreciate where you work. This building opened in 1924 as the Medical Arts Building. It's Gothic Revival, which is why you see all that carved detail on the outside. Later it became the hotel you know today, the Emily Morgan, and it's a member of Historic Hotels of America.
+
+[KOLE]
+We sit right across the plaza from the Alamo, one of the most visited places in Texas. That means a lot of our guests are here for a once-in-a-lifetime trip. A family reunion. A honeymoon. A kid seeing the Alamo for the first time.
+
+[KOLE]
+For them, we're not just a place to sleep. We're part of the memory. That's a big responsibility, and honestly, it's a pretty cool one.
+
+ON SCREEN: Graphic: 1924 Medical Arts Building -> Today: The Emily Morgan Hotel, A DoubleTree by Hilton. (Have dates verified before final render.)
+
+
+----------------------------------------------------------------------
+SCENE: Guests have choices
+----------------------------------------------------------------------
+Setting: Kole avatar, aerial photo behind.
+Visuals: P01 aerial, slow drift showing nearby hotels
+
+[KOLE]
+Now let's be honest. Look at that skyline. Guests have choices. Another hotel down the street might have a newer room, a different price, or an amenity we don't have.
+
+[KOLE]
+Here's how we compete. We never criticize another hotel. We never promise something we can't deliver. We earn trust by being honest, being welcoming, and being consistent, every single time.
+
+[KOLE]
+And let me be clear about one thing. Great service doesn't replace fixing a broken shower or a noisy AC. If something's wrong with the room, we fix it. Service is how we make the guest feel while we fix it.
+
+[KOLE]
+So here's the question I want you to sit with: if a guest could choose us or a hotel down the street at the exact same price, what could you do today that would make them choose us again?
+
+
+----------------------------------------------------------------------
+SCENE: Minimum Standard vs. Above and Beyond
+----------------------------------------------------------------------
+Setting: Animated two-column graphic.
+Visuals: GFX minimum_vs_beyond
+
+[KOLE]
+Two ideas we'll use for the rest of this training. First, the minimum standard. That's what every guest receives, every time, no exceptions: clean surroundings, a courteous welcome, accurate information, respectful treatment, and ownership of their requests.
+
+[KOLE]
+Second, above and beyond. That's a thoughtful, appropriate extra step based on that specific guest's needs. It does not mean giving things away without approval, ignoring safety, or making promises we can't keep.
+
+[KOLE]
+And remember: an extra never makes up for a missed basic. A handwritten card doesn't fix a dirty bathroom. Basics first, every time.
+
+
+----------------------------------------------------------------------
+SCENE: Chapter recap
+----------------------------------------------------------------------
+Setting: Kole avatar + recap card (15 seconds on screen).
+Visuals: GFX recap_ch01
+
+[KOLE]
+Quick recap before we move on. Every job is a guest job. Notice, listen, follow through, make it easy. Basics first. Extras never replace basics.
+
+ON SCREEN: Recap card holds 6 seconds. Transition stinger to next chapter.
+
+
+======================================================================
+CHAPTER 2: READY FOR WORK  -  Dependable, presentable, respectful
+Time 07:12 to 12:55  (5.7 min)
+======================================================================
+
+ON SCREEN: Chapter card  ->  graphics/ch02_card.jpg  (5 seconds)
+
+----------------------------------------------------------------------
+SCENE: Show up ready
+----------------------------------------------------------------------
+Setting: Kole avatar walking-shot feel; checklist graphic.
+Visuals: GFX ch02_card | GFX ready_checklist
+
+[KOLE]
+Great service starts before you ever meet a guest. It starts with how you arrive.
+
+[KOLE]
+Be ready at your scheduled start time, following our timekeeping policy. And if you're going to be late or you can't make it, follow the call-in procedure right away. A text to your coworker is not a call-in. Your supervisor needs to hear it from you.
+
+ON SCREEN: On-screen policy box (FILL IN BEFORE PRODUCTION): Late/absence contact: [CONFIRM]. Time clock location: [CONFIRM].
+
+[KOLE]
+Use the employee entrance, the time clock, and the staff route. Never prop open a secured door, and never let someone you don't know follow you in. And one more thing: all required work, including shift handoffs, happens on the clock. Always.
+
+ON SCREEN: On-screen policy box (FILL IN): Employee entrance/exit: [CONFIRM]. Staff route and restricted areas: [CONFIRM].
+
+
+----------------------------------------------------------------------
+SCENE: Scene: 2:50 PM
+----------------------------------------------------------------------
+Setting: Hannah in her car in a parking garage, phone in hand, traffic outside. Clock graphic reads 2:50.
+Visuals: Car interior set | Clock overlay 2:50
+
+[HANNAH]
+(to herself) Shift starts at three... I'm at least fifteen minutes out. Okay, I'll just text Ana and ask her to cover for me.
+
+ON SCREEN: FREEZE FRAME. Red buzzer sound. On-screen: "What should Hannah do?"
+
+[KOLE]
+Pause right there. Texting a coworker feels easier, but it puts Ana in a tough spot and it doesn't reach the person who manages the schedule.
+
+ON SCREEN: REWIND effect. Hannah dials instead.
+
+[HANNAH]
+Hi, this is Hannah from banquets. I'm stuck in traffic on I-35 and I'll be about fifteen minutes late. I'm sorry. I'll be there by three-fifteen.
+
+[KOLE]
+That's it. Contact the designated supervisor promptly, give an honest arrival estimate, follow the procedure. Simple, respectful, done.
+
+
+----------------------------------------------------------------------
+SCENE: Look the part
+----------------------------------------------------------------------
+Setting: Locker room. Rosa and Hannah.
+Visuals: Locker room set | GFX uniform_standard
+
+ON SCREEN: Hannah looks at a coffee stain on her uniform shirt, shrugs, starts to close her locker.
+
+[ROSA]
+Mija, wait. What happened there?
+
+[HANNAH]
+Coffee. It's small. Nobody will notice.
+
+[ROSA]
+The guests notice everything. Come on, tell your supervisor and let's get you a clean one. Takes two minutes. Ándale.
+
+[KOLE]
+Rosa's right. Wear the correct uniform, clean, pressed, and fitting well, with your name badge and approved footwear. Hair, hands, and nails clean and maintained for your role. If you work around food, follow food safety rules. Go easy on the cologne and perfume.
+
+[KOLE]
+And if something's wrong with your uniform, don't hide it. Tell your supervisor and get an approved replacement. We apply our grooming standards and any approved accommodations the same way for everyone.
+
+ON SCREEN: On-screen policy box (FILL IN): Uniform, footwear, name badge, and grooming requirements by department: [CONFIRM].
+
+
+----------------------------------------------------------------------
+SCENE: Pre-shift huddle
+----------------------------------------------------------------------
+Setting: Back-of-house corridor, 2:58 PM. Rosa leads a quick housekeeping huddle. Mixed team.
+Visuals: BOH corridor set
+
+[ROSA]
+Okay, equipo, buenas tardes. Quick one. We have a full house tonight, a big wedding group on floors eight through ten.
+SUBTITLE: "equipo" = team. "buenas tardes" = good afternoon.
+
+[ROSA]
+Uniforms, badges, everybody looks sharp, good. Remember, if the elevators get busy, guests come first, we wait for the next one.
+
+[HANNAH]
+Rosa, I'm on banquets tonight, but I can help with turndown if you need it later.
+
+[ROSA]
+¡Eso es! That's what I like to hear. Gracias, Hannah. Okay, let's go.
+
+[KOLE]
+That's what a respectful team looks like. Ready on time, looking the part, offering help across departments. Nobody had to be asked twice.
+
+
+----------------------------------------------------------------------
+SCENE: Respect on the team
+----------------------------------------------------------------------
+Setting: Lobby. A guest is at the desk. Marcus and a coworker nearby.
+Visuals: P04 lobby | GFX respect_rules
+
+ON SCREEN: A guest waits at the desk. A coworker (background extra) mutters loudly enough to be heard:
+
+[EXTRA]
+Ugh. Housekeeping never gets anything right.
+
+ON SCREEN: The guest's eyebrows go up. Freeze frame.
+
+[KOLE]
+Ouch. What did that guest just learn about our hotel? Nothing good. Let's run it back.
+
+ON SCREEN: Rewind. Marcus steps in calmly.
+
+[MARCUS]
+(to coworker, quietly) Hey, let's take care of our guest first. We'll talk about it after. (to guest, warm) Sorry for the wait, sir. How can I help?
+
+[KOLE]
+Here's our team standard. Speak respectfully about coworkers, in front of guests and behind the scenes. No insults, no gossip, no eye-rolling, no discriminatory comments, no public blame. Offer help. Make clean handoffs. If you have a concern, bring it privately to your supervisor.
+
+[KOLE]
+Being dependable is one of the ways we show respect. Your coworkers should be able to count on you, and you should be able to count on them.
+
+
+----------------------------------------------------------------------
+SCENE: Chapter recap
+----------------------------------------------------------------------
+Setting: Kole avatar + recap card (15 seconds on screen).
+Visuals: GFX recap_ch02
+
+[KOLE]
+Quick recap before we move on. Call in to your supervisor, not a coworker. Clean uniform, badge, approved footwear. Disagree privately. Never in front of guests.
+
+ON SCREEN: Recap card holds 6 seconds. Transition stinger to next chapter.
+
+
+======================================================================
+CHAPTER 3: FIRST IMPRESSIONS  -  The greeting standard
+Time 12:55 to 17:39  (4.7 min)
+======================================================================
+
+ON SCREEN: Chapter card  ->  graphics/ch03_card.jpg  (5 seconds)
+
+----------------------------------------------------------------------
+SCENE: Why the greeting matters
+----------------------------------------------------------------------
+Setting: Kole avatar; P03 entry doors behind.
+Visuals: GFX ch03_card | P03 doors
+
+[KOLE]
+A guest decides how they feel about a hotel in the first few seconds. Before they see the room. Before they taste a drink at Oro. It's the greeting.
+
+[KOLE]
+A warm welcome is part of the job. A smile is part of our everyday welcome, a natural one, not a forced one. But read the moment: if someone's upset, hurt, or worried, a calm, caring expression is the right choice. And if smiling isn't comfortable for you, you can show warmth with your voice and your attention.
+
+
+----------------------------------------------------------------------
+SCENE: The three moves
+----------------------------------------------------------------------
+Setting: Animated graphic.
+Visuals: GFX greeting_three_moves
+
+[KOLE]
+Three moves. One: notice the guest. Pause a non-essential task, when it's safe to do so. Two: face them, with open posture and natural eye contact. Three: give a friendly greeting and a clear next step.
+
+[KOLE]
+Already helping someone? Acknowledge the next guest and let them know you'll be right with them. And never stop a safety-critical task to say hi.
+
+[KOLE]
+Use a guest's name when you know it and it's appropriate, but don't overdo it. And never, ever announce a room number or private information out loud.
+
+
+----------------------------------------------------------------------
+SCENE: Same words, different result
+----------------------------------------------------------------------
+Setting: Front desk. Ana. Side-by-side split screen.
+Visuals: Front desk set | Split screen
+
+ON SCREEN: LEFT SIDE: Ana looking down at her phone, flat voice.
+
+[ANA]
+Good afternoon. Welcome to the Emily Morgan. How may I help you.
+
+ON SCREEN: RIGHT SIDE: Ana sets the pen down, looks up, smiles naturally.
+
+[ANA]
+Good afternoon! Welcome to the Emily Morgan. How may I help you?
+
+[KOLE]
+Exact same words. Completely different feeling. Attention is the difference.
+
+
+----------------------------------------------------------------------
+SCENE: Round 1: Arrival with luggage
+----------------------------------------------------------------------
+Setting: Exterior canopy (P05). A family steps out of an SUV, looking uncertain.
+Visuals: P05 entrance
+
+[MARCUS]
+Good afternoon, and welcome! Are you checking in with us today?
+
+[GUEST (Sr. Trevino)]
+Sí... yes. Sorry, my English is not so good.
+
+[MARCUS]
+No problem at all. Would you prefer English or Spanish? ¿Prefiere inglés o español?
+
+[GUEST (Sr. Trevino)]
+Español, por favor.
+SUBTITLE: Spanish, please.
+
+[MARCUS]
+Perfect. One moment. Ana! (Ana steps out)
+
+[ANA]
+¡Bienvenidos al Emily Morgan! Me llamo Ana. Con gusto los ayudo con el registro. Marcus les sube el equipaje.
+SUBTITLE: Welcome to the Emily Morgan! My name is Ana. I'm happy to help you check in. Marcus will bring up your luggage.
+
+[GUEST (Sra. Trevino)]
+¡Qué amables! Gracias.
+SUBTITLE: How kind! Thank you.
+
+[KOLE]
+Notice what Marcus did. He didn't guess what language they spoke based on how they looked or sounded. He asked. Then he connected them with a teammate who could help. That's the standard: ask, don't assume, and use approved help when there's a language barrier.
+
+
+----------------------------------------------------------------------
+SCENE: Round 2: The hallway
+----------------------------------------------------------------------
+Setting: Guest-floor hallway. Rosa with her cart, pulled flush to the wall.
+Visuals: Hallway set | P09 suite glimpse through door
+
+ON SCREEN: A business traveler walks past, on the phone. Rosa pauses, steps aside, smiles, small nod.
+
+[ROSA]
+Good morning.
+
+ON SCREEN: Guest nods back, keeps walking. Ten seconds later a couple walks by, unhurried.
+
+[ROSA]
+Good morning! Enjoy your day in San Antonio.
+
+[KOLE]
+Every department shares the greeting standard. Front desk, housekeeping, engineering, food and beverage, everybody. Rosa matched each guest. Quick nod for the busy one, a little more for the couple taking their time.
+
+
+----------------------------------------------------------------------
+SCENE: Round 3: Two guests at once
+----------------------------------------------------------------------
+Setting: Front desk. Ana helping one guest; another approaches.
+Visuals: Front desk set
+
+[ANA]
+(making eye contact with the second guest) Hi there! I'll be with you as soon as I finish helping this guest.
+
+ON SCREEN: Second guest relaxes, nods. Ana finishes, turns.
+
+[ANA]
+Thank you so much for waiting. How can I help?
+
+[KOLE]
+Ten words, and that guest went from "am I invisible?" to "I'm next." Keep these ready.
+
+ON SCREEN: GFX greeting_phrases: "Good morning. Enjoy your day." / "Hello. May I help you find something?" / "I'll be with you as soon as I finish helping this guest."
+
+[KOLE]
+And one quick tip: don't guess a guest's title, relationship, or reason for visiting. "Is this your daughter?" can go very wrong. Keep it simple and friendly.
+
+
+----------------------------------------------------------------------
+SCENE: Chapter recap
+----------------------------------------------------------------------
+Setting: Kole avatar + recap card (15 seconds on screen).
+Visuals: GFX recap_ch03
+
+[KOLE]
+Quick recap before we move on. Notice, face, greet. Acknowledge the next guest. Ask language preference. Never assume.
+
+ON SCREEN: Recap card holds 6 seconds. Transition stinger to next chapter.
+
+
+======================================================================
+CHAPTER 4: WORDS THAT WORK  -  The phrase makeover
+Time 17:39 to 22:27  (4.8 min)
+======================================================================
+
+ON SCREEN: Chapter card  ->  graphics/ch04_card.jpg  (5 seconds)
+
+----------------------------------------------------------------------
+SCENE: Language basics
+----------------------------------------------------------------------
+Setting: Kole avatar.
+Visuals: GFX ch04_card
+
+[KOLE]
+Words matter. The same answer can make a guest feel helped or brushed off, depending on how you say it.
+
+[KOLE]
+Clear, respectful language. Calm volume. No profanity, no sarcasm, no confusing slang, no pet names like "honey" or "buddy," and no internal hotel jargon. Guests don't know what "OOO" or "the MOD" means. And listen all the way through before you answer.
+
+
+----------------------------------------------------------------------
+SCENE: Phrase Makeover (game segment)
+----------------------------------------------------------------------
+Setting: Game-show style. Bright stinger. Hannah plays contestant; Luis hosts from behind the Oro bar.
+Visuals: GFX makeover_title | GFX makeover_1..7 (one card per phrase) | Oro bar set
+
+[LUIS]
+Welcome to... PHRASE MAKEOVER! The show where bad phrases get a glow-up. Hannah, you ready?
+
+[HANNAH]
+Uh, I think so?
+
+[LUIS]
+Round one. A guest asks what time the River Walk boat tours stop running. You don't know. What do you NOT say?
+
+[HANNAH]
+"I don't know."
+
+[LUIS]
+And what do you say instead?
+
+[HANNAH]
+"Let me find out for you."
+
+ON SCREEN: Ding! Card flips: "I don't know." becomes "Let me find out for you."
+
+[LUIS]
+Round two. Guest asks you, the banquet server, about their parking charge.
+
+[HANNAH]
+Not "That's not my department." Instead: "Let me connect you with the right person and explain what you need, so you don't have to repeat yourself."
+
+[LUIS]
+¡Eso! Round three. Guest's room isn't ready.
+
+[HANNAH]
+Not "You have to wait." Instead: "I'm checking on that now. I'll update you in five minutes."
+
+[LUIS]
+Ah, but careful, contestant! Only use a time you can actually meet. If it's twenty minutes, say twenty.
+
+[LUIS]
+Round four. Guest is upset and raising their voice.
+
+[HANNAH]
+Never "Calm down." Try: "I can see this has been frustrating. Let me understand what happened."
+
+[LUIS]
+Round five, the classic. We're busy and the guest has waited.
+
+[HANNAH]
+Not "We're short-staffed." Instead: "I'm sorry for the delay. Here's what I can do right now."
+
+[LUIS]
+Round six. Guest asks for something we can't do.
+
+[HANNAH]
+Not "No, we can't." Instead: "That option isn't available, but let me check what alternatives we can offer."
+
+[LUIS]
+Final round. A request fell through the cracks on the last shift.
+
+[HANNAH]
+Not "They didn't tell me." Instead: "Thank you for explaining. I'll take it from here and confirm the next step."
+
+[LUIS]
+Seven for seven! Hannah, you're going home with... the satisfaction of excellent guest communication!
+
+[HANNAH]
+(laughing) I was hoping for a gift card.
+
+
+----------------------------------------------------------------------
+SCENE: Ownership words
+----------------------------------------------------------------------
+Setting: Kole avatar, all 7 cards on screen in a grid.
+Visuals: GFX makeover_grid
+
+[KOLE]
+Look at the right column. What do almost all of those phrases have in common? "Let me." "I'll." That's ownership language. You're telling the guest: I've got you.
+
+[KOLE]
+But here's the catch. Helpful words have to be followed by action. Never invent an answer, a repair time, an available room, a refund, or an amenity just to make the moment easier. A made-up answer becomes a broken promise later.
+
+
+----------------------------------------------------------------------
+SCENE: Phone and radio
+----------------------------------------------------------------------
+Setting: PBX/phone desk. Ana with headset.
+Visuals: Phone desk set | GFX phone_script
+
+[ANA]
+Thank you for calling the Emily Morgan, this is Ana. How may I help you?
+
+[CALLER (V.O.)]
+Hi, I need to talk to someone about a banquet invoice.
+
+[ANA]
+Of course. May I place you on a brief hold while I connect you with our events team?
+
+[CALLER (V.O.)]
+Sure.
+
+[ANA]
+Thank you. I'm transferring you to Catering Sales now. If we get disconnected, their direct line is [CONFIRM NUMBER].
+
+[KOLE]
+Answer with our name and yours. Ask permission before placing someone on hold. Tell them where you're transferring them. Follow our approved phone procedure.
+
+ON SCREEN: Cut to Jake on a radio in a service corridor.
+
+[JAKE]
+Engineering to front desk. Room 1-2-... uh, actually, front desk, can you call my phone?
+
+[KOLE]
+Nice catch, Jake. Keep radio messages brief and professional. Guests can sometimes hear them. Anything sensitive, like names, room numbers with names, or security details, moves to an approved private channel.
+
+
+----------------------------------------------------------------------
+SCENE: Chapter recap
+----------------------------------------------------------------------
+Setting: Kole avatar + recap card (15 seconds on screen).
+Visuals: GFX recap_ch04
+
+[KOLE]
+Quick recap before we move on. "Let me" and "I'll" = ownership. Only promise times you can meet. Hold, transfer and radio etiquette.
+
+ON SCREEN: Recap card holds 6 seconds. Transition stinger to next chapter.
+
+
+======================================================================
+CHAPTER 5: READ THE GUEST  -  Creating moments of delight
+Time 22:27 to 28:27  (6.0 min)
+======================================================================
+
+ON SCREEN: Chapter card  ->  graphics/ch05_card.jpg  (5 seconds)
+
+----------------------------------------------------------------------
+SCENE: Cues are clues, not proof
+----------------------------------------------------------------------
+Setting: Kole avatar.
+Visuals: GFX ch05_card | GFX notice_ask_offer_confirm
+
+[KOLE]
+Great hospitality professionals are great observers. But here's the important part: body language gives you clues, not proof.
+
+[KOLE]
+A guest looking around might need directions. Short answers might mean they want a quick interaction. But folded arms, silence, limited eye contact, or an accent? Those tell you nothing about someone's mood or ability. Don't assume. Ask a respectful question and let the guest tell you what they need.
+
+[KOLE]
+Here's the sequence. Notice a cue. Ask a useful question. Offer a relevant action. Confirm it helped. And if the guest says no thanks, respect that "no."
+
+[KOLE]
+One firm rule: never touch a guest, their belongings, or a mobility device without permission.
+
+
+----------------------------------------------------------------------
+SCENE: Cue 1: Lost on Alamo Plaza
+----------------------------------------------------------------------
+Setting: Exterior near the Alamo (P02). A couple looking from phone to street signs.
+Visuals: P02 Alamo
+
+[MARCUS]
+Hi folks, may I help you find your way?
+
+[GUEST (woman)]
+We're trying to get to the River Walk, but the map keeps spinning.
+
+[MARCUS]
+Happens to everybody. It's about a three-minute walk. Here, (pulls a hotel map card from his pocket and draws a line) straight down this way, and the stairs are right by the bridge. Want me to mark a good spot for lunch too?
+
+[GUEST (man)]
+That would be great.
+
+[KOLE]
+Confirm current directions, offer a clear written route, and the extra step came naturally because Marcus asked first.
+
+
+----------------------------------------------------------------------
+SCENE: Cue 2: The birthday
+----------------------------------------------------------------------
+Setting: Oro Restaurant & Bar. Luis behind the bar. A woman mentions a birthday, smiling.
+Visuals: Oro bar set
+
+[GUEST]
+It's my birthday today, actually. First time in San Antonio!
+
+[LUIS]
+Happy birthday! ¡Feliz cumpleaños! Would you enjoy a suggestion for celebrating while you're in town?
+
+[GUEST]
+Absolutely.
+
+[LUIS]
+If you like live music, the Pearl district is beautiful at night. And I'll let my team know it's your special day.
+
+[KOLE]
+Luis offered a personal recommendation, and he can arrange an approved note or gesture. Notice he didn't promise a free dessert he doesn't have authority to give. Personal, appropriate, within our authority.
+
+
+----------------------------------------------------------------------
+SCENE: Cue 3: The guest in a hurry
+----------------------------------------------------------------------
+Setting: Lobby (P04). A business traveler giving one-word answers, checking his watch.
+Visuals: P04 lobby
+
+[ANA]
+Good morning, Mr. Collins. Would you prefer the quickest option today?
+
+[GUEST (Mr. Collins)]
+Yes. Please.
+
+[ANA]
+You're all set. Key's in the sleeve, your receipt is going to your email. Valet is bringing the car now.
+
+ON SCREEN: Collins nods, actually smiles, leaves.
+
+[KOLE]
+Was Mr. Collins rude? No. He was busy. Ana didn't take it personally and she didn't force small talk. For him, the extra step was speed. Same values, very different delivery.
+
+
+----------------------------------------------------------------------
+SCENE: Cue 4: When the answer is no
+----------------------------------------------------------------------
+Setting: Lobby. A guest using a wheelchair is heading toward the elevator with a heavy tote on her lap. Jake walking by.
+Visuals: P04 lobby
+
+[JAKE]
+Good afternoon! Would you like a hand with that bag, or are you all set?
+
+[GUEST]
+I've got it, thank you. I do this every day.
+
+[JAKE]
+Sounds good. Have a great afternoon. (presses and holds the elevator door button, steps back)
+
+[KOLE]
+Jake offered. The guest said no. Jake respected it, completely, without making it awkward, and still found a small, helpful thing to do by holding the elevator. He never grabbed the bag or touched the chair. That's what respect for a guest's preference looks like.
+
+
+----------------------------------------------------------------------
+SCENE: Having fun with guests
+----------------------------------------------------------------------
+Setting: Kole avatar, playful music bed.
+Visuals: GFX fun_dos_donts
+
+[KOLE]
+Can we have fun with guests? Absolutely, we're in San Antonio! Follow the guest's lead. Light conversation about their trip, the Spurs, the food... that's often welcome. When their attention shifts or replies get shorter, wrap it up.
+
+[KOLE]
+Stay away from jokes about appearance, identity, politics, religion, money, or a service problem. Never flirt, tease, or pressure someone to join in.
+
+
+----------------------------------------------------------------------
+SCENE: Our building has stories
+----------------------------------------------------------------------
+Setting: Oro bar, evening lighting. Luis with a couple. P11 gothic details cut-ins.
+Visuals: P11 gothic detail | P01 tower at dusk | GFX legends_card
+
+[GUEST]
+Someone told us this place is haunted. Is that true?
+
+[LUIS]
+(grinning) Well... this building opened in 1924 as the Medical Arts Building. Doctors, a hospital, the whole thing. And if you look up at the outside you'll see carved gargoyles. Legend says some of them show the ailments the doctors treated, like a toothache or a broken bone.
+
+[GUEST]
+And the ghosts?
+
+[LUIS]
+Some guests say they've had experiences. I'll let you decide for yourself. There are a lot of fun legends about this place. I just tell them as legends.
+
+[KOLE]
+Perfect. Guests love the history and the stories of this building. Share a brief, approved anecdote if they ask. Present legends as legends. Don't invent history, don't scare children, and don't turn a quiet guest's stay into a ghost tour they didn't ask for.
+
+ON SCREEN: On-screen note for production: have the approved building history/legend talking points reviewed before final render.
+
+
+----------------------------------------------------------------------
+SCENE: What made it personal?
+----------------------------------------------------------------------
+Setting: Kole avatar.
+Visuals: GFX personal_three_checks
+
+[KOLE]
+So, what made each of those extra steps personal? Three things. It matched what the guest actually told us. It respected their preference. And it stayed within our authority.
+
+ON SCREEN: Graphic: MATCHED THEIR NEED / RESPECTED THEIR PREFERENCE / STAYED WITHIN OUR AUTHORITY.
+
+
+----------------------------------------------------------------------
+SCENE: Chapter recap
+----------------------------------------------------------------------
+Setting: Kole avatar + recap card (15 seconds on screen).
+Visuals: GFX recap_ch05
+
+[KOLE]
+Quick recap before we move on. Cues are clues, not proof. Notice, ask, offer, confirm. Legends are legends. Respect the "no".
+
+ON SCREEN: Recap card holds 6 seconds. Transition stinger to next chapter.
+
+
+======================================================================
+CHAPTER 6: WE ALL OWN IT  -  Cleanliness and safety
+Time 28:27 to 33:00  (4.5 min)
+======================================================================
+
+ON SCREEN: Chapter card  ->  graphics/ch06_card.jpg  (5 seconds)
+
+----------------------------------------------------------------------
+SCENE: If you see it, own it
+----------------------------------------------------------------------
+Setting: Kole avatar, P03 lobby doors.
+Visuals: GFX ch06_card | P03 lobby doors
+
+[KOLE]
+Here's a simple rule. If you see ordinary trash and it's safe to pick it up, pick it up. We all own the appearance of this hotel. Don't walk past a problem because another department usually handles it.
+
+[KOLE]
+But safety first. Use the right equipment and wash your hands. Never pick up needles, broken glass, unknown substances, or bodily waste with your bare hands. Protect the area and call the trained team. Never mix cleaning chemicals, and never try a task you haven't been trained on.
+
+
+----------------------------------------------------------------------
+SCENE: SPOT THE PROBLEM (interactive)
+----------------------------------------------------------------------
+Setting: Wide lobby shot, staged. 15-second on-screen timer. Viewers pause and count issues.
+Visuals: GFX spot_the_problem_title | Staged lobby wide shot | GFX timer_15
+
+[KOLE]
+Time for a challenge. You're walking through the lobby. I'm going to show you a scene for fifteen seconds. Count how many problems you can spot. Ready? Go.
+
+ON SCREEN: Staged scene: paper cup on a table; water puddle near the entrance; fingerprints on the brass front door; a bag blocking a walkway; a housekeeping cart blocking an exit; a wallet left on a chair; a guest waiting for directions while two employees argue nearby. 15-second countdown.
+
+[KOLE]
+Time! How many did you get? There were seven. Let's go through them, in the right order.
+
+
+----------------------------------------------------------------------
+SCENE: The answers, in priority order
+----------------------------------------------------------------------
+Setting: Each problem circled in gold as Kole explains.
+Visuals: GFX spot_answers
+
+[KOLE]
+Safety first. The water by the entrance and the cart blocking the exit. Address immediate safety. Protect the area, get help, keep emergency routes clear. Don't leave a slip hazard unguarded while you go find a mop if someone could get hurt.
+
+ON SCREEN: Rosa places a wet-floor sign and radios for help while staying with the spill. Jake moves the cart.
+
+[ROSA]
+(on radio) Housekeeping, I need a mop at the main entrance, please. I'm staying with it.
+
+[KOLE]
+Next, the cup and the fingerprints. Make sure the cup isn't still in use, then remove it. Clean the door with approved methods, or let the responsible person know.
+
+[KOLE]
+Now the bag and the wallet. Belongings are never trash. If the bag's owner is nearby, ask them politely to move it. If it's unattended, follow hotel security procedures. The wallet goes through our lost and found process. Secure it, document it.
+
+ON SCREEN: On-screen policy box (FILL IN): Lost & found and unattended item procedure: [CONFIRM].
+
+[KOLE]
+And the guest waiting while two employees argue? Acknowledge the guest, offer help, and take the employee disagreement somewhere private.
+
+[KOLE]
+So ask yourself: what can I fix safely myself, and what needs trained help? Ownership means taking the right next action and making sure someone follows through.
+
+
+----------------------------------------------------------------------
+SCENE: Report it and confirm it
+----------------------------------------------------------------------
+Setting: Guest corridor. Hannah notices a flickering hallway light and a loose handrail by the stairwell.
+Visuals: Corridor set
+
+[HANNAH]
+(to camera, a little unsure) The light's flickering, and this rail is loose. That's not my department... but somebody could get hurt.
+
+ON SCREEN: She pulls out the request tool / calls engineering.
+
+[HANNAH]
+Hi Jake, it's Hannah. Tenth floor, by the east stairwell, the handrail is loose and a light is flickering. I'm going to stay near it until someone's here.
+
+[JAKE]
+Got it, thanks Hannah. I'll be up in ten, and I'll put it in the work order system.
+
+[KOLE]
+Hannah didn't try to fix the rail herself. She reported the defect, made sure a real person owned it, and confirmed the next step. That's ownership. Report it, and make sure it landed.
+
+
+----------------------------------------------------------------------
+SCENE: Rosa's tip
+----------------------------------------------------------------------
+Setting: Housekeeping office, talking head.
+Visuals: Housekeeping office set
+
+[ROSA]
+I tell my team: el hotel es nuestra casa. The hotel is our house. You wouldn't walk past trash in your own living room. Same thing here. But you also wouldn't pick up broken glass with your hands at home, ¿verdad? Use your head. Get the right tools.
+SUBTITLE: "El hotel es nuestra casa" = The hotel is our house. "¿verdad?" = right?
+
+
+----------------------------------------------------------------------
+SCENE: Chapter recap
+----------------------------------------------------------------------
+Setting: Kole avatar + recap card (15 seconds on screen).
+Visuals: GFX recap_ch06
+
+[KOLE]
+Quick recap before we move on. Safety first. Belongings are never trash. Report it and confirm someone owns it.
+
+ON SCREEN: Recap card holds 6 seconds. Transition stinger to next chapter.
+
+
+======================================================================
+CHAPTER 7: WHEN THINGS GO WRONG  -  Problem solving with ownership
+Time 33:00 to 41:53  (8.9 min)
+======================================================================
+
+ON SCREEN: Chapter card  ->  graphics/ch07_card.jpg  (5 seconds)
+
+----------------------------------------------------------------------
+SCENE: The 5 Steps of Ownership
+----------------------------------------------------------------------
+Setting: Kole avatar with animated stair-step graphic.
+Visuals: GFX ch07_card | GFX five_steps
+
+[KOLE]
+Things will go wrong. Rooms get cold. Cars get delayed. Requests get missed. What guests remember most is not the problem. It's how we handled it.
+
+[KOLE]
+Five steps. One: Listen. Let the guest finish, and understand how it affected them. Two: Acknowledge and apologize. "I'm sorry your room is uncomfortable." Three: Act. Ask what would help, explain realistic options, and work within your authority.
+
+[KOLE]
+Four: Hand off clearly. Give the next person the issue and the agreed action, so the guest never has to start over. Five: Follow through. Record the request, agree on a specific update time, and check that the solution actually worked.
+
+[KOLE]
+Now listen closely. An update time is a promise to communicate. It is not a promise that the repair will be finished. If it's not fixed when the time comes, you update the guest anyway, and you escalate.
+
+[KOLE]
+And if there's immediate danger, an injury, a threat, or a security concern, follow emergency procedures and get help right away. You never have to tolerate abuse or handle a threat alone.
+
+ON SCREEN: On-screen policy box (FILL IN): Manager on duty contact: [CONFIRM]. Request tracking tool and escalation: [CONFIRM]. Employee remedy authority/limits: [CONFIRM].
+
+
+----------------------------------------------------------------------
+SCENE: Blooper reel: How NOT to do it
+----------------------------------------------------------------------
+Setting: Same cold-room setup, played for laughs. Record-scratch sound effects, red X graphics after each line.
+Visuals: GFX red_x | Front desk set
+
+ON SCREEN: Alternate-universe Ana ("Bad Ana"), slouching, chewing gum.
+
+[ANA]
+(Bad Ana) Cold? Huh. It's probably fine. Did you try the thermostat?
+
+ON SCREEN: Record scratch. Red X: MINIMIZING.
+
+[ANA]
+(Bad Ana) Yeah, the night shift never logs anything. Not my fault.
+
+ON SCREEN: Red X: BLAMING.
+
+[ANA]
+(Bad Ana) Tell you what, I'll comp your whole stay and get you a suite. Engineering will have it fixed in ten minutes, guaranteed.
+
+ON SCREEN: Red X: PROMISES WE CAN'T KEEP.
+
+[ANA]
+(Bad Ana) Or I could find you a space heater from the storage room...
+
+ON SCREEN: Siren sound. Red X: SAFETY RISK. Real Ana walks into frame, shakes her head, laughs.
+
+[ANA]
+(Real Ana) Okay, okay. Let's do this the right way.
+
+[KOLE]
+We laugh, but every one of those has happened at some hotel somewhere. Minimizing, blaming, promising what you can't deliver, improvising unsafe fixes. Let's see the right way.
+
+
+----------------------------------------------------------------------
+SCENE: Role play 1: The cold room
+----------------------------------------------------------------------
+Setting: Front desk, late evening. Guest (Ms. Patterson) is tired and frustrated. Ana at the desk.
+Visuals: GFX roleplay_1 | P07 room | Front desk set
+
+[GUEST (Ms. Patterson)]
+My room is freezing. I already called once and nobody came. I'm exhausted and I just want to sleep.
+
+ON SCREEN: Freeze. On-screen: WHAT WOULD YOU SAY? (5-second pause). Then play.
+
+[ANA]
+I'm so sorry, Ms. Patterson. You called once already and you're still cold. That's not okay, especially when you just want to rest. Can I ask, is the issue the thermostat, or does it feel like the air isn't working at all?
+
+[GUEST (Ms. Patterson)]
+It's blowing cold no matter what I set it to.
+
+[ANA]
+Thank you, that helps. I'm calling engineering and our manager on duty right now to check the options, including whether another room is available. I'll update you in five minutes, even if I'm still waiting on an answer.
+
+ON SCREEN: Ana picks up phone. Cut to Jake receiving the call.
+
+[ANA]
+Jake, room [####], heat stuck on cold. Guest already called once, she's tired and wants to rest. Can you get eyes on it, and let me know your ETA in the next five?
+
+[JAKE]
+Heading up now. I'll call you from the room.
+
+ON SCREEN: Five minutes later. Ana walks to the guest, who's waiting in the lobby lounge.
+
+[ANA]
+Ms. Patterson, quick update. Jake from engineering is in your room now, and our manager is confirming a room that's ready, in case you'd rather move. Which would you prefer?
+
+[KOLE]
+Did you catch what Ana did NOT do? She didn't minimize it. She didn't blame the last shift. She didn't promise a repair time, a room move, or a credit she couldn't authorize. And she never suggested an improvised fix like a space heater. She owned it, handed it off clearly, and came back when she said she would.
+
+[KOLE]
+One more thing. Ana logs it in our tracking system. Repeated problems get recorded so management can fix the cause, not just tonight's complaint.
+
+
+----------------------------------------------------------------------
+SCENE: Role play 2: Late for dinner
+----------------------------------------------------------------------
+Setting: Valet podium (P05), evening. A couple, dressed up, checking the time.
+Visuals: GFX roleplay_2 | P05 entrance
+
+[GUEST (man)]
+We've been waiting for our car for twenty minutes. Our reservation's in fifteen. We're going to miss it.
+
+[MARCUS]
+I'm sorry about the wait, sir. Let me check right now exactly where your car is.
+
+ON SCREEN: Marcus radios the garage.
+
+[MARCUS]
+(radio) Podium to garage, status on ticket 4-1-8? (listens) Okay, thank you.
+
+[MARCUS]
+Here's what I know: your car is being pulled now, they're on the second level. I don't want to give you a guess, so I'll update you again in three minutes either way. In the meantime, would you like me to help you call the restaurant and let them know you're running a few minutes behind?
+
+[GUEST (woman)]
+Yes, that would help a lot.
+
+[KOLE]
+Marcus apologized, confirmed real status, and gave an honest update commitment. He didn't invent an arrival time, and he didn't promise the restaurant would hold the table. With their permission, he helped them call. And he stays with them until they have a clear next step.
+
+
+----------------------------------------------------------------------
+SCENE: Role play 3: The towels and the birthday
+----------------------------------------------------------------------
+Setting: Phone desk. Ana takes a call. Split screen with a guest in room P09, getting ready.
+Visuals: GFX roleplay_3 | P09 suite | Split screen
+
+[GUEST (Mrs. Harper, V.O.)]
+Hi, we asked for extra towels an hour ago. We're trying to get ready for my daughter's birthday dinner.
+
+[ANA]
+I'm sorry, Mrs. Harper, you should have had those already. How many towels do you need?
+
+[GUEST (Mrs. Harper)]
+Three. Just quickly and quietly, please.
+
+[ANA]
+Three bath towels, quick and quiet. I'm sending them with Rosa's team right now and I'll call you back to confirm they arrived. And happy birthday to your daughter!
+
+ON SCREEN: Ana can't leave the desk. She calls Rosa.
+
+[ANA]
+Rosa, room [####] needs three bath towels, priority. It's the second request. Can you confirm when they're delivered?
+
+[ROSA]
+Ya voy. On my way. Five minutes.
+SUBTITLE: "Ya voy" = I'm on my way.
+
+ON SCREEN: Rosa delivers, knocks softly, hands towels with a quick smile, "Happy birthday to your daughter." Leaves. Ana calls back.
+
+[ANA]
+Mrs. Harper, did the towels arrive? Is there anything else you need before dinner?
+
+[KOLE]
+The essential request came first. A brief birthday wish matched what the guest wanted: quiet and quick, not a parade. A note or a gesture can be a lovely extra, but it never replaces the towels.
+
+
+----------------------------------------------------------------------
+SCENE: Debrief
+----------------------------------------------------------------------
+Setting: Kole avatar.
+Visuals: GFX five_steps (recap)
+
+[KOLE]
+In all three stories, the employee couldn't fix everything personally. What did they say? "Let me check." "I'll update you by." "Here's what I know." And they avoided promising anything they couldn't keep.
+
+[KOLE]
+Remember: a handoff isn't complete until the next person accepts responsibility. Ana didn't just send a message into the void. She got a "heading up now" and a "ya voy."
+
+
+----------------------------------------------------------------------
+SCENE: Chapter recap
+----------------------------------------------------------------------
+Setting: Kole avatar + recap card (15 seconds on screen).
+Visuals: GFX recap_ch07
+
+[KOLE]
+Quick recap before we move on. Listen, acknowledge, act, hand off, follow through. Update on time, even without an answer. Never promise without authority.
+
+ON SCREEN: Recap card holds 6 seconds. Transition stinger to next chapter.
+
+
+======================================================================
+CHAPTER 8: KNOWLEDGE CHECK  -  The Alamo City Quiz
+Time 41:53 to 43:24  (1.5 min)
+======================================================================
+
+ON SCREEN: Chapter card  ->  graphics/ch08_card.jpg  (5 seconds)
+
+----------------------------------------------------------------------
+SCENE: Quiz show
+----------------------------------------------------------------------
+Setting: Game-show graphics. Luis hosts again. Each question shows a 5-second countdown. Tell viewers to pause if they need more time.
+Visuals: GFX quiz_title | GFX quiz_1..5
+
+[LUIS]
+¡Bienvenidos a THE ALAMO CITY QUIZ! Five questions. Answer out loud or in your head. Pause the video if you need a minute. ¿Listos? Ready?
+SUBTITLE: "¿Listos?" = Ready?
+
+[LUIS]
+Question one. You realize you'll be late for your shift. What must you do?
+
+ON SCREEN: 5-second timer. Answer reveal.
+
+[KOLE]
+Follow the call-in procedure promptly, and give your supervisor an honest arrival estimate.
+
+[LUIS]
+Question two. A guest asks you something outside your department.
+
+[KOLE]
+Offer to find the answer or connect them with the right person, and confirm someone owns it.
+
+[LUIS]
+Question three. A guest gives short answers and keeps looking at the time. Are they being rude?
+
+[KOLE]
+No. Don't assume. Ask if they'd prefer the quickest option, and respect their preference.
+
+[LUIS]
+Question four. Broken glass in a walkway. First move?
+
+[KOLE]
+Protect the area and contact trained help with the proper equipment. Never use bare hands.
+
+[LUIS]
+Final question. The update time you promised arrives, but the problem isn't fixed.
+
+[KOLE]
+Update the guest on time anyway. Explain what you know, escalate if needed, and agree on the next contact.
+
+[LUIS]
+Five for five? ¡Felicidades! You're ready.
+SUBTITLE: "¡Felicidades!" = Congratulations!
+
+
+======================================================================
+CHAPTER 9: THE EMILY MORGAN WAY  -  My next-shift commitment
+Time 43:24 to 45:27  (2.1 min)
+======================================================================
+
+ON SCREEN: Chapter card  ->  graphics/ch09_card.jpg  (5 seconds)
+
+----------------------------------------------------------------------
+SCENE: Seven every-shift standards
+----------------------------------------------------------------------
+Setting: Kole avatar + animated list.
+Visuals: GFX ch09_card | GFX seven_standards
+
+[KOLE]
+Let's bring it home. Every shift, the Emily Morgan way: Be dependable. Be presentable. Be welcoming. Be respectful. Be observant. Be helpful. Be responsible.
+
+
+----------------------------------------------------------------------
+SCENE: Your commitment
+----------------------------------------------------------------------
+Setting: Kole avatar, P01 sunset behind.
+Visuals: GFX commitment_card | P01 tower at sunset
+
+[KOLE]
+Now I want you to pick one. Just one behavior you'll practice on your very next shift. Maybe it's greeting every guest in the hallway. Maybe it's replacing "I don't know" with "Let me find out." Maybe it's coming back exactly when you said you would. Write it on your handout, and tell a teammate.
+
+ON SCREEN: Cast quick-cuts, each saying their commitment:
+
+[HANNAH]
+I'm going to stop saying "no problem" and start saying "I'll take care of it."
+
+[MARCUS]
+Learning five returning guests' names this week.
+
+[ROSA]
+Saludar a cada huésped en el pasillo. Every guest in the hallway gets a greeting.
+SUBTITLE: Greet every guest in the hallway.
+
+[JAKE]
+When I fix something, I call the front desk so they can tell the guest.
+
+[ANA]
+Coming back on time, every time. Even if I don't have the answer yet.
+
+[LUIS]
+Recommending one hidden gem in San Antonio to every guest who asks.
+
+[KOLE]
+Our guests should feel that we're glad they chose us. That starts with being ready, treating one another well, noticing what needs attention, and doing what we say we will do.
+
+[KOLE]
+Thank you for taking care of our guests, and thank you for taking care of each other. Muchas gracias, equipo. Now let's put one of these into practice on our very next shift.
+
+ON SCREEN: Music swells. Drone shot (P01) pulls back. End card: THE EMILY MORGAN HOTEL logo. "Thank you for making every guest feel welcome." Hold 5 seconds.
+
+
+======================================================================
+PHOTO KEY
+======================================================================
+P01  01_exterior_drone_sunset.jpg  -  Aerial: tower and Texas flag at sunset
+P02  02_alamo_with_hotel_tower.jpg  -  The Alamo facade with the hotel tower behind it
+P03  03_lobby_entry_doors.jpg  -  Lobby entry doors, brass, red welcome mats
+P04  04_lobby_business_center.jpg  -  Lobby lounge and business center
+P05  05_main_entrance_valet.jpg  -  Main entrance canopy, 705, valet podium
+P06  06_kole_siefken_headshot.jpg  -  Kole Siefken - GM (avatar reference only)
+P07  07_king_room_arched_windows.jpg  -  King room with arched windows
+P08  08_double_room_tower_view.jpg  -  Room with desk and tower view
+P09  09_suite_bedroom.jpg  -  Suite bedroom with chaise
+P10  10_logo.jpg  -  The Emily Morgan Hotel logo
+P11  11_gothic_facade_detail.jpg  -  Gothic terra-cotta facade detail
+P12  12_meeting_room_detail.jpg  -  Meeting room table set
+
+Estimated total runtime: 45.5 minutes
